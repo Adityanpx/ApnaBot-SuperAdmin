@@ -1,4 +1,5 @@
 // components/shops/ShopSubscriptionCard.jsx
+import React from 'react';
 import Badge from '@/components/ui/Badge';
 import {
   formatDate,
@@ -21,7 +22,7 @@ function FeatureRow({ icon, label, value, enabled }) {
   return (
     <div className="flex items-center justify-between py-2.5 border-b border-border-subtle last:border-0">
       <div className="flex items-center gap-2.5">
-        <span className="text-text-tertiary">{icon}</span>
+        {React.isValidElement(icon) ? icon : (icon && React.createElement(icon, { className: 'w-4 h-4 text-text-tertiary' }))}
         <span className="text-sm text-text-secondary">{label}</span>
       </div>
       <span className={`text-sm font-semibold ${enabled === false ? 'text-text-disabled' : 'text-text-primary'}`}>

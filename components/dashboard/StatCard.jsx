@@ -1,6 +1,7 @@
 // components/dashboard/StatCard.jsx
 'use client';
 
+import React from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { SkeletonStatCard } from '@/components/ui/Skeleton';
@@ -52,7 +53,7 @@ export default function StatCard({
         </p>
 
         {/* Icon box */}
-        {icon && typeof icon === 'object' && '$typeof' in icon ? (
+        {icon && React.isValidElement(icon) ? (
           <div className={cn(
             'w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0',
             'transition-transform duration-200 group-hover:scale-110',

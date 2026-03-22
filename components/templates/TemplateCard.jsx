@@ -139,9 +139,9 @@ function StatPill({ icon: Icon, label, value }) {
 
 function ReplyTypeDot({ type }) {
   const colors = {
-    text:            'bg-info-DEFAULT',
-    booking_trigger: 'bg-warning-DEFAULT',
-    payment_link:    'bg-success-DEFAULT',
+    text:            'bg-info',
+    booking_trigger: 'bg-warning',
+    payment_link:    'bg-success',
   };
   return (
     <span className={`

@@ -19,10 +19,11 @@ import {
 
 function InfoRow({ icon, label, value }) {
   if (!value) return null;
+  const IconComponent = icon;
   return (
     <div className="flex items-start gap-3 py-3 border-b border-border-subtle last:border-0">
       <div className="w-8 h-8 rounded-lg bg-bg-subtle flex items-center justify-center flex-shrink-0 mt-0.5">
-        <span className="text-text-tertiary w-4 h-4">{icon}</span>
+        {IconComponent && <IconComponent className="w-4 h-4 text-text-tertiary" />}
       </div>
       <div className="min-w-0">
         <p className="text-xs text-text-tertiary font-medium">{label}</p>

@@ -27,9 +27,9 @@ export default function TemplatesPage() {
 
       {/* Legend */}
       <div className="flex flex-wrap items-center gap-4 text-xs text-text-tertiary">
-        <LegendItem color="bg-info-DEFAULT"    label="Text reply" />
-        <LegendItem color="bg-warning-DEFAULT" label="Booking trigger" />
-        <LegendItem color="bg-success-DEFAULT" label="Payment link" />
+        <LegendItem color="bg-info"    label="Text reply" />
+        <LegendItem color="bg-warning" label="Booking trigger" />
+        <LegendItem color="bg-success" label="Payment link" />
         <span className="text-text-disabled">|</span>
         <span>
           <span className="text-info-text font-semibold">*</span> = required booking field

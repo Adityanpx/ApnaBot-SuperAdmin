@@ -96,17 +96,17 @@ const Button = forwardRef(function Button(
         <Loader2 className="w-4 h-4 animate-spin flex-shrink-0" />
       ) : icon ? (
         <span className="flex-shrink-0">
-          {typeof icon === 'object' && icon !== null ? icon : (
-            typeof icon === 'function' ? React.createElement(icon) : icon
-          )}
+          {React.isValidElement(icon) ? React.cloneElement(icon, { className: cn(icon.props.className, 'w-4 h-4') }) : 
+           typeof icon === 'function' ? React.createElement(icon, { className: 'w-4 h-4' }) : 
+           icon}
         </span>
       ) : null}
       {children}
       {iconRight && !loading && (
         <span className="flex-shrink-0">
-          {typeof iconRight === 'object' && iconRight !== null ? iconRight : (
-            typeof iconRight === 'function' ? React.createElement(iconRight) : iconRight
-          )}
+          {React.isValidElement(iconRight) ? React.cloneElement(iconRight, { className: cn(iconRight.props.className, 'w-4 h-4') }) : 
+           typeof iconRight === 'function' ? React.createElement(iconRight, { className: 'w-4 h-4' }) : 
+           iconRight}
         </span>
       )}
     </motion.button>

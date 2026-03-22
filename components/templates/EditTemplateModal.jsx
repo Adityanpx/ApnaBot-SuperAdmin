@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import { MessageSquare, ClipboardList } from 'lucide-react';
 import Modal   from '@/components/ui/Modal';
@@ -157,9 +157,9 @@ export default function EditTemplateModal({ open, onClose, template, onSuccess }
       </div>
 
       {/* Tab content */}
-      <AnimatedTab>
+      <AnimatedTab tabKey={activeTab}>
         {activeTab === 'rules' ? (
-          <RuleEditor  rules={rules}   onChange={setRules} />
+          <RuleEditor rules={rules} onChange={setRules} />
         ) : (
           <FieldEditor fields={fields} onChange={setFields} />
         )}
@@ -169,15 +169,18 @@ export default function EditTemplateModal({ open, onClose, template, onSuccess }
 }
 
 // Simple wrapper that animates when content switches
-function AnimatedTab({ children }) {
+function AnimatedTab({ children, tabKey }) {
   return (
-    <motion.div
-      key={children.type?.displayName || Math.random()}
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.2 }}
-    >
-      {children}
-    </motion.div>
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={tabKey}
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -4 }}
+        transition={{ duration: 0.18 }}
+      >
+        {children}
+      </motion.div>
+    </AnimatePresence>
   );
 }

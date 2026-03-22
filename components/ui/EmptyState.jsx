@@ -1,4 +1,6 @@
+import React from 'react';
 import { cn } from '@/lib/utils';
+import Button from './Button';
 
 /**
  * Renders icon properly whether passed as component or element
@@ -6,9 +8,9 @@ import { cn } from '@/lib/utils';
 function renderIcon(icon) {
   if (!icon) return null;
   
-  // If it's a React element (has $typeof), render it directly
-  if (icon && typeof icon === 'object' && '$typeof' in icon) {
-    return icon;
+  // If it's a React element, clone it with proper className
+  if (React.isValidElement(icon)) {
+    return React.cloneElement(icon, { className: cn(icon.props.className, 'w-6 h-6') });
   }
   
   // If it's a function (component), try to render it
@@ -42,7 +44,15 @@ export default function EmptyState({ icon, title, description, action, className
       {description && (
         <p className="text-sm text-text-tertiary max-w-xs leading-relaxed">{description}</p>
       )}
-      {action && <div className="mt-6">{action}</div>}
+      {action && (
+        <div className="mt-6">
+          {typeof action === 'object' && action.label && action.onClick ? (
+            <Button onClick={action.onClick}>
+              {action.label}
+            </Button>
+          ) : null}
+        </div>
+      )}
     </div>
   );
 }
