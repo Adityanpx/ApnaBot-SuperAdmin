@@ -1,6 +1,6 @@
 'use client';
 
-import { forwardRef } from 'react';
+import React, { forwardRef } from 'react';
 import { motion } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -95,11 +95,19 @@ const Button = forwardRef(function Button(
       {loading ? (
         <Loader2 className="w-4 h-4 animate-spin flex-shrink-0" />
       ) : icon ? (
-        <span className="flex-shrink-0">{icon}</span>
+        <span className="flex-shrink-0">
+          {typeof icon === 'object' && icon !== null ? icon : (
+            typeof icon === 'function' ? React.createElement(icon) : icon
+          )}
+        </span>
       ) : null}
       {children}
       {iconRight && !loading && (
-        <span className="flex-shrink-0">{iconRight}</span>
+        <span className="flex-shrink-0">
+          {typeof iconRight === 'object' && iconRight !== null ? iconRight : (
+            typeof iconRight === 'function' ? React.createElement(iconRight) : iconRight
+          )}
+        </span>
       )}
     </motion.button>
   );

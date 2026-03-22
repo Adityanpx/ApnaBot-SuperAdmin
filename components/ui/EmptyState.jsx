@@ -1,5 +1,26 @@
 import { cn } from '@/lib/utils';
 
+/**
+ * Renders icon properly whether passed as component or element
+ */
+function renderIcon(icon) {
+  if (!icon) return null;
+  
+  // If it's a React element (has $typeof), render it directly
+  if (icon && typeof icon === 'object' && '$typeof' in icon) {
+    return icon;
+  }
+  
+  // If it's a function (component), try to render it
+  if (typeof icon === 'function') {
+    const IconComponent = icon;
+    return <IconComponent className="w-6 h-6" />;
+  }
+  
+  // Otherwise, render as text
+  return icon;
+}
+
 export default function EmptyState({ icon, title, description, action, className }) {
   return (
     <div className={cn(
@@ -14,7 +35,7 @@ export default function EmptyState({ icon, title, description, action, className
           text-text-tertiary mb-5
           text-2xl
         ">
-          {icon}
+          {renderIcon(icon)}
         </div>
       )}
       <h3 className="text-base font-semibold text-text-primary mb-2">{title}</h3>
