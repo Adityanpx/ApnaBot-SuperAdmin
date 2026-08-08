@@ -130,6 +130,12 @@ module.exports = {
         'sidebar-c': '72px',
       },
 
+      // ── Sidebar spacing (for pl-sidebar / pr-sidebar / etc.) ───────
+      spacing: {
+        sidebar:    '260px',
+        'sidebar-c': '72px',
+      },
+
       // ── Animations ────────────────────────────────────────────────
       keyframes: {
         fadeInUp: {

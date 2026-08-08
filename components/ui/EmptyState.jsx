@@ -13,8 +13,8 @@ function renderIcon(icon) {
     return React.cloneElement(icon, { className: cn(icon.props.className, 'w-6 h-6') });
   }
   
-  // If it's a function (component), try to render it
-  if (typeof icon === 'function') {
+  // If it's a function or forwardRef object (component), try to render it
+  if (typeof icon === 'function' || typeof icon === 'object') {
     const IconComponent = icon;
     return <IconComponent className="w-6 h-6" />;
   }
