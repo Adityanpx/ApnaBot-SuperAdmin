@@ -84,7 +84,7 @@ export default function EditTemplateModal({ open, onClose, template, onSuccess }
         bookingFields: cleanFields,
       });
 
-      toast.success(`Template updated: ${capitalize(template.businessType)}`);
+      toast.success(`Template updated: ${capitalize(template.businessCategory)}`);
       onSuccess?.();
     } catch (err) {
       toast.error(err.userMessage || 'Failed to save template');
@@ -95,7 +95,7 @@ export default function EditTemplateModal({ open, onClose, template, onSuccess }
 
   if (!template) return null;
 
-  const emoji = getBusinessEmoji(template.businessType);
+  const emoji = getBusinessEmoji(template.businessCategory);
 
   return (
     <Modal
@@ -105,7 +105,7 @@ export default function EditTemplateModal({ open, onClose, template, onSuccess }
       title={
         <span className="flex items-center gap-2">
           <span className="text-xl">{emoji}</span>
-          {capitalize(template.businessType)} Template
+          {capitalize(template.businessCategory)} Template
         </span>
       }
       subtitle="Changes apply to new shops only — existing shops keep their current rules"

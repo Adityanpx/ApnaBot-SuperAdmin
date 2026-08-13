@@ -43,14 +43,14 @@ export default function ShopDetailCard({ shop, staffCount }) {
           <div className="flex items-center gap-4">
             {/* Business type emoji avatar */}
             <div className="w-14 h-14 rounded-2xl bg-bg-subtle flex items-center justify-center text-3xl flex-shrink-0">
-              {getBusinessEmoji(shop.businessType)}
+              {getBusinessEmoji(shop.businessCategory)}
             </div>
             <div>
               <h2 className="text-xl font-bold text-text-primary leading-tight">
                 {shop.name}
               </h2>
               <p className="text-sm text-text-secondary mt-1">
-                {capitalize(shop.businessType)}{shop.city ? ` · ${shop.city}` : ''}
+                {capitalize(shop.businessCategory)}{shop.city ? ` · ${shop.city}` : ''}
               </p>
               <p className="text-xs text-text-tertiary mt-1">
                 Joined {formatDate(shop.createdAt)}

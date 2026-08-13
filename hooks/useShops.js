@@ -25,7 +25,7 @@ export function useShops() {
       const params = { page, limit };
       if (search)       params.search       = search;
       if (isActive)     params.isActive     = isActive;
-      if (businessType) params.businessType = businessType;
+      if (businessType) params.businessCategory = businessType;
 
       const res = await api.get(API.SHOPS, { params });
       setShops(res.data.data.shops);

@@ -10,7 +10,7 @@ import { toast } from 'sonner';
 const DUMMY_TEMPLATES = [
   {
     _id: '1',
-    businessType: 'tailor',
+    businessCategory: 'tailor',
     defaultRules: [
       { keyword: 'hello', reply: 'Welcome to our tailor shop!', replyType: 'text' },
       { keyword: 'price', reply: 'Our starting price is ₹500', replyType: 'text' },
@@ -22,7 +22,7 @@ const DUMMY_TEMPLATES = [
   },
   {
     _id: '2',
-    businessType: 'salon',
+    businessCategory: 'salon',
     defaultRules: [
       { keyword: 'hi', reply: 'Welcome to our salon!', replyType: 'text' },
     ],

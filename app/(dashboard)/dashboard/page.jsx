@@ -1,8 +1,9 @@
 // app/(dashboard)/dashboard/page.jsx
 'use client';
 
-import { useEffect } from 'react';
+import { useMemo } from 'react';
 import { motion } from 'framer-motion';
+import { Store, CheckCircle2, PauseCircle } from 'lucide-react';
 import { useStats } from '@/hooks/useStats';
 import StatsGrid from '@/components/dashboard/StatsGrid';
 import RevenueChart from '@/components/dashboard/RevenueChart';
@@ -15,6 +16,34 @@ export default function DashboardPage() {
     revenuePeriod,
     changeRevenuePeriod,
   } = useStats();
+
+  // Platform stats come back as totalBusinesses/activeBusinesses/inactiveBusinesses —
+  // map to the card shape StatsGrid expects
+  const statsCards = useMemo(() => {
+    if (!stats) return null;
+    return [
+      {
+        key: 'total',
+        title: 'Total Businesses',
+        value: stats.totalBusinesses,
+        icon: <Store className="w-5 h-5" />,
+      },
+      {
+        key: 'active',
+        title: 'Active Businesses',
+        value: stats.activeBusinesses,
+        icon: <CheckCircle2 className="w-5 h-5" />,
+        changeType: 'positive',
+      },
+      {
+        key: 'inactive',
+        title: 'Inactive Businesses',
+        value: stats.inactiveBusinesses,
+        icon: <PauseCircle className="w-5 h-5" />,
+        changeType: 'negative',
+      },
+    ];
+  }, [stats]);
 
   return (
     <motion.div
@@ -36,7 +65,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Stats grid */}
-      <StatsGrid stats={stats} loading={loading} />
+      <StatsGrid stats={statsCards} loading={loading} />
 
       {/* Revenue chart */}
       <RevenueChart

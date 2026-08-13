@@ -85,7 +85,7 @@ export default function ShopTable({ shops, loading, onToggle }) {
                       w-9 h-9 rounded-xl flex items-center justify-center
                       bg-bg-subtle text-base flex-shrink-0
                     ">
-                      {getBusinessEmoji(shop.businessType)}
+                      {getBusinessEmoji(shop.businessCategory)}
                     </div>
                     <div className="min-w-0">
                       <p className="font-semibold text-text-primary truncate max-w-[180px]">
@@ -127,8 +127,8 @@ export default function ShopTable({ shops, loading, onToggle }) {
                 {/* Business type */}
                 <TD className="hidden md:table-cell">
                   <span className="text-text-secondary text-xs">
-                    {getBusinessEmoji(shop.businessType)}{' '}
-                    {capitalize(shop.businessType)}
+                    {getBusinessEmoji(shop.businessCategory)}{' '}
+                    {capitalize(shop.businessCategory)}
                   </span>
                 </TD>
 

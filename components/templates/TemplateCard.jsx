@@ -18,7 +18,7 @@ import { getBusinessEmoji, capitalize } from '@/lib/utils';
  *   delay     number   — framer motion stagger delay
  */
 export default function TemplateCard({ template, onEdit, delay = 0 }) {
-  const emoji      = getBusinessEmoji(template.businessType);
+  const emoji      = getBusinessEmoji(template.businessCategory);
   const ruleCount  = template.defaultRules?.length  || 0;
   const fieldCount = template.bookingFields?.length || 0;
 
@@ -46,7 +46,7 @@ export default function TemplateCard({ template, onEdit, delay = 0 }) {
           </div>
           <div>
             <h3 className="text-base font-bold text-text-primary tracking-tight capitalize">
-              {capitalize(template.businessType)}
+              {capitalize(template.businessCategory)}
             </h3>
             <p className="text-xs text-text-tertiary mt-0.5">
               Business type template
