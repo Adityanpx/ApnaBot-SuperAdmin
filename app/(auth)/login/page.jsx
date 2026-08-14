@@ -18,9 +18,16 @@ export default function LoginPage() {
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading]   = useState(false);
 
-  // If already logged in, redirect straight to dashboard
+  // Single source of truth for post-auth navigation: fires whenever
+  // isLoggedIn flips true, whether from a fresh login or landing here
+  // already authenticated. router.refresh() invalidates the client
+  // Router Cache so the /dashboard request re-runs middleware fresh
+  // instead of potentially resolving from a stale cached response.
   useEffect(() => {
-    if (isLoggedIn) router.replace('/dashboard');
+    if (isLoggedIn) {
+      router.replace('/dashboard');
+      router.refresh();
+    }
   }, [isLoggedIn, router]);
 
   const {
@@ -50,7 +57,9 @@ export default function LoginPage() {
 
       loginSuccess(user, accessToken, refreshToken);
       toast.success(`Welcome back, ${user.name}!`);
-      router.replace('/dashboard');
+      // Navigation happens via the isLoggedIn useEffect above —
+      // loginSuccess() sets isLoggedIn: true synchronously, which
+      // triggers it without a second, competing replace() here.
 
     } catch (err) {
       toast.error(err.userMessage || 'Login failed. Check your credentials.');
