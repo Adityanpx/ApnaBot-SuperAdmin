@@ -38,7 +38,7 @@ export default function VehicleCatalogCard({ entry, onEdit, onDelete, onToggle, 
           <img
             src={entry.photoUrl}
             alt={entry.name}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-contain"
           />
         ) : (
           <Car className="w-10 h-10 text-text-disabled" />
