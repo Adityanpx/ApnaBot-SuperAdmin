@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Trash2, GripVertical, X } from 'lucide-react';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
+import KeywordAutocomplete from './KeywordAutocomplete';
 import { cn } from '@/lib/utils';
 
 /** Stable identity for a rule that may not have a real _id yet (matches FlowMap.jsx node ids). */
@@ -110,6 +111,10 @@ export default function RuleEditor({ rules = [], onChange, focusRequest }) {
                   highlighted={highlightKey === key}
                   onChange={(field, val) => updateRule(index, field, val)}
                   onRemove={() => removeRule(index)}
+                  existingKeywords={rules
+                    .filter((_, i) => i !== index)
+                    .map((r) => r.keyword)
+                    .filter(Boolean)}
                 />
               </motion.div>
             );
@@ -132,7 +137,7 @@ export default function RuleEditor({ rules = [], onChange, focusRequest }) {
 }
 
 // ── Single rule row ────────────────────────────────────────────────────────
-function RuleRow({ rule, index, onChange, onRemove, highlighted }) {
+function RuleRow({ rule, index, onChange, onRemove, highlighted, existingKeywords }) {
 
   const typeColors = {
     text:            'bg-info-bg    text-info-text',
@@ -247,12 +252,14 @@ function RuleRow({ rule, index, onChange, onRemove, highlighted }) {
       <ButtonsEditor
         buttons={rule.buttons || []}
         onChange={(vals) => onChange('buttons', vals)}
+        existingKeywords={existingKeywords}
       />
 
       {/* List options (max 10) */}
       <ListOptionsEditor
         listOptions={rule.listOptions || []}
         onChange={(vals) => onChange('listOptions', vals)}
+        existingKeywords={existingKeywords}
       />
     </div>
   );
@@ -311,7 +318,7 @@ function TagInput({ label, hint, values, onChange }) {
 }
 
 // ── Buttons editor (max 3) ──────────────────────────────────────────────────
-function ButtonsEditor({ buttons, onChange }) {
+function ButtonsEditor({ buttons, onChange, existingKeywords }) {
   const update = (i, field, value) => {
     onChange(buttons.map((b, idx) => idx === i ? { ...b, [field]: value } : b));
   };
@@ -331,12 +338,14 @@ function ButtonsEditor({ buttons, onChange }) {
             onChange={(e) => update(i, 'title', e.target.value)}
             containerClassName="flex-1"
           />
-          <Input
-            placeholder="Next keyword"
-            value={btn.nextKeyword}
-            onChange={(e) => update(i, 'nextKeyword', e.target.value)}
-            containerClassName="flex-1"
-          />
+          <div className="flex-1">
+            <KeywordAutocomplete
+              placeholder="Next keyword"
+              value={btn.nextKeyword}
+              onChange={(val) => update(i, 'nextKeyword', val)}
+              existingKeywords={existingKeywords}
+            />
+          </div>
           <button
             onClick={() => remove(i)}
             className="
@@ -365,7 +374,7 @@ function ButtonsEditor({ buttons, onChange }) {
 }
 
 // ── List options editor (max 10) ────────────────────────────────────────────
-function ListOptionsEditor({ listOptions, onChange }) {
+function ListOptionsEditor({ listOptions, onChange, existingKeywords }) {
   const update = (i, field, value) => {
     onChange(listOptions.map((o, idx) => idx === i ? { ...o, [field]: value } : o));
   };
@@ -389,10 +398,11 @@ function ListOptionsEditor({ listOptions, onChange }) {
             value={opt.description}
             onChange={(e) => update(i, 'description', e.target.value)}
           />
-          <Input
+          <KeywordAutocomplete
             placeholder="Next keyword"
             value={opt.nextKeyword}
-            onChange={(e) => update(i, 'nextKeyword', e.target.value)}
+            onChange={(val) => update(i, 'nextKeyword', val)}
+            existingKeywords={existingKeywords}
           />
           <button
             onClick={() => remove(i)}
