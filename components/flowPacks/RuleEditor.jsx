@@ -1,12 +1,17 @@
 // components/flowPacks/RuleEditor.jsx
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Trash2, GripVertical, X } from 'lucide-react';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import { cn } from '@/lib/utils';
+
+/** Stable identity for a rule that may not have a real _id yet (matches FlowMap.jsx node ids). */
+export function getRuleKey(rule, index) {
+  return String(rule._id || rule._tempId || index);
+}
 
 const MATCH_TYPES = [
   { value: 'contains',   label: 'Contains' },
@@ -23,7 +28,7 @@ const REPLY_TYPES = [
 const MAX_BUTTONS      = 3;
 const MAX_LIST_OPTIONS = 10;
 
-const EMPTY_RULE = {
+export const EMPTY_RULE = {
   keyword:       '',
   matchType:     'contains',
   hindiAliases:  [],
@@ -40,10 +45,24 @@ const EMPTY_RULE = {
  * shape (adds hindiAliases, replyImageUrl, buttons, listOptions).
  *
  * Props:
- *   rules     array   — current rules array
- *   onChange  fn(arr) — called with updated rules array on every change
+ *   rules         array        — current rules array
+ *   onChange      fn(arr)      — called with updated rules array on every change
+ *   focusRequest  {key, ts}    — when set, scrolls that rule into view and briefly highlights it
+ *                                (used by FlowMap.jsx when a node is clicked)
  */
-export default function RuleEditor({ rules = [], onChange }) {
+export default function RuleEditor({ rules = [], onChange, focusRequest }) {
+
+  const rowRefs = useRef({});
+  const [highlightKey, setHighlightKey] = useState(null);
+
+  useEffect(() => {
+    if (!focusRequest?.key) return;
+    const el = rowRefs.current[focusRequest.key];
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setHighlightKey(focusRequest.key);
+    const timer = setTimeout(() => setHighlightKey(null), 1600);
+    return () => clearTimeout(timer);
+  }, [focusRequest]);
 
   const addRule = () => {
     onChange([...rules, { ...EMPTY_RULE, _tempId: Date.now() }]);
@@ -74,22 +93,27 @@ export default function RuleEditor({ rules = [], onChange }) {
             No rules yet. Click &quot;Add Rule&quot; to create the first one.
           </motion.div>
         ) : (
-          rules.map((rule, index) => (
-            <motion.div
-              key={rule._id || rule._tempId || index}
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.2 }}
-            >
-              <RuleRow
-                rule={rule}
-                index={index}
-                onChange={(field, val) => updateRule(index, field, val)}
-                onRemove={() => removeRule(index)}
-              />
-            </motion.div>
-          ))
+          rules.map((rule, index) => {
+            const key = getRuleKey(rule, index);
+            return (
+              <motion.div
+                key={key}
+                ref={(el) => { rowRefs.current[key] = el; }}
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <RuleRow
+                  rule={rule}
+                  index={index}
+                  highlighted={highlightKey === key}
+                  onChange={(field, val) => updateRule(index, field, val)}
+                  onRemove={() => removeRule(index)}
+                />
+              </motion.div>
+            );
+          })
         )}
       </AnimatePresence>
 
@@ -108,7 +132,7 @@ export default function RuleEditor({ rules = [], onChange }) {
 }
 
 // ── Single rule row ────────────────────────────────────────────────────────
-function RuleRow({ rule, index, onChange, onRemove }) {
+function RuleRow({ rule, index, onChange, onRemove, highlighted }) {
 
   const typeColors = {
     text:            'bg-info-bg    text-info-text',
@@ -117,10 +141,11 @@ function RuleRow({ rule, index, onChange, onRemove }) {
   };
 
   return (
-    <div className="
-      bg-bg-subtle border border-border rounded-xl p-4 space-y-3
-      hover:border-border-strong transition-colors duration-150
-    ">
+    <div className={cn(
+      'bg-bg-subtle border border-border rounded-xl p-4 space-y-3',
+      'hover:border-border-strong transition-colors duration-300',
+      highlighted && 'border-brand-500 ring-2 ring-brand-500/40'
+    )}>
       {/* Row header — rule number + type indicator + delete */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">

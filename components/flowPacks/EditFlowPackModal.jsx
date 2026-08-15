@@ -4,12 +4,13 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
-import { Settings, MessageSquare } from 'lucide-react';
+import { Settings, MessageSquare, List, Workflow } from 'lucide-react';
 import Modal   from '@/components/ui/Modal';
 import Input   from '@/components/ui/Input';
 import Select  from '@/components/ui/Select';
 import Button  from '@/components/ui/Button';
 import RuleEditor from './RuleEditor';
+import FlowMap from './FlowMap';
 import { FLOW_PACK_CATEGORIES } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 
@@ -35,6 +36,8 @@ export default function EditFlowPackModal({ open, pack, onClose, updatePack }) {
   const [form,   setForm]   = useState(null);
   const [rules,  setRules]  = useState([]);
   const [saving, setSaving] = useState(false);
+  const [rulesView, setRulesView] = useState('list'); // 'list' | 'flow'
+  const [focusRequest, setFocusRequest] = useState(null);
 
   // Hydrate local state when pack prop changes (modal opened with new pack)
   useEffect(() => {
@@ -49,8 +52,18 @@ export default function EditFlowPackModal({ open, pack, onClose, updatePack }) {
       // Deep clone to avoid mutating the original
       setRules(JSON.parse(JSON.stringify(pack.rules || [])));
       setActiveTab('details');
+      setRulesView('list');
+      setFocusRequest(null);
     }
   }, [pack]);
+
+  // FlowMap calls this when a real rule node is clicked (or a new rule is created
+  // from a ghost node) — switch to List view and scroll/highlight that rule there,
+  // since there's no separate rule-editing modal in this panel.
+  const handleFocusRule = (rule, key) => {
+    setRulesView('list');
+    setFocusRequest({ key, ts: Date.now() });
+  };
 
   const update = field => e => setForm(prev => ({
     ...prev,
@@ -110,7 +123,7 @@ export default function EditFlowPackModal({ open, pack, onClose, updatePack }) {
     <Modal
       open={open}
       onClose={onClose}
-      size="lg"
+      size={activeTab === 'rules' && rulesView === 'flow' ? 'xl' : 'lg'}
       title={form.name}
       subtitle="Changes apply immediately to shops using this flow pack"
       footer={
@@ -167,7 +180,40 @@ export default function EditFlowPackModal({ open, pack, onClose, updatePack }) {
         {activeTab === 'details' ? (
           <DetailsForm form={form} update={update} />
         ) : (
-          <RuleEditor rules={rules} onChange={setRules} />
+          <div className="space-y-3">
+            <div className="flex gap-1 bg-bg-subtle rounded-lg p-1 w-fit">
+              <button
+                type="button"
+                onClick={() => setRulesView('list')}
+                className={cn(
+                  'flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-colors duration-150',
+                  rulesView === 'list'
+                    ? 'bg-bg-raised text-text-primary shadow-card'
+                    : 'text-text-secondary hover:text-text-primary'
+                )}
+              >
+                <List className="w-3.5 h-3.5" /> List
+              </button>
+              <button
+                type="button"
+                onClick={() => setRulesView('flow')}
+                className={cn(
+                  'flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-colors duration-150',
+                  rulesView === 'flow'
+                    ? 'bg-bg-raised text-text-primary shadow-card'
+                    : 'text-text-secondary hover:text-text-primary'
+                )}
+              >
+                <Workflow className="w-3.5 h-3.5" /> Flow
+              </button>
+            </div>
+
+            {rulesView === 'list' ? (
+              <RuleEditor rules={rules} onChange={setRules} focusRequest={focusRequest} />
+            ) : (
+              <FlowMap rules={rules} onChange={setRules} onFocusRule={handleFocusRule} />
+            )}
+          </div>
         )}
       </AnimatedTab>
     </Modal>

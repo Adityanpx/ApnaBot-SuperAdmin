@@ -9,9 +9,11 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@xyflow/react": "^12.11.3",
     "autoprefixer": "^10.4.27",
     "axios": "^1.6.8",
     "clsx": "^2.1.1",
+    "dagre": "^0.8.5",
     "date-fns": "^3.6.0",
     "framer-motion": "^11.2.12",
     "lucide-react": "^0.378.0",
