@@ -29,6 +29,7 @@ export default function Modal({
   title,
   subtitle,
   children,
+  footer,
   size = 'md',
   hideClose = false,
   className,
@@ -106,6 +107,12 @@ export default function Modal({
               <div className="flex-1 overflow-y-auto px-6 py-5">
                 {children}
               </div>
+
+              {footer && (
+                <div className="px-6 py-5 border-t border-border-subtle flex-shrink-0">
+                  {footer}
+                </div>
+              )}
             </motion.div>
           </div>
         </>
