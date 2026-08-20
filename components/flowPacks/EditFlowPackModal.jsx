@@ -4,12 +4,12 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
-import { Settings, MessageSquare, List, Workflow } from 'lucide-react';
+import { Settings, MessageSquare, List, Workflow, ClipboardPaste } from 'lucide-react';
 import Modal   from '@/components/ui/Modal';
 import Input   from '@/components/ui/Input';
 import Select  from '@/components/ui/Select';
 import Button  from '@/components/ui/Button';
-import RuleEditor from './RuleEditor';
+import RuleEditor, { EMPTY_RULE } from './RuleEditor';
 import FlowMap from './FlowMap';
 import { FLOW_PACK_CATEGORIES } from '@/lib/constants';
 import { cn } from '@/lib/utils';
@@ -18,6 +18,15 @@ const TABS = [
   { id: 'details', label: 'Details', icon: Settings },
   { id: 'rules',   label: 'Rules',   icon: MessageSquare },
 ];
+
+// Shared per-rule validation predicates — used by validate() and by the "Paste JSON" import,
+// so both paths enforce the exact same rules without duplicating the checks.
+function ruleHasKeyword(rule) {
+  return !!rule.keyword?.trim();
+}
+function ruleHasRequiredReply(rule) {
+  return rule.replyType !== 'text' || !!rule.reply?.trim();
+}
 
 /**
  * EditFlowPackModal — tabbed modal for editing a flow pack
@@ -38,6 +47,7 @@ export default function EditFlowPackModal({ open, pack, onClose, updatePack }) {
   const [saving, setSaving] = useState(false);
   const [rulesView, setRulesView] = useState('list'); // 'list' | 'flow'
   const [focusRequest, setFocusRequest] = useState(null);
+  const [pasteJsonOpen, setPasteJsonOpen] = useState(false);
 
   // Hydrate local state when pack prop changes (modal opened with new pack)
   useEffect(() => {
@@ -65,6 +75,19 @@ export default function EditFlowPackModal({ open, pack, onClose, updatePack }) {
     setFocusRequest({ key, ts: Date.now() });
   };
 
+  // Merge (or replace) rules parsed from the "Paste JSON" panel into local state.
+  // Mirrors RuleEditor's addRule() _tempId assignment; handleSave strips _tempId before saving.
+  const handleImportRules = (newRules, replace) => {
+    setRules(prev => (replace ? newRules : [...prev, ...newRules]));
+    setRulesView('list');
+    setPasteJsonOpen(false);
+    toast.success(
+      replace
+        ? `Replaced rules with ${newRules.length} from JSON`
+        : `Added ${newRules.length} rules from JSON`
+    );
+  };
+
   const update = field => e => setForm(prev => ({
     ...prev,
     [field]: e.target.type === 'checkbox' ? e.target.checked : e.target.value,
@@ -78,12 +101,12 @@ export default function EditFlowPackModal({ open, pack, onClose, updatePack }) {
       return false;
     }
     for (const rule of rules) {
-      if (!rule.keyword?.trim()) {
+      if (!ruleHasKeyword(rule)) {
         toast.error('All rules must have a keyword');
         setActiveTab('rules');
         return false;
       }
-      if (!rule.reply?.trim() && rule.replyType === 'text') {
+      if (!ruleHasRequiredReply(rule)) {
         toast.error('All text rules must have a reply');
         setActiveTab('rules');
         return false;
@@ -120,6 +143,7 @@ export default function EditFlowPackModal({ open, pack, onClose, updatePack }) {
   if (!pack || !form) return null;
 
   return (
+    <>
     <Modal
       open={open}
       onClose={onClose}
@@ -206,6 +230,16 @@ export default function EditFlowPackModal({ open, pack, onClose, updatePack }) {
               >
                 <Workflow className="w-3.5 h-3.5" /> Flow
               </button>
+              <button
+                type="button"
+                onClick={() => setPasteJsonOpen(true)}
+                className={cn(
+                  'flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-colors duration-150',
+                  'text-text-secondary hover:text-text-primary'
+                )}
+              >
+                <ClipboardPaste className="w-3.5 h-3.5" /> Paste JSON
+              </button>
             </div>
 
             {rulesView === 'list' ? (
@@ -217,6 +251,13 @@ export default function EditFlowPackModal({ open, pack, onClose, updatePack }) {
         )}
       </AnimatedTab>
     </Modal>
+
+    <PasteJsonModal
+      open={pasteJsonOpen}
+      onClose={() => setPasteJsonOpen(false)}
+      onImport={handleImportRules}
+    />
+    </>
   );
 }
 
@@ -315,5 +356,96 @@ function AnimatedTab({ children, tabKey }) {
         {children}
       </motion.div>
     </AnimatePresence>
+  );
+}
+
+// ── Paste JSON — bulk-import rules from a pasted JSON array ────────────────
+function PasteJsonModal({ open, onClose, onImport }) {
+  const [text, setText] = useState('');
+  const [replace, setReplace] = useState(false);
+
+  const handleClose = () => {
+    setText('');
+    setReplace(false);
+    onClose();
+  };
+
+  const handleImport = () => {
+    let parsed;
+    try {
+      parsed = JSON.parse(text);
+    } catch {
+      toast.error('Invalid JSON — check for syntax errors');
+      return;
+    }
+
+    if (!Array.isArray(parsed)) {
+      toast.error('JSON must be an array of rule objects');
+      return;
+    }
+    if (parsed.length === 0) {
+      toast.error('Paste at least one rule');
+      return;
+    }
+
+    for (let i = 0; i < parsed.length; i++) {
+      const rule = parsed[i];
+      if (!ruleHasKeyword(rule)) {
+        toast.error(`Rule ${i + 1}: must have a keyword`);
+        return;
+      }
+      if (!ruleHasRequiredReply(rule)) {
+        toast.error(`Rule ${i + 1}: text rules must have a reply`);
+        return;
+      }
+    }
+
+    // Same _tempId strategy as RuleEditor.addRule(); offset by index so pasting
+    // several rules in one batch (same millisecond) doesn't collide on key/_tempId.
+    const newRules = parsed.map((rule, i) => ({
+      ...EMPTY_RULE,
+      ...rule,
+      _tempId: Date.now() + i,
+    }));
+
+    onImport(newRules, replace);
+    setText('');
+    setReplace(false);
+  };
+
+  return (
+    <Modal
+      open={open}
+      onClose={handleClose}
+      title="Paste Rules JSON"
+      subtitle="Paste an array of rule objects to bulk-add or bulk-replace rules"
+      size="md"
+      footer={
+        <div className="flex justify-end gap-3">
+          <Button variant="secondary" onClick={handleClose}>Cancel</Button>
+          <Button variant="primary" onClick={handleImport}>Import</Button>
+        </div>
+      }
+    >
+      <div className="space-y-3">
+        <textarea
+          rows={12}
+          placeholder={'[\n  { "keyword": "hi", "matchType": "contains", "reply": "Hello!", "replyType": "text" }\n]'}
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          className="input-field resize-none text-sm font-mono"
+          spellCheck={false}
+        />
+        <label className="flex items-center gap-2 cursor-pointer text-sm text-text-secondary hover:text-text-primary">
+          <input
+            type="checkbox"
+            checked={replace}
+            onChange={(e) => setReplace(e.target.checked)}
+            className="w-4 h-4 rounded border-border"
+          />
+          Replace existing rules instead of appending
+        </label>
+      </div>
+    </Modal>
   );
 }
