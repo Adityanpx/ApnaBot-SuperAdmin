@@ -1,7 +1,8 @@
 // components/flowPacks/FlowMap.jsx
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 import dagre from 'dagre';
 import {
   Background,
@@ -433,47 +434,88 @@ export default function FlowMap({ rules, onChange, onFocusRule }) {
     setLinkKeyword(link, '');
   };
 
+  // Lock page scroll while the fullscreen overlay is open, and allow Escape to close it.
+  useEffect(() => {
+    if (!expanded) return;
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape') setExpanded(false);
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      document.removeEventListener('keydown', onKeyDown);
+    };
+  }, [expanded]);
+
+  const flowCanvas = (
+    <ReactFlow
+      nodes={nodes}
+      edges={edges}
+      nodeTypes={nodeTypes}
+      onNodeClick={onNodeClick}
+      onConnect={onConnect}
+      onConnectEnd={onConnectEnd}
+      onEdgeClick={onEdgeClick}
+      nodesDraggable={false}
+      nodesConnectable={editMode}
+      edgesFocusable={editMode}
+      panOnScroll
+      zoomOnScroll
+      fitView
+      proOptions={{ hideAttribution: true }}
+    >
+      <Background />
+      <Controls showInteractive={false} />
+    </ReactFlow>
+  );
+
+  const toolbar = (
+    <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+      <p className="text-xs text-text-tertiary">
+        {editMode
+          ? "Drag from a button/option's dot to another reply to link it, drag to empty space to create a new reply, or click a connection to remove it."
+          : 'Click a reply to edit it in List view.'}
+      </p>
+      <div className="flex gap-2">
+        <Button type="button" variant={editMode ? 'primary' : 'secondary'} size="sm" onClick={() => setEditMode((v) => !v)}>
+          {editMode ? 'Done editing connections' : 'Edit connections'}
+        </Button>
+        <Button type="button" variant="secondary" size="sm" icon={expanded ? Minimize2 : Maximize2} onClick={() => setExpanded((v) => !v)}>
+          {expanded ? 'Collapse' : 'Expand'}
+        </Button>
+      </div>
+    </div>
+  );
+
+  // Fullscreen mode is rendered through a portal straight onto <body>. FlowMap normally
+  // lives inside EditFlowPackModal's motion.div, which framer-motion keeps a CSS
+  // `transform` on even at rest — any transform on an ancestor creates a new containing
+  // block for `position: fixed` descendants, so a fixed-position overlay nested in there
+  // would be clipped to the modal's box instead of covering the viewport. Portaling out
+  // to document.body sidesteps that entirely (same reason apnabot-web's Fullscreen works:
+  // its FlowMap isn't nested inside an animated modal).
+  if (expanded && typeof document !== 'undefined') {
+    return createPortal(
+      <div className="fixed inset-0 z-[100] bg-bg-base p-4 flex flex-col">
+        {toolbar}
+        <div className="flex-1 min-h-0 bg-bg-raised border border-border rounded-2xl shadow-card overflow-hidden">
+          {flowCanvas}
+        </div>
+      </div>,
+      document.body
+    );
+  }
+
   return (
     <div>
-      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-        <p className="text-xs text-text-tertiary">
-          {editMode
-            ? "Drag from a button/option's dot to another reply to link it, drag to empty space to create a new reply, or click a connection to remove it."
-            : 'Click a reply to edit it in List view.'}
-        </p>
-        <div className="flex gap-2">
-          <Button type="button" variant={editMode ? 'primary' : 'secondary'} size="sm" onClick={() => setEditMode((v) => !v)}>
-            {editMode ? 'Done editing connections' : 'Edit connections'}
-          </Button>
-          <Button type="button" variant="secondary" size="sm" icon={expanded ? Minimize2 : Maximize2} onClick={() => setExpanded((v) => !v)}>
-            {expanded ? 'Collapse' : 'Expand'}
-          </Button>
-        </div>
-      </div>
-
+      {toolbar}
       <div
-        style={{ height: expanded ? 640 : 420 }}
-        className="bg-bg-raised border border-border rounded-2xl shadow-card overflow-hidden transition-[height] duration-200"
+        style={{ height: 420 }}
+        className="bg-bg-raised border border-border rounded-2xl shadow-card overflow-hidden"
       >
-        <ReactFlow
-          nodes={nodes}
-          edges={edges}
-          nodeTypes={nodeTypes}
-          onNodeClick={onNodeClick}
-          onConnect={onConnect}
-          onConnectEnd={onConnectEnd}
-          onEdgeClick={onEdgeClick}
-          nodesDraggable={false}
-          nodesConnectable={editMode}
-          edgesFocusable={editMode}
-          panOnScroll
-          zoomOnScroll
-          fitView
-          proOptions={{ hideAttribution: true }}
-        >
-          <Background />
-          <Controls showInteractive={false} />
-        </ReactFlow>
+        {flowCanvas}
       </div>
     </div>
   );
