@@ -182,12 +182,17 @@ function RuleRow({ rule, index, onChange, onRemove, highlighted, existingKeyword
         <div className="space-y-3 min-w-0">
           {/* Keyword + match type */}
           <div className="grid grid-cols-2 gap-3">
-            <Input
-              label="Keyword"
-              placeholder="e.g. price"
-              value={rule.keyword}
-              onChange={(e) => onChange('keyword', e.target.value)}
-            />
+            <div className="space-y-1.5">
+              <label className="block text-sm font-medium text-text-secondary">
+                Keyword
+              </label>
+              <KeywordAutocomplete
+                placeholder="e.g. price"
+                value={rule.keyword}
+                onChange={(val) => onChange('keyword', val)}
+                existingKeywords={existingKeywords}
+              />
+            </div>
             <div className="space-y-1.5">
               <label className="block text-sm font-medium text-text-secondary">
                 Match type
