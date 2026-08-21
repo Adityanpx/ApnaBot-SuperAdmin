@@ -147,7 +147,7 @@ export default function EditFlowPackModal({ open, pack, onClose, updatePack }) {
     <Modal
       open={open}
       onClose={onClose}
-      size={activeTab === 'rules' ? 'xl' : 'lg'}
+      size={activeTab === 'rules' ? '2xl' : 'lg'}
       title={form.name}
       subtitle="Changes apply immediately to businesses using this flow pack"
       footer={

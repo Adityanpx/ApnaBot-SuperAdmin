@@ -177,7 +177,7 @@ function RuleRow({ rule, index, onChange, onRemove, highlighted, existingKeyword
         </button>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-[1fr_260px] gap-4 items-start">
+      <div className="grid grid-cols-1 sm:grid-cols-[1fr_300px] gap-6 items-start">
         {/* Fields */}
         <div className="space-y-3 min-w-0">
           {/* Keyword + match type */}
