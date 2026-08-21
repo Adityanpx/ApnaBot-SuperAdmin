@@ -147,12 +147,12 @@ function RuleRow({ rule, index, onChange, onRemove, highlighted, existingKeyword
 
   return (
     <div className={cn(
-      'bg-bg-subtle border border-border rounded-xl p-4 space-y-3',
+      'bg-bg-subtle border border-border rounded-xl p-4',
       'hover:border-border-strong transition-colors duration-300',
       highlighted && 'border-brand-500 ring-2 ring-brand-500/40'
     )}>
       {/* Row header — rule number + type indicator + delete */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <GripVertical className="w-3.5 h-3.5 text-text-disabled cursor-grab" />
           <span className="text-xs font-bold text-text-tertiary">
@@ -177,90 +177,145 @@ function RuleRow({ rule, index, onChange, onRemove, highlighted, existingKeyword
         </button>
       </div>
 
-      {/* Keyword + match type */}
-      <div className="grid grid-cols-2 gap-3">
-        <Input
-          label="Keyword"
-          placeholder="e.g. price"
-          value={rule.keyword}
-          onChange={(e) => onChange('keyword', e.target.value)}
-        />
-        <div className="space-y-1.5">
-          <label className="block text-sm font-medium text-text-secondary">
-            Match type
-          </label>
-          <select
-            value={rule.matchType}
-            onChange={(e) => onChange('matchType', e.target.value)}
-            className="input-field appearance-none cursor-pointer"
-          >
-            {MATCH_TYPES.map((o) => (
-              <option key={o.value} value={o.value}>{o.label}</option>
-            ))}
-          </select>
-        </div>
-      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-[1fr_260px] gap-4 items-start">
+        {/* Fields */}
+        <div className="space-y-3 min-w-0">
+          {/* Keyword + match type */}
+          <div className="grid grid-cols-2 gap-3">
+            <Input
+              label="Keyword"
+              placeholder="e.g. price"
+              value={rule.keyword}
+              onChange={(e) => onChange('keyword', e.target.value)}
+            />
+            <div className="space-y-1.5">
+              <label className="block text-sm font-medium text-text-secondary">
+                Match type
+              </label>
+              <select
+                value={rule.matchType}
+                onChange={(e) => onChange('matchType', e.target.value)}
+                className="input-field appearance-none cursor-pointer"
+              >
+                {MATCH_TYPES.map((o) => (
+                  <option key={o.value} value={o.value}>{o.label}</option>
+                ))}
+              </select>
+            </div>
+          </div>
 
-      {/* Hindi aliases — tag input */}
-      <TagInput
-        label="Hindi aliases"
-        hint="Alternate keywords a customer might type (Hinglish/Hindi)"
-        values={rule.hindiAliases || []}
-        onChange={(vals) => onChange('hindiAliases', vals)}
-      />
+          {/* Hindi aliases — tag input */}
+          <TagInput
+            label="Hindi aliases"
+            hint="Alternate keywords a customer might type (Hinglish/Hindi)"
+            values={rule.hindiAliases || []}
+            onChange={(vals) => onChange('hindiAliases', vals)}
+          />
 
-      {/* Reply text + reply type */}
-      <div className="grid grid-cols-3 gap-3">
-        <div className="col-span-2">
-          <label className="block text-sm font-medium text-text-secondary mb-1.5">
-            Reply text
-          </label>
-          <textarea
-            rows={2}
-            placeholder="What the bot will send…"
-            value={rule.reply}
-            onChange={(e) => onChange('reply', e.target.value)}
-            className="input-field resize-none text-sm"
+          {/* Reply text + reply type */}
+          <div className="grid grid-cols-3 gap-3">
+            <div className="col-span-2">
+              <label className="block text-sm font-medium text-text-secondary mb-1.5">
+                Reply text
+              </label>
+              <textarea
+                rows={2}
+                placeholder="What the bot will send…"
+                value={rule.reply}
+                onChange={(e) => onChange('reply', e.target.value)}
+                className="input-field resize-none text-sm"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="block text-sm font-medium text-text-secondary">
+                Reply type
+              </label>
+              <select
+                value={rule.replyType}
+                onChange={(e) => onChange('replyType', e.target.value)}
+                className="input-field appearance-none cursor-pointer h-[72px]"
+              >
+                {REPLY_TYPES.map((o) => (
+                  <option key={o.value} value={o.value}>{o.label}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* Reply image URL */}
+          <Input
+            label="Reply image URL"
+            placeholder="Optional — https://…"
+            value={rule.replyImageUrl || ''}
+            onChange={(e) => onChange('replyImageUrl', e.target.value)}
+          />
+
+          {/* Buttons (max 3) */}
+          <ButtonsEditor
+            buttons={rule.buttons || []}
+            onChange={(vals) => onChange('buttons', vals)}
+            existingKeywords={existingKeywords}
+          />
+
+          {/* List options (max 10) */}
+          <ListOptionsEditor
+            listOptions={rule.listOptions || []}
+            onChange={(vals) => onChange('listOptions', vals)}
+            existingKeywords={existingKeywords}
           />
         </div>
 
-        <div className="space-y-1.5">
-          <label className="block text-sm font-medium text-text-secondary">
-            Reply type
-          </label>
-          <select
-            value={rule.replyType}
-            onChange={(e) => onChange('replyType', e.target.value)}
-            className="input-field appearance-none cursor-pointer h-[72px]"
-          >
-            {REPLY_TYPES.map((o) => (
-              <option key={o.value} value={o.value}>{o.label}</option>
-            ))}
-          </select>
+        {/* Live WhatsApp-style preview */}
+        <div className="sm:sticky sm:top-4">
+          <RulePreview
+            replyImageUrl={rule.replyImageUrl}
+            reply={rule.reply}
+            buttons={rule.buttons || []}
+            listOptions={rule.listOptions || []}
+          />
         </div>
       </div>
+    </div>
+  );
+}
 
-      {/* Reply image URL */}
-      <Input
-        label="Reply image URL"
-        placeholder="Optional — https://…"
-        value={rule.replyImageUrl || ''}
-        onChange={(e) => onChange('replyImageUrl', e.target.value)}
-      />
-
-      {/* Buttons (max 3) */}
-      <ButtonsEditor
-        buttons={rule.buttons || []}
-        onChange={(vals) => onChange('buttons', vals)}
-        existingKeywords={existingKeywords}
-      />
-
-      {/* List options (max 10) */}
-      <ListOptionsEditor
-        listOptions={rule.listOptions || []}
-        onChange={(vals) => onChange('listOptions', vals)}
-        existingKeywords={existingKeywords}
-      />
+// ── Live preview — WhatsApp-style reply bubble, mirrors apnabot-web's RulePreview ──
+function RulePreview({ replyImageUrl, reply, buttons, listOptions }) {
+  return (
+    <div className="rounded-2xl bg-[#e5ddd5] p-3">
+      <p className="mb-2 text-[10px] font-bold uppercase tracking-wide text-black/50">Live preview</p>
+      <div className="max-w-full overflow-hidden rounded-lg rounded-tl-none bg-white shadow-sm">
+        {replyImageUrl && (
+          <img src={replyImageUrl} alt="" className="h-32 w-full object-cover" />
+        )}
+        <div className="px-3 py-2">
+          <p className="whitespace-pre-wrap text-sm text-[#111]">
+            {reply || 'Your reply text will appear here…'}
+          </p>
+        </div>
+        {buttons.length > 0 &&
+          buttons.map((b, i) => (
+            <div key={i} className="border-t border-[#e5e5e5] px-3 py-2 text-center text-sm font-medium text-[#00a5f4]">
+              {b.title || 'Button'}
+            </div>
+          ))}
+        {listOptions.length > 0 && (
+          <div className="border-t border-[#e5e5e5] px-3 py-2 text-center text-sm font-medium text-[#00a5f4]">
+            View list ({listOptions.length})
+          </div>
+        )}
+      </div>
+      {listOptions.length > 0 && (
+        <div className="mt-3 max-w-full overflow-hidden rounded-lg bg-white shadow-sm">
+          {listOptions.map((o, i) => (
+            <div key={i} className="border-b border-[#f0f0f0] px-3 py-2 last:border-b-0">
+              <p className="text-sm font-medium text-[#111]">{o.label || 'Option'}</p>
+              {o.description && <p className="text-xs text-black/50">{o.description}</p>}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
