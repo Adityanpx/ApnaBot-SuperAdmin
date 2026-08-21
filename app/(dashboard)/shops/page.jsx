@@ -1,9 +1,11 @@
 // app/(dashboard)/shops/page.jsx
 'use client';
 
+import { useState } from 'react';
 import { useShops } from '@/hooks/useShops';
 import ShopFilters from '@/components/shops/ShopFilters';
 import ShopTable from '@/components/shops/ShopTable';
+import DeleteShopModal from '@/components/shops/DeleteShopModal';
 import Pagination from '@/components/ui/Pagination';
 
 export default function ShopsPage() {
@@ -21,7 +23,10 @@ export default function ShopsPage() {
     handleTypeChange,
     handlePageChange,
     toggleShop,
+    deleteShop,
   } = useShops();
+
+  const [deletingShop, setDeletingShop] = useState(null);
 
   return (
     <div className="space-y-6 max-w-screen-xl">
@@ -50,6 +55,7 @@ export default function ShopsPage() {
         shops={shops}
         loading={loading}
         onToggle={toggleShop}
+        onDelete={setDeletingShop}
       />
 
       {/* Pagination */}
@@ -62,6 +68,14 @@ export default function ShopsPage() {
           limit={limit}
         />
       )}
+
+      {/* Delete confirmation */}
+      <DeleteShopModal
+        open={!!deletingShop}
+        shop={deletingShop}
+        onClose={() => setDeletingShop(null)}
+        onConfirm={deleteShop}
+      />
     </div>
   );
 }

@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { ExternalLink, ToggleLeft, ToggleRight } from 'lucide-react';
+import { ExternalLink, ToggleLeft, ToggleRight, Trash2 } from 'lucide-react';
 import Badge from '@/components/ui/Badge';
 import { SkeletonTableRow } from '@/components/ui/Skeleton';
 import EmptyState from '@/components/ui/EmptyState';
@@ -31,7 +31,7 @@ const TD = ({ children, className }) => (
   </td>
 );
 
-export default function ShopTable({ shops, loading, onToggle }) {
+export default function ShopTable({ shops, loading, onToggle, onDelete }) {
   return (
     <div className="card overflow-hidden">
       <div className="overflow-x-auto">
@@ -182,6 +182,19 @@ export default function ShopTable({ shops, loading, onToggle }) {
                         <ExternalLink className="w-3.5 h-3.5" />
                       </button>
                     </Link>
+
+                    {/* Delete */}
+                    <button
+                      onClick={() => onDelete(shop)}
+                      title="Delete business"
+                      className="
+                        w-8 h-8 flex items-center justify-center rounded-lg
+                        text-text-tertiary hover:text-danger-text hover:bg-danger-bg
+                        transition-colors duration-150
+                      "
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
                   </div>
                 </TD>
               </motion.tr>

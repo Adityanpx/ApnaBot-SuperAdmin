@@ -4,11 +4,12 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { ArrowLeft, ToggleLeft, ToggleRight, RefreshCcw, CreditCard } from 'lucide-react';
+import { ArrowLeft, ToggleLeft, ToggleRight, RefreshCcw, CreditCard, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import Link from 'next/link';
 import api from '@/lib/api';
 import { API } from '@/lib/constants';
+import { summarizeDeletedCounts } from '@/hooks/useShops';
 import ShopDetailCard from '@/components/shops/ShopDetailCard';
 import ShopSubscriptionCard from '@/components/shops/ShopSubscriptionCard';
 import Button from '@/components/ui/Button';
@@ -18,6 +19,7 @@ import { SkeletonCard } from '@/components/ui/Skeleton';
 import ToggleShopModal   from '@/components/shops/ToggleShopModal';
 import ChangePlanModal   from '@/components/shops/ChangePlanModal';
 import ExtendSubModal    from '@/components/shops/ExtendSubModal';
+import DeleteShopModal   from '@/components/shops/DeleteShopModal';
 
 export default function ShopDetailPage() {
   const { id }    = useParams();
@@ -33,6 +35,24 @@ export default function ShopDetailPage() {
   const [toggleModal, setToggleModal]  = useState(false);
   const [planModal,   setPlanModal]    = useState(false);
   const [extendModal, setExtendModal]  = useState(false);
+  const [deleteModal, setDeleteModal]  = useState(false);
+
+  // ── Delete shop (permanent — removes all related data) ─────────────────
+  const handleDeleteShop = async (shopId) => {
+    try {
+      const res = await api.delete(API.SHOP_BY_ID(shopId));
+      const { businessName, deleted } = res.data.data;
+
+      toast.success(`${businessName} deleted`, {
+        description: `Removed ${summarizeDeletedCounts(deleted)}.`,
+      });
+      router.replace('/shops');
+      return true;
+    } catch (err) {
+      toast.error(err.userMessage || 'Failed to delete business');
+      return false;
+    }
+  };
 
   // ── Fetch shop data ─────────────────────────────────────────────────────
   const fetchShop = async () => {
@@ -121,6 +141,15 @@ export default function ShopDetailPage() {
           >
             Change Plan
           </Button>
+
+          <Button
+            variant="danger"
+            size="sm"
+            icon={<Trash2 className="w-4 h-4" />}
+            onClick={() => setDeleteModal(true)}
+          >
+            Delete
+          </Button>
         </div>
       </div>
 
@@ -156,6 +185,13 @@ export default function ShopDetailPage() {
         shopName={shop.name}
         currentEndDate={subscription?.endDate}
         onSuccess={() => { fetchShop(); setExtendModal(false); }}
+      />
+
+      <DeleteShopModal
+        open={deleteModal}
+        shop={shop}
+        onClose={() => setDeleteModal(false)}
+        onConfirm={handleDeleteShop}
       />
     </motion.div>
   );
