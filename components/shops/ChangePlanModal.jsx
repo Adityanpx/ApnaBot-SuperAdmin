@@ -70,7 +70,7 @@ export default function ChangePlanModal({ open, onClose, shopId, currentPlanId, 
       open={open}
       onClose={onClose}
       title="Change Subscription Plan"
-      subtitle="Select a new plan to assign to this shop."
+      subtitle="Select a new plan to assign to this business."
       size="md"
     >
       <div className="space-y-5">

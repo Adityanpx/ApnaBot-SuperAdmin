@@ -108,7 +108,7 @@ export default function EditTemplateModal({ open, onClose, template, onSuccess }
           {capitalize(template.businessCategory)} Template
         </span>
       }
-      subtitle="Changes apply to new shops only — existing shops keep their current rules"
+      subtitle="Changes apply to new businesses only — existing businesses keep their current rules"
       footer={
         <div className="flex items-center justify-between gap-3">
           <p className="text-xs text-text-tertiary">

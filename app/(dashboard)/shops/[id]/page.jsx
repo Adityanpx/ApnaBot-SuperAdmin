@@ -45,7 +45,7 @@ export default function ShopDetailPage() {
       setPlan(plan);
       setStaffCount(staffCount);
     } catch (err) {
-      toast.error(err.userMessage || 'Failed to load shop');
+      toast.error(err.userMessage || 'Failed to load business');
       router.replace('/shops');
     } finally {
       setLoading(false);
@@ -89,7 +89,7 @@ export default function ShopDetailPage() {
         <Link href="/shops">
           <button className="flex items-center gap-2 text-sm text-text-secondary hover:text-text-primary transition-colors">
             <ArrowLeft className="w-4 h-4" />
-            Back to Shops
+            Back to Business
           </button>
         </Link>
 

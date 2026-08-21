@@ -43,7 +43,7 @@ export default function ShopSubscriptionCard({ subscription, plan }) {
         <div className="flex flex-col items-center py-6 text-center">
           <CreditCard className="w-8 h-8 text-text-disabled mb-3" />
           <p className="text-sm text-text-secondary font-medium">No active subscription</p>
-          <p className="text-xs text-text-tertiary mt-1">Assign a plan to activate this shop.</p>
+          <p className="text-xs text-text-tertiary mt-1">Assign a plan to activate this business.</p>
         </div>
       </div>
     );

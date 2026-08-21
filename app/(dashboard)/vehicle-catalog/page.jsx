@@ -46,7 +46,7 @@ export default function VehicleCatalogPage() {
         <div>
           <h1 className="page-title">Vehicle Catalog</h1>
           <p className="text-sm text-text-secondary mt-1">
-            Vehicle types shop owners can add to their fleet
+            Vehicle types business owners can add to their fleet
           </p>
         </div>
         <Button
@@ -78,7 +78,7 @@ export default function VehicleCatalogPage() {
         <EmptyState
           icon={Car}
           title="No vehicle types yet"
-          description="Add one so shop owners can build their fleet."
+          description="Add one so business owners can build their fleet."
           action={{
             label: 'Add Vehicle Type',
             onClick: () => setShowCreate(true),

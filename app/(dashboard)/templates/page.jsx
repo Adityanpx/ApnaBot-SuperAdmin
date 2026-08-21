@@ -20,8 +20,8 @@ export default function TemplatesPage() {
       <div>
         <h1 className="page-title">Business Type Templates</h1>
         <p className="text-sm text-text-tertiary mt-1">
-          Default chatbot rules and booking fields applied when a new shop registers.
-          Changes only affect new shops — existing shops keep their current rules.
+          Default chatbot rules and booking fields applied when a new business registers.
+          Changes only affect new businesses — existing businesses keep their current rules.
         </p>
       </div>
 

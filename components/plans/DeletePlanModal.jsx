@@ -65,7 +65,7 @@ export default function DeletePlanModal({ open, plan, onClose, onSuccess }) {
                 <p className="font-semibold mb-1">Warning</p>
                 <p>
                   Deleting <strong>{planName}</strong> will remove it permanently.
-                  All shops currently on this plan will lose access to its features.
+                  All businesses currently on this plan will lose access to its features.
                 </p>
               </div>
             </div>

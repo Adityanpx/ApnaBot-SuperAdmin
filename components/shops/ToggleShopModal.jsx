@@ -49,7 +49,7 @@ export default function ToggleShopModal({ open, onClose, shop, onSuccess }) {
     <Modal
       open={open}
       onClose={onClose}
-      title={willDeactivate ? 'Deactivate Shop?' : 'Activate Shop?'}
+      title={willDeactivate ? 'Deactivate Business?' : 'Activate Business?'}
       subtitle={shop.name}
       size="sm"
     >

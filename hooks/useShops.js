@@ -31,7 +31,7 @@ export function useShops() {
       setShops(res.data.data.shops);
       setPagination(res.data.data.pagination);
     } catch (err) {
-      toast.error(err.userMessage || 'Failed to load shops');
+      toast.error(err.userMessage || 'Failed to load businesses');
     } finally {
       setLoading(false);
     }

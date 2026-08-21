@@ -28,9 +28,9 @@ export default function ShopsPage() {
 
       {/* Page header */}
       <div>
-        <h1 className="page-title">Shops</h1>
+        <h1 className="page-title">Business</h1>
         <p className="text-sm text-text-secondary mt-1">
-          View, search, and manage all registered shops on the platform.
+          View, search, and manage all registered businesses on the platform.
         </p>
       </div>
 

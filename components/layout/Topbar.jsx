@@ -8,7 +8,7 @@ import { useSidebar } from '../../hooks/useSidebar';
 // Map pathnames to human-readable page titles
 const PAGE_TITLES = {
   '/dashboard':  { title: 'Dashboard',  subtitle: 'Platform overview and stats' },
-  '/shops':      { title: 'Shops',      subtitle: 'Manage all registered shops' },
+  '/shops':      { title: 'Business',   subtitle: 'Manage all registered businesses' },
   '/plans':      { title: 'Plans',      subtitle: 'Subscription plan management' },
   '/templates':  { title: 'Templates',  subtitle: 'Business type chatbot templates' },
 };

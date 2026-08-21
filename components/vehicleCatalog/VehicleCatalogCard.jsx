@@ -72,7 +72,7 @@ export default function VehicleCatalogCard({ entry, onEdit, onDelete, onToggle, 
       {/* Inactive warning */}
       {isInactive && (
         <p className="text-xs text-warning-text bg-warning-bg rounded-lg px-3 py-2 mb-4">
-          Hidden from shop owner&apos;s vehicle selection
+          Hidden from business owner&apos;s vehicle selection
         </p>
       )}
 

@@ -64,7 +64,7 @@ export default function ShopFilters({
           type="text"
           value={localSearch}
           onChange={(e) => setLocalSearch(e.target.value)}
-          placeholder="Search shops or city…"
+          placeholder="Search businesses or city…"
           className="input-field pl-10 pr-10 h-10"
         />
         {localSearch && (
@@ -112,7 +112,7 @@ export default function ShopFilters({
         {/* Total count */}
         {totalShops !== undefined && (
           <span className="text-sm text-text-tertiary whitespace-nowrap hidden md:block">
-            {totalShops} shop{totalShops !== 1 ? 's' : ''}
+            {totalShops} business{totalShops !== 1 ? 'es' : ''}
           </span>
         )}
       </div>

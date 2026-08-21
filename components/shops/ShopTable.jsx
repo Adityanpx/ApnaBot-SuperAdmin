@@ -40,7 +40,7 @@ export default function ShopTable({ shops, loading, onToggle }) {
           {/* Head */}
           <thead className="border-b border-border bg-bg-subtle/50">
             <tr>
-              <TH>Shop</TH>
+              <TH>Business</TH>
               <TH>Owner</TH>
               <TH className="hidden md:table-cell">Type</TH>
               <TH className="hidden lg:table-cell">Joined</TH>
@@ -62,7 +62,7 @@ export default function ShopTable({ shops, loading, onToggle }) {
                 <td colSpan={6}>
                   <EmptyState
                     icon="🏪"
-                    title="No shops found"
+                    title="No businesses found"
                     description="Try adjusting your search or filter criteria."
                   />
                 </td>
@@ -156,7 +156,7 @@ export default function ShopTable({ shops, loading, onToggle }) {
                     {/* Toggle active/inactive */}
                     <button
                       onClick={() => onToggle(shop._id)}
-                      title={shop.isActive ? 'Deactivate shop' : 'Activate shop'}
+                      title={shop.isActive ? 'Deactivate business' : 'Activate business'}
                       className="
                         w-8 h-8 flex items-center justify-center rounded-lg
                         text-text-tertiary hover:text-text-primary hover:bg-bg-subtle
@@ -172,7 +172,7 @@ export default function ShopTable({ shops, loading, onToggle }) {
                     {/* View detail */}
                     <Link href={`/shops/${shop._id}`}>
                       <button
-                        title="View shop details"
+                        title="View business details"
                         className="
                           w-8 h-8 flex items-center justify-center rounded-lg
                           text-text-tertiary hover:text-text-primary hover:bg-bg-subtle

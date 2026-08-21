@@ -149,7 +149,7 @@ export default function EditFlowPackModal({ open, pack, onClose, updatePack }) {
       onClose={onClose}
       size={activeTab === 'rules' && rulesView === 'flow' ? 'xl' : 'lg'}
       title={form.name}
-      subtitle="Changes apply immediately to shops using this flow pack"
+      subtitle="Changes apply immediately to businesses using this flow pack"
       footer={
         <div className="flex items-center justify-between gap-3">
           <p className="text-xs text-text-tertiary">

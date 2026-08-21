@@ -60,7 +60,7 @@ export default function DeleteVehicleCatalogModal({ open, entry, onClose, delete
                 <p className="font-semibold mb-1">Warning</p>
                 <p>
                   Deleting <strong>{entryName}</strong> will remove it permanently.
-                  Shop owners will no longer be able to select this vehicle type.
+                  Business owners will no longer be able to select this vehicle type.
                 </p>
               </div>
             </div>

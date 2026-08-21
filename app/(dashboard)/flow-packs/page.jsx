@@ -36,7 +36,7 @@ export default function FlowPacksPage() {
         <div>
           <h1 className="page-title">Flow Packs</h1>
           <p className="text-sm text-text-secondary mt-1">
-            Reusable sets of chatbot rules shops can add to their bot
+            Reusable sets of chatbot rules businesses can add to their bot
           </p>
         </div>
         <Button
@@ -61,7 +61,7 @@ export default function FlowPacksPage() {
         <EmptyState
           icon={Workflow}
           title="No flow packs yet"
-          description="Create one to give shops a reusable set of chatbot rules."
+          description="Create one to give businesses a reusable set of chatbot rules."
           action={{
             label: 'Create Flow Pack',
             onClick: () => setShowCreate(true),
