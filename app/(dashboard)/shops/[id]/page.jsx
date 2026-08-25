@@ -4,7 +4,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { ArrowLeft, ToggleLeft, ToggleRight, RefreshCcw, CreditCard, Trash2 } from 'lucide-react';
+import { ArrowLeft, ToggleLeft, ToggleRight, RefreshCcw, CreditCard, Trash2, ShieldCheck } from 'lucide-react';
 import { toast } from 'sonner';
 import Link from 'next/link';
 import api from '@/lib/api';
@@ -12,14 +12,16 @@ import { API } from '@/lib/constants';
 import { summarizeDeletedCounts } from '@/hooks/useShops';
 import ShopDetailCard from '@/components/shops/ShopDetailCard';
 import ShopSubscriptionCard from '@/components/shops/ShopSubscriptionCard';
+import SubscriptionHistoryCard from '@/components/shops/SubscriptionHistoryCard';
 import Button from '@/components/ui/Button';
 import { SkeletonCard } from '@/components/ui/Skeleton';
 
 // These modals are built in Step 10
-import ToggleShopModal   from '@/components/shops/ToggleShopModal';
-import ChangePlanModal   from '@/components/shops/ChangePlanModal';
-import ExtendSubModal    from '@/components/shops/ExtendSubModal';
-import DeleteShopModal   from '@/components/shops/DeleteShopModal';
+import ToggleShopModal        from '@/components/shops/ToggleShopModal';
+import ChangePlanModal        from '@/components/shops/ChangePlanModal';
+import ExtendSubModal         from '@/components/shops/ExtendSubModal';
+import GrantSubscriptionModal from '@/components/shops/GrantSubscriptionModal';
+import DeleteShopModal        from '@/components/shops/DeleteShopModal';
 
 export default function ShopDetailPage() {
   const { id }    = useParams();
@@ -29,12 +31,14 @@ export default function ShopDetailPage() {
   const [subscription, setSubscription] = useState(null);
   const [plan,         setPlan]         = useState(null);
   const [staffCount,   setStaffCount]   = useState(0);
+  const [subHistory,   setSubHistory]   = useState([]);
   const [loading,      setLoading]      = useState(true);
 
   // Modal state
   const [toggleModal, setToggleModal]  = useState(false);
   const [planModal,   setPlanModal]    = useState(false);
   const [extendModal, setExtendModal]  = useState(false);
+  const [grantModal,  setGrantModal]   = useState(false);
   const [deleteModal, setDeleteModal]  = useState(false);
 
   // ── Delete shop (permanent — removes all related data) ─────────────────
@@ -72,7 +76,17 @@ export default function ShopDetailPage() {
     }
   };
 
-  useEffect(() => { fetchShop(); }, [id]);
+  // ── Fetch subscription history ──────────────────────────────────────────
+  const fetchSubHistory = async () => {
+    try {
+      const res = await api.get(API.SHOP_SUBSCRIPTION_HISTORY(id));
+      setSubHistory(res.data.data.subscriptions);
+    } catch (err) {
+      toast.error(err.userMessage || 'Failed to load subscription history');
+    }
+  };
+
+  useEffect(() => { fetchShop(); fetchSubHistory(); }, [id]);
 
   // ── Render ──────────────────────────────────────────────────────────────
   if (loading) {
@@ -143,6 +157,15 @@ export default function ShopDetailPage() {
           </Button>
 
           <Button
+            variant="secondary"
+            size="sm"
+            icon={<ShieldCheck className="w-4 h-4" />}
+            onClick={() => setGrantModal(true)}
+          >
+            Grant Subscription
+          </Button>
+
+          <Button
             variant="danger"
             size="sm"
             icon={<Trash2 className="w-4 h-4" />}
@@ -159,7 +182,10 @@ export default function ShopDetailPage() {
         <ShopDetailCard shop={shop} staffCount={staffCount} />
 
         {/* Right — subscription */}
-        <ShopSubscriptionCard subscription={subscription} plan={plan} />
+        <div className="space-y-6">
+          <ShopSubscriptionCard subscription={subscription} plan={plan} />
+          <SubscriptionHistoryCard history={subHistory} />
+        </div>
       </div>
 
       {/* Modals — built in Step 10 */}
@@ -185,6 +211,14 @@ export default function ShopDetailPage() {
         shopName={shop.name}
         currentEndDate={subscription?.endDate}
         onSuccess={() => { fetchShop(); setExtendModal(false); }}
+      />
+
+      <GrantSubscriptionModal
+        open={grantModal}
+        onClose={() => setGrantModal(false)}
+        shopId={id}
+        shopName={shop.name}
+        onSuccess={() => { fetchShop(); fetchSubHistory(); setGrantModal(false); }}
       />
 
       <DeleteShopModal
