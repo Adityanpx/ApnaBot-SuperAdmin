@@ -1,4 +1,4 @@
-// components/shops/ShopFilters.jsx
+// components/businesses/BusinessFilters.jsx
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -27,14 +27,14 @@ const TYPE_OPTIONS = [
   ...BUSINESS_TYPES,
 ];
 
-export default function ShopFilters({
+export default function BusinessFilters({
   search,
   isActive,
   businessType,
   onSearchChange,
   onActiveChange,
   onTypeChange,
-  totalShops,
+  totalBusinesses,
 }) {
   const [localSearch, setLocalSearch] = useState(search);
   const debouncedSearch = useDebounce(localSearch, 400);
@@ -110,9 +110,9 @@ export default function ShopFilters({
         </div>
 
         {/* Total count */}
-        {totalShops !== undefined && (
+        {totalBusinesses !== undefined && (
           <span className="text-sm text-text-tertiary whitespace-nowrap hidden md:block">
-            {totalShops} business{totalShops !== 1 ? 'es' : ''}
+            {totalBusinesses} business{totalBusinesses !== 1 ? 'es' : ''}
           </span>
         )}
       </div>

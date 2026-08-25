@@ -1,4 +1,4 @@
-// components/shops/ShopDetailCard.jsx
+// components/businesses/BusinessDetailCard.jsx
 import Badge from '@/components/ui/Badge';
 import {
   getInitials,
@@ -33,7 +33,7 @@ function InfoRow({ icon, label, value }) {
   );
 }
 
-export default function ShopDetailCard({ shop, staffCount }) {
+export default function BusinessDetailCard({ business, staffCount }) {
   return (
     <div className="space-y-5">
 
@@ -43,28 +43,28 @@ export default function ShopDetailCard({ shop, staffCount }) {
           <div className="flex items-center gap-4">
             {/* Business type emoji avatar */}
             <div className="w-14 h-14 rounded-2xl bg-bg-subtle flex items-center justify-center text-3xl flex-shrink-0">
-              {getBusinessEmoji(shop.businessCategory)}
+              {getBusinessEmoji(business.businessCategory)}
             </div>
             <div>
               <h2 className="text-xl font-bold text-text-primary leading-tight">
-                {shop.name}
+                {business.name}
               </h2>
               <p className="text-sm text-text-secondary mt-1">
-                {capitalize(shop.businessCategory)}{shop.city ? ` · ${shop.city}` : ''}
+                {capitalize(business.businessCategory)}{business.city ? ` · ${business.city}` : ''}
               </p>
               <p className="text-xs text-text-tertiary mt-1">
-                Joined {formatDate(shop.createdAt)}
+                Joined {formatDate(business.createdAt)}
               </p>
             </div>
           </div>
 
           {/* Status */}
           <Badge
-            variant={shop.isActive ? 'success' : 'neutral'}
+            variant={business.isActive ? 'success' : 'neutral'}
             dot
             className="flex-shrink-0"
           >
-            {shop.isActive ? 'Active' : 'Inactive'}
+            {business.isActive ? 'Active' : 'Inactive'}
           </Badge>
         </div>
       </div>
@@ -73,29 +73,29 @@ export default function ShopDetailCard({ shop, staffCount }) {
       <div className="card p-6">
         <h3 className="text-sm font-semibold text-text-secondary mb-1">Business Details</h3>
         <div className="mt-3">
-          <InfoRow icon={MapPin} label="Address" value={shop.address} />
-          <InfoRow icon={Phone}  label="WhatsApp Number" value={shop.whatsappNumber} />
+          <InfoRow icon={MapPin} label="Address" value={business.address} />
+          <InfoRow icon={Phone}  label="WhatsApp Number" value={business.whatsappNumber} />
         </div>
 
         {/* WhatsApp connection status */}
         <div className="flex items-center gap-3 pt-3 mt-1">
-          <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${shop.isWhatsappConnected ? 'bg-success-bg' : 'bg-bg-subtle'}`}>
-            {shop.isWhatsappConnected
+          <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${business.isWhatsappConnected ? 'bg-success-bg' : 'bg-bg-subtle'}`}>
+            {business.isWhatsappConnected
               ? <Wifi className="w-4 h-4 text-success-text" />
               : <WifiOff className="w-4 h-4 text-text-tertiary" />
             }
           </div>
           <div>
             <p className="text-xs text-text-tertiary font-medium">WhatsApp</p>
-            <p className={`text-sm font-semibold mt-0.5 ${shop.isWhatsappConnected ? 'text-success-text' : 'text-text-tertiary'}`}>
-              {shop.isWhatsappConnected ? 'Connected' : 'Not connected'}
+            <p className={`text-sm font-semibold mt-0.5 ${business.isWhatsappConnected ? 'text-success-text' : 'text-text-tertiary'}`}>
+              {business.isWhatsappConnected ? 'Connected' : 'Not connected'}
             </p>
           </div>
         </div>
       </div>
 
       {/* Owner card */}
-      {shop.ownerUserId && (
+      {business.ownerUserId && (
         <div className="card p-6">
           <h3 className="text-sm font-semibold text-text-secondary mb-4">Owner</h3>
           <div className="flex items-center gap-3">
@@ -103,20 +103,20 @@ export default function ShopDetailCard({ shop, staffCount }) {
               w-10 h-10 rounded-full flex items-center justify-center
               bg-gradient-brand text-white text-sm font-bold flex-shrink-0
             ">
-              {getInitials(shop.ownerUserId.name)}
+              {getInitials(business.ownerUserId.name)}
             </div>
             <div className="min-w-0">
               <p className="text-sm font-semibold text-text-primary">
-                {shop.ownerUserId.name}
+                {business.ownerUserId.name}
               </p>
               <p className="text-xs text-text-tertiary mt-0.5 flex items-center gap-1.5">
                 <Mail className="w-3 h-3 flex-shrink-0" />
-                {shop.ownerUserId.email}
+                {business.ownerUserId.email}
               </p>
-              {shop.ownerUserId.lastLoginAt && (
+              {business.ownerUserId.lastLoginAt && (
                 <p className="text-xs text-text-tertiary mt-0.5 flex items-center gap-1.5">
                   <Calendar className="w-3 h-3 flex-shrink-0" />
-                  Last seen {formatRelative(shop.ownerUserId.lastLoginAt)}
+                  Last seen {formatRelative(business.ownerUserId.lastLoginAt)}
                 </p>
               )}
             </div>

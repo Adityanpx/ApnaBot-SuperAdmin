@@ -1,4 +1,4 @@
-// components/shops/ChangePlanModal.jsx
+// components/businesses/ChangePlanModal.jsx
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -13,16 +13,16 @@ import api from '@/lib/api';
 import { API } from '@/lib/constants';
 
 /**
- * Modal to pick a new plan for a shop and assign it
+ * Modal to pick a new plan for a business and assign it
  *
  * Props:
  *   open          — boolean
  *   onClose       — () => void
- *   shopId        — string
+ *   businessId    — string
  *   currentPlanId — string (to highlight current plan)
  *   onSuccess     — () => void — called after plan change
  */
-export default function ChangePlanModal({ open, onClose, shopId, currentPlanId, onSuccess }) {
+export default function ChangePlanModal({ open, onClose, businessId, currentPlanId, onSuccess }) {
   const [plans,        setPlans]        = useState([]);
   const [selected,     setSelected]     = useState(currentPlanId || '');
   const [loadingPlans, setLoadingPlans] = useState(true);
@@ -54,7 +54,7 @@ export default function ChangePlanModal({ open, onClose, shopId, currentPlanId, 
     }
     try {
       setSaving(true);
-      await api.put(API.SHOP_PLAN(shopId), { planId: selected });
+      await api.put(API.BUSINESS_PLAN(businessId), { planId: selected });
       const chosenPlan = plans.find((p) => p._id === selected);
       toast.success(`Plan changed to ${chosenPlan?.displayName}.`);
       onSuccess();

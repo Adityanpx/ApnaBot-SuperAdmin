@@ -1,4 +1,4 @@
-// components/shops/ToggleShopModal.jsx
+// components/businesses/ToggleBusinessModal.jsx
 'use client';
 
 import { useState } from 'react';
@@ -10,34 +10,34 @@ import api from '@/lib/api';
 import { API } from '@/lib/constants';
 
 /**
- * Confirm dialog before toggling a shop active/inactive
+ * Confirm dialog before toggling a business active/inactive
  *
  * Props:
  *   open       — boolean
  *   onClose    — () => void
- *   shop       — the shop object { _id, name, isActive }
- *   onSuccess  — (updatedShop) => void — called after successful API call
+ *   business   — the business object { _id, name, isActive }
+ *   onSuccess  — (updatedBusiness) => void — called after successful API call
  */
-export default function ToggleShopModal({ open, onClose, shop, onSuccess }) {
+export default function ToggleBusinessModal({ open, onClose, business, onSuccess }) {
   const [loading, setLoading] = useState(false);
 
-  if (!shop) return null;
+  if (!business) return null;
 
-  const willDeactivate = shop.isActive;
+  const willDeactivate = business.isActive;
 
   const handleConfirm = async () => {
     try {
       setLoading(true);
-      const res = await api.put(API.SHOP_TOGGLE(shop._id));
+      const res = await api.put(API.BUSINESS_TOGGLE(business._id));
       const newStatus = res.data.data.isActive;
 
       toast.success(
         newStatus
-          ? `${shop.name} is now active.`
-          : `${shop.name} has been deactivated.`
+          ? `${business.name} is now active.`
+          : `${business.name} has been deactivated.`
       );
 
-      onSuccess({ ...shop, isActive: newStatus });
+      onSuccess({ ...business, isActive: newStatus });
     } catch (err) {
       toast.error(err.userMessage || 'Action failed. Please try again.');
     } finally {
@@ -50,7 +50,7 @@ export default function ToggleShopModal({ open, onClose, shop, onSuccess }) {
       open={open}
       onClose={onClose}
       title={willDeactivate ? 'Deactivate Business?' : 'Activate Business?'}
-      subtitle={shop.name}
+      subtitle={business.name}
       size="sm"
     >
       <div className="space-y-5">
@@ -66,8 +66,8 @@ export default function ToggleShopModal({ open, onClose, shop, onSuccess }) {
           }
           <p className={`text-sm leading-relaxed ${willDeactivate ? 'text-warning-text' : 'text-success-text'}`}>
             {willDeactivate
-              ? `Deactivating "${shop.name}" will immediately stop their WhatsApp chatbot from responding to any customer messages.`
-              : `Activating "${shop.name}" will allow their chatbot to start responding to customer messages again.`
+              ? `Deactivating "${business.name}" will immediately stop their WhatsApp chatbot from responding to any customer messages.`
+              : `Activating "${business.name}" will allow their chatbot to start responding to customer messages again.`
             }
           </p>
         </div>

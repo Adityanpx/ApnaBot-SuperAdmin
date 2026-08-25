@@ -1,4 +1,4 @@
-// app/(dashboard)/shops/[id]/page.jsx
+// app/(dashboard)/businesses/[id]/page.jsx
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -9,25 +9,25 @@ import { toast } from 'sonner';
 import Link from 'next/link';
 import api from '@/lib/api';
 import { API } from '@/lib/constants';
-import { summarizeDeletedCounts } from '@/hooks/useShops';
-import ShopDetailCard from '@/components/shops/ShopDetailCard';
-import ShopSubscriptionCard from '@/components/shops/ShopSubscriptionCard';
-import SubscriptionHistoryCard from '@/components/shops/SubscriptionHistoryCard';
+import { summarizeDeletedCounts } from '@/hooks/useBusinesses';
+import BusinessDetailCard from '@/components/businesses/BusinessDetailCard';
+import BusinessSubscriptionCard from '@/components/businesses/BusinessSubscriptionCard';
+import SubscriptionHistoryCard from '@/components/businesses/SubscriptionHistoryCard';
 import Button from '@/components/ui/Button';
 import { SkeletonCard } from '@/components/ui/Skeleton';
 
 // These modals are built in Step 10
-import ToggleShopModal        from '@/components/shops/ToggleShopModal';
-import ChangePlanModal        from '@/components/shops/ChangePlanModal';
-import ExtendSubModal         from '@/components/shops/ExtendSubModal';
-import GrantSubscriptionModal from '@/components/shops/GrantSubscriptionModal';
-import DeleteShopModal        from '@/components/shops/DeleteShopModal';
+import ToggleBusinessModal    from '@/components/businesses/ToggleBusinessModal';
+import ChangePlanModal        from '@/components/businesses/ChangePlanModal';
+import ExtendSubModal         from '@/components/businesses/ExtendSubModal';
+import GrantSubscriptionModal from '@/components/businesses/GrantSubscriptionModal';
+import DeleteBusinessModal    from '@/components/businesses/DeleteBusinessModal';
 
-export default function ShopDetailPage() {
+export default function BusinessDetailPage() {
   const { id }    = useParams();
   const router    = useRouter();
 
-  const [shop,         setShop]         = useState(null);
+  const [business,     setBusiness]     = useState(null);
   const [subscription, setSubscription] = useState(null);
   const [plan,         setPlan]         = useState(null);
   const [staffCount,   setStaffCount]   = useState(0);
@@ -41,16 +41,16 @@ export default function ShopDetailPage() {
   const [grantModal,  setGrantModal]   = useState(false);
   const [deleteModal, setDeleteModal]  = useState(false);
 
-  // ── Delete shop (permanent — removes all related data) ─────────────────
-  const handleDeleteShop = async (shopId) => {
+  // ── Delete business (permanent — removes all related data) ─────────────
+  const handleDeleteBusiness = async (businessId) => {
     try {
-      const res = await api.delete(API.SHOP_BY_ID(shopId));
+      const res = await api.delete(API.BUSINESS_BY_ID(businessId));
       const { businessName, deleted } = res.data.data;
 
       toast.success(`${businessName} deleted`, {
         description: `Removed ${summarizeDeletedCounts(deleted)}.`,
       });
-      router.replace('/shops');
+      router.replace('/businesses');
       return true;
     } catch (err) {
       toast.error(err.userMessage || 'Failed to delete business');
@@ -58,19 +58,19 @@ export default function ShopDetailPage() {
     }
   };
 
-  // ── Fetch shop data ─────────────────────────────────────────────────────
-  const fetchShop = async () => {
+  // ── Fetch business data ──────────────────────────────────────────────────
+  const fetchBusiness = async () => {
     try {
       setLoading(true);
-      const res = await api.get(API.SHOP_BY_ID(id));
-      const { shop, subscription, plan, staffCount } = res.data.data;
-      setShop(shop);
+      const res = await api.get(API.BUSINESS_BY_ID(id));
+      const { business, subscription, plan, staffCount } = res.data.data;
+      setBusiness(business);
       setSubscription(subscription);
       setPlan(plan);
       setStaffCount(staffCount);
     } catch (err) {
       toast.error(err.userMessage || 'Failed to load business');
-      router.replace('/shops');
+      router.replace('/businesses');
     } finally {
       setLoading(false);
     }
@@ -79,14 +79,14 @@ export default function ShopDetailPage() {
   // ── Fetch subscription history ──────────────────────────────────────────
   const fetchSubHistory = async () => {
     try {
-      const res = await api.get(API.SHOP_SUBSCRIPTION_HISTORY(id));
+      const res = await api.get(API.BUSINESS_SUBSCRIPTION_HISTORY(id));
       setSubHistory(res.data.data.subscriptions);
     } catch (err) {
       toast.error(err.userMessage || 'Failed to load subscription history');
     }
   };
 
-  useEffect(() => { fetchShop(); fetchSubHistory(); }, [id]);
+  useEffect(() => { fetchBusiness(); fetchSubHistory(); }, [id]);
 
   // ── Render ──────────────────────────────────────────────────────────────
   if (loading) {
@@ -107,7 +107,7 @@ export default function ShopDetailPage() {
     );
   }
 
-  if (!shop) return null;
+  if (!business) return null;
 
   return (
     <motion.div
@@ -120,7 +120,7 @@ export default function ShopDetailPage() {
       <div className="flex items-center justify-between gap-4 flex-wrap">
 
         {/* Back */}
-        <Link href="/shops">
+        <Link href="/businesses">
           <button className="flex items-center gap-2 text-sm text-text-secondary hover:text-text-primary transition-colors">
             <ArrowLeft className="w-4 h-4" />
             Back to Business
@@ -132,10 +132,10 @@ export default function ShopDetailPage() {
           <Button
             variant="secondary"
             size="sm"
-            icon={shop.isActive ? <ToggleRight className="w-4 h-4" /> : <ToggleLeft className="w-4 h-4" />}
+            icon={business.isActive ? <ToggleRight className="w-4 h-4" /> : <ToggleLeft className="w-4 h-4" />}
             onClick={() => setToggleModal(true)}
           >
-            {shop.isActive ? 'Deactivate' : 'Activate'}
+            {business.isActive ? 'Deactivate' : 'Activate'}
           </Button>
 
           <Button
@@ -178,54 +178,54 @@ export default function ShopDetailPage() {
 
       {/* Two-column layout */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Left — shop info */}
-        <ShopDetailCard shop={shop} staffCount={staffCount} />
+        {/* Left — business info */}
+        <BusinessDetailCard business={business} staffCount={staffCount} />
 
         {/* Right — subscription */}
         <div className="space-y-6">
-          <ShopSubscriptionCard subscription={subscription} plan={plan} />
+          <BusinessSubscriptionCard subscription={subscription} plan={plan} />
           <SubscriptionHistoryCard history={subHistory} />
         </div>
       </div>
 
       {/* Modals — built in Step 10 */}
-      <ToggleShopModal
+      <ToggleBusinessModal
         open={toggleModal}
         onClose={() => setToggleModal(false)}
-        shop={shop}
-        onSuccess={(updatedShop) => { setShop(updatedShop); setToggleModal(false); }}
+        business={business}
+        onSuccess={(updatedBusiness) => { setBusiness(updatedBusiness); setToggleModal(false); }}
       />
 
       <ChangePlanModal
         open={planModal}
         onClose={() => setPlanModal(false)}
-        shopId={id}
+        businessId={id}
         currentPlanId={plan?._id}
-        onSuccess={() => { fetchShop(); setPlanModal(false); }}
+        onSuccess={() => { fetchBusiness(); setPlanModal(false); }}
       />
 
       <ExtendSubModal
         open={extendModal}
         onClose={() => setExtendModal(false)}
-        shopId={id}
-        shopName={shop.name}
+        businessId={id}
+        businessName={business.name}
         currentEndDate={subscription?.endDate}
-        onSuccess={() => { fetchShop(); setExtendModal(false); }}
+        onSuccess={() => { fetchBusiness(); setExtendModal(false); }}
       />
 
       <GrantSubscriptionModal
         open={grantModal}
         onClose={() => setGrantModal(false)}
-        shopId={id}
-        shopName={shop.name}
-        onSuccess={() => { fetchShop(); fetchSubHistory(); setGrantModal(false); }}
+        businessId={id}
+        businessName={business.name}
+        onSuccess={() => { fetchBusiness(); fetchSubHistory(); setGrantModal(false); }}
       />
 
-      <DeleteShopModal
+      <DeleteBusinessModal
         open={deleteModal}
-        shop={shop}
+        business={business}
         onClose={() => setDeleteModal(false)}
-        onConfirm={handleDeleteShop}
+        onConfirm={handleDeleteBusiness}
       />
     </motion.div>
   );

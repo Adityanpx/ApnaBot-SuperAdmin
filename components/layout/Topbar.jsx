@@ -8,7 +8,7 @@ import { useSidebar } from '../../hooks/useSidebar';
 // Map pathnames to human-readable page titles
 const PAGE_TITLES = {
   '/dashboard':  { title: 'Dashboard',  subtitle: 'Platform overview and stats' },
-  '/shops':      { title: 'Business',   subtitle: 'Manage all registered businesses' },
+  '/businesses': { title: 'Business',   subtitle: 'Manage all registered businesses' },
   '/plans':      { title: 'Plans',      subtitle: 'Subscription plan management' },
   '/templates':  { title: 'Templates',  subtitle: 'Business type chatbot templates' },
 };
@@ -16,7 +16,7 @@ const PAGE_TITLES = {
 function getPageInfo(pathname) {
   // Exact match first
   if (PAGE_TITLES[pathname]) return PAGE_TITLES[pathname];
-  // Check for sub-paths (e.g. /shops/[id])
+  // Check for sub-paths (e.g. /businesses/[id])
   const base = '/' + pathname.split('/')[1];
   return PAGE_TITLES[base] || { title: 'Dashboard', subtitle: '' };
 }

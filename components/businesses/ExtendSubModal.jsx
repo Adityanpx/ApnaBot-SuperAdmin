@@ -1,4 +1,4 @@
-// components/shops/ExtendSubModal.jsx
+// components/businesses/ExtendSubModal.jsx
 'use client';
 
 import { useState } from 'react';
@@ -11,13 +11,13 @@ import api from '@/lib/api';
 import { API } from '@/lib/constants';
 
 /**
- * Modal to extend a shop's subscription by a preset number of days
+ * Modal to extend a business's subscription by a preset number of days
  *
  * Props:
  *   open           — boolean
  *   onClose        — () => void
- *   shopId         — string
- *   shopName       — string
+ *   businessId     — string
+ *   businessName   — string
  *   currentEndDate — ISO date string
  *   onSuccess      — () => void
  */
@@ -32,8 +32,8 @@ const PRESET_OPTIONS = [
 export default function ExtendSubModal({
   open,
   onClose,
-  shopId,
-  shopName,
+  businessId,
+  businessName,
   currentEndDate,
   onSuccess,
 }) {
@@ -61,7 +61,7 @@ export default function ExtendSubModal({
     }
     try {
       setSaving(true);
-      await api.put(API.SHOP_EXTEND(shopId), { days: effectiveDays });
+      await api.put(API.BUSINESS_EXTEND(businessId), { days: effectiveDays });
       toast.success(`Subscription extended by ${effectiveDays} days.`);
       onSuccess();
     } catch (err) {
@@ -76,7 +76,7 @@ export default function ExtendSubModal({
       open={open}
       onClose={onClose}
       title="Extend Subscription"
-      subtitle={shopName}
+      subtitle={businessName}
       size="sm"
     >
       <div className="space-y-5">

@@ -161,7 +161,7 @@
     transition: box-shadow 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
   }
 
-  /* Glowing highlighted card (for popular plan, active shop etc.) */
+  /* Glowing highlighted card (for popular plan, active business etc.) */
   .card-glow {
     background-color: var(--bg-raised);
     border-radius: 16px;

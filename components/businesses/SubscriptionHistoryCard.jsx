@@ -1,4 +1,4 @@
-// components/shops/SubscriptionHistoryCard.jsx
+// components/businesses/SubscriptionHistoryCard.jsx
 import Badge from '@/components/ui/Badge';
 import { formatDate, formatCurrency, getSubStatusVariant, capitalize } from '@/lib/utils';
 import { History, ShieldCheck, CreditCard } from 'lucide-react';

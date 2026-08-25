@@ -1,4 +1,4 @@
-// hooks/useShops.js
+// hooks/useBusinesses.js
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
@@ -7,7 +7,7 @@ import api from '@/lib/api';
 import { API } from '@/lib/constants';
 
 // ── Deleted-row summary for the post-delete toast ───────────────────────────
-// Matches the `deleted` breakdown returned by DELETE /api/admin/shops/:id
+// Matches the `deleted` breakdown returned by DELETE /api/admin/businesses/:id
 const DELETED_COUNT_LABELS = [
   ['rules',            'rule'],
   ['bookings',         'booking'],
@@ -27,8 +27,8 @@ export function summarizeDeletedCounts(deleted = {}) {
   return parts.length ? parts.join(', ') : 'no related records';
 }
 
-export function useShops() {
-  const [shops,      setShops]      = useState([]);
+export function useBusinesses() {
+  const [businesses, setBusinesses] = useState([]);
   const [pagination, setPagination] = useState({ total: 0, page: 1, pages: 1 });
   const [loading,    setLoading]    = useState(true);
 
@@ -39,8 +39,8 @@ export function useShops() {
   const [isActive,     setIsActive]     = useState('');
   const [businessType, setBusinessType] = useState('');
 
-  // ── Fetch shops ─────────────────────────────────────────────────────────
-  const fetchShops = useCallback(async () => {
+  // ── Fetch businesses ────────────────────────────────────────────────────
+  const fetchBusinesses = useCallback(async () => {
     try {
       setLoading(true);
       const params = { page, limit };
@@ -48,8 +48,8 @@ export function useShops() {
       if (isActive)     params.isActive     = isActive;
       if (businessType) params.businessCategory = businessType;
 
-      const res = await api.get(API.SHOPS, { params });
-      setShops(res.data.data.shops);
+      const res = await api.get(API.BUSINESSES, { params });
+      setBusinesses(res.data.data.businesses);
       setPagination(res.data.data.pagination);
     } catch (err) {
       toast.error(err.userMessage || 'Failed to load businesses');
@@ -64,30 +64,30 @@ export function useShops() {
   const handleTypeChange    = (val) => { setBusinessType(val); setPage(1); };
   const handlePageChange    = (val) => setPage(val);
 
-  // ── Toggle a shop (optimistic update) ───────────────────────────────────
-  const toggleShop = async (shopId) => {
+  // ── Toggle a business (optimistic update) ───────────────────────────────
+  const toggleBusiness = async (businessId) => {
     // Optimistic — flip locally first
-    setShops((prev) =>
-      prev.map((s) => s._id === shopId ? { ...s, isActive: !s.isActive } : s)
+    setBusinesses((prev) =>
+      prev.map((b) => b._id === businessId ? { ...b, isActive: !b.isActive } : b)
     );
     try {
-      await api.put(API.SHOP_TOGGLE(shopId));
+      await api.put(API.BUSINESS_TOGGLE(businessId));
     } catch (err) {
       // Revert on failure
-      setShops((prev) =>
-        prev.map((s) => s._id === shopId ? { ...s, isActive: !s.isActive } : s)
+      setBusinesses((prev) =>
+        prev.map((b) => b._id === businessId ? { ...b, isActive: !b.isActive } : b)
       );
       toast.error(err.userMessage || 'Toggle failed');
     }
   };
 
-  // ── Delete a shop (permanent — removes all related data) ────────────────
-  const deleteShop = async (shopId) => {
+  // ── Delete a business (permanent — removes all related data) ────────────
+  const deleteBusiness = async (businessId) => {
     try {
-      const res = await api.delete(API.SHOP_BY_ID(shopId));
+      const res = await api.delete(API.BUSINESS_BY_ID(businessId));
       const { businessName, deleted } = res.data.data;
 
-      setShops((prev) => prev.filter((s) => s._id !== shopId));
+      setBusinesses((prev) => prev.filter((b) => b._id !== businessId));
 
       toast.success(`${businessName} deleted`, {
         description: `Removed ${summarizeDeletedCounts(deleted)}.`,
@@ -99,10 +99,10 @@ export function useShops() {
     }
   };
 
-  useEffect(() => { fetchShops(); }, [fetchShops]);
+  useEffect(() => { fetchBusinesses(); }, [fetchBusinesses]);
 
   return {
-    shops,
+    businesses,
     pagination,
     loading,
     page,
@@ -114,8 +114,8 @@ export function useShops() {
     handleActiveChange,
     handleTypeChange,
     handlePageChange,
-    refetch: fetchShops,
-    toggleShop,
-    deleteShop,
+    refetch: fetchBusinesses,
+    toggleBusiness,
+    deleteBusiness,
   };
 }

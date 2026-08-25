@@ -1,4 +1,4 @@
-// components/shops/ShopSubscriptionCard.jsx
+// components/businesses/BusinessSubscriptionCard.jsx
 import React from 'react';
 import Badge from '@/components/ui/Badge';
 import {
@@ -35,7 +35,7 @@ function FeatureRow({ icon, label, value, enabled }) {
   );
 }
 
-export default function ShopSubscriptionCard({ subscription, plan }) {
+export default function BusinessSubscriptionCard({ subscription, plan }) {
   if (!subscription || !plan) {
     return (
       <div className="card p-6">

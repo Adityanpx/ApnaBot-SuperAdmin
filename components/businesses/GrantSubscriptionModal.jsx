@@ -1,4 +1,4 @@
-// components/shops/GrantSubscriptionModal.jsx
+// components/businesses/GrantSubscriptionModal.jsx
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -13,15 +13,15 @@ import api from '@/lib/api';
 import { API } from '@/lib/constants';
 
 /**
- * Modal to manually grant/override a shop's subscription — superadmin-only,
+ * Modal to manually grant/override a business's subscription — superadmin-only,
  * bypasses payment entirely. Full control over plan, status, and duration.
  *
  * Props:
- *   open      — boolean
- *   onClose   — () => void
- *   shopId    — string
- *   shopName  — string
- *   onSuccess — () => void — called after the grant succeeds
+ *   open         — boolean
+ *   onClose      — () => void
+ *   businessId   — string
+ *   businessName — string
+ *   onSuccess    — () => void — called after the grant succeeds
  */
 
 const STATUS_OPTIONS = [
@@ -33,7 +33,7 @@ const STATUS_OPTIONS = [
 
 const DURATION_PRESETS = [7, 15, 30];
 
-export default function GrantSubscriptionModal({ open, onClose, shopId, shopName, onSuccess }) {
+export default function GrantSubscriptionModal({ open, onClose, businessId, businessName, onSuccess }) {
   const [plans,        setPlans]        = useState([]);
   const [loadingPlans, setLoadingPlans] = useState(true);
   const [planId,       setPlanId]       = useState('');
@@ -79,7 +79,7 @@ export default function GrantSubscriptionModal({ open, onClose, shopId, shopName
     }
     try {
       setSaving(true);
-      await api.post(API.SHOP_GRANT_SUBSCRIPTION(shopId), { planId, status, durationDays });
+      await api.post(API.BUSINESS_GRANT_SUBSCRIPTION(businessId), { planId, status, durationDays });
       toast.success('Subscription granted successfully.');
       onSuccess();
     } catch (err) {
@@ -94,7 +94,7 @@ export default function GrantSubscriptionModal({ open, onClose, shopId, shopName
       open={open}
       onClose={onClose}
       title="Grant Subscription"
-      subtitle={shopName}
+      subtitle={businessName}
       size="sm"
     >
       <div className="space-y-5">

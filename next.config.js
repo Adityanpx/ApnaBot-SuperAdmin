@@ -11,7 +11,7 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'res.cloudinary.com', // Cloudinary (used by backend for shop images)
+        hostname: 'res.cloudinary.com', // Cloudinary (used by backend for business images)
       },
       {
         protocol: 'https',

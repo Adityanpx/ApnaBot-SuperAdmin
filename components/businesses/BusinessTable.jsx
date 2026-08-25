@@ -1,4 +1,4 @@
-// components/shops/ShopTable.jsx
+// components/businesses/BusinessTable.jsx
 'use client';
 
 import Link from 'next/link';
@@ -31,7 +31,7 @@ const TD = ({ children, className }) => (
   </td>
 );
 
-export default function ShopTable({ shops, loading, onToggle, onDelete }) {
+export default function BusinessTable({ businesses, loading, onToggle, onDelete }) {
   return (
     <div className="card overflow-hidden">
       <div className="overflow-x-auto">
@@ -57,7 +57,7 @@ export default function ShopTable({ shops, loading, onToggle, onDelete }) {
             ))}
 
             {/* Empty state */}
-            {!loading && shops.length === 0 && (
+            {!loading && businesses.length === 0 && (
               <tr>
                 <td colSpan={6}>
                   <EmptyState
@@ -70,30 +70,30 @@ export default function ShopTable({ shops, loading, onToggle, onDelete }) {
             )}
 
             {/* Data rows */}
-            {!loading && shops.map((shop, i) => (
+            {!loading && businesses.map((business, i) => (
               <motion.tr
-                key={shop._id}
+                key={business._id}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: i * 0.03, duration: 0.25 }}
                 className="table-row"
               >
-                {/* Shop name + city */}
+                {/* Business name + city */}
                 <TD>
                   <div className="flex items-center gap-3">
                     <div className="
                       w-9 h-9 rounded-xl flex items-center justify-center
                       bg-bg-subtle text-base flex-shrink-0
                     ">
-                      {getBusinessEmoji(shop.businessCategory)}
+                      {getBusinessEmoji(business.businessCategory)}
                     </div>
                     <div className="min-w-0">
                       <p className="font-semibold text-text-primary truncate max-w-[180px]">
-                        {shop.name}
+                        {business.name}
                       </p>
-                      {shop.city && (
+                      {business.city && (
                         <p className="text-xs text-text-tertiary mt-0.5">
-                          📍 {shop.city}
+                          📍 {business.city}
                         </p>
                       )}
                     </div>
@@ -102,20 +102,20 @@ export default function ShopTable({ shops, loading, onToggle, onDelete }) {
 
                 {/* Owner */}
                 <TD>
-                  {shop.ownerUserId ? (
+                  {business.ownerUserId ? (
                     <div className="flex items-center gap-2">
                       <div className="
                         w-7 h-7 rounded-full flex items-center justify-center
                         bg-gradient-brand text-white text-xs font-bold flex-shrink-0
                       ">
-                        {getInitials(shop.ownerUserId.name)}
+                        {getInitials(business.ownerUserId.name)}
                       </div>
                       <div className="min-w-0">
                         <p className="text-text-primary text-xs font-medium truncate max-w-[130px]">
-                          {shop.ownerUserId.name}
+                          {business.ownerUserId.name}
                         </p>
                         <p className="text-text-tertiary text-[11px] truncate max-w-[130px]">
-                          {shop.ownerUserId.email}
+                          {business.ownerUserId.email}
                         </p>
                       </div>
                     </div>
@@ -127,25 +127,25 @@ export default function ShopTable({ shops, loading, onToggle, onDelete }) {
                 {/* Business type */}
                 <TD className="hidden md:table-cell">
                   <span className="text-text-secondary text-xs">
-                    {getBusinessEmoji(shop.businessCategory)}{' '}
-                    {capitalize(shop.businessCategory)}
+                    {getBusinessEmoji(business.businessCategory)}{' '}
+                    {capitalize(business.businessCategory)}
                   </span>
                 </TD>
 
                 {/* Date joined */}
                 <TD className="hidden lg:table-cell">
                   <span className="text-text-tertiary text-xs">
-                    {formatDate(shop.createdAt)}
+                    {formatDate(business.createdAt)}
                   </span>
                 </TD>
 
                 {/* Status badge */}
                 <TD>
                   <Badge
-                    variant={shop.isActive ? 'success' : 'neutral'}
+                    variant={business.isActive ? 'success' : 'neutral'}
                     dot
                   >
-                    {shop.isActive ? 'Active' : 'Inactive'}
+                    {business.isActive ? 'Active' : 'Inactive'}
                   </Badge>
                 </TD>
 
@@ -155,22 +155,22 @@ export default function ShopTable({ shops, loading, onToggle, onDelete }) {
 
                     {/* Toggle active/inactive */}
                     <button
-                      onClick={() => onToggle(shop._id)}
-                      title={shop.isActive ? 'Deactivate business' : 'Activate business'}
+                      onClick={() => onToggle(business._id)}
+                      title={business.isActive ? 'Deactivate business' : 'Activate business'}
                       className="
                         w-8 h-8 flex items-center justify-center rounded-lg
                         text-text-tertiary hover:text-text-primary hover:bg-bg-subtle
                         transition-colors duration-150
                       "
                     >
-                      {shop.isActive
+                      {business.isActive
                         ? <ToggleRight className="w-4 h-4 text-success" />
                         : <ToggleLeft  className="w-4 h-4" />
                       }
                     </button>
 
                     {/* View detail */}
-                    <Link href={`/shops/${shop._id}`}>
+                    <Link href={`/businesses/${business._id}`}>
                       <button
                         title="View business details"
                         className="
@@ -185,7 +185,7 @@ export default function ShopTable({ shops, loading, onToggle, onDelete }) {
 
                     {/* Delete */}
                     <button
-                      onClick={() => onDelete(shop)}
+                      onClick={() => onDelete(business)}
                       title="Delete business"
                       className="
                         w-8 h-8 flex items-center justify-center rounded-lg

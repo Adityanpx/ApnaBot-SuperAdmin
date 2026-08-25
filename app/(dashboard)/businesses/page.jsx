@@ -1,16 +1,16 @@
-// app/(dashboard)/shops/page.jsx
+// app/(dashboard)/businesses/page.jsx
 'use client';
 
 import { useState } from 'react';
-import { useShops } from '@/hooks/useShops';
-import ShopFilters from '@/components/shops/ShopFilters';
-import ShopTable from '@/components/shops/ShopTable';
-import DeleteShopModal from '@/components/shops/DeleteShopModal';
+import { useBusinesses } from '@/hooks/useBusinesses';
+import BusinessFilters from '@/components/businesses/BusinessFilters';
+import BusinessTable from '@/components/businesses/BusinessTable';
+import DeleteBusinessModal from '@/components/businesses/DeleteBusinessModal';
 import Pagination from '@/components/ui/Pagination';
 
-export default function ShopsPage() {
+export default function BusinessesPage() {
   const {
-    shops,
+    businesses,
     pagination,
     loading,
     page,
@@ -22,11 +22,11 @@ export default function ShopsPage() {
     handleActiveChange,
     handleTypeChange,
     handlePageChange,
-    toggleShop,
-    deleteShop,
-  } = useShops();
+    toggleBusiness,
+    deleteBusiness,
+  } = useBusinesses();
 
-  const [deletingShop, setDeletingShop] = useState(null);
+  const [deletingBusiness, setDeletingBusiness] = useState(null);
 
   return (
     <div className="space-y-6 max-w-screen-xl">
@@ -40,22 +40,22 @@ export default function ShopsPage() {
       </div>
 
       {/* Filters */}
-      <ShopFilters
+      <BusinessFilters
         search={search}
         isActive={isActive}
         businessType={businessType}
         onSearchChange={handleSearchChange}
         onActiveChange={handleActiveChange}
         onTypeChange={handleTypeChange}
-        totalShops={pagination.total}
+        totalBusinesses={pagination.total}
       />
 
       {/* Table */}
-      <ShopTable
-        shops={shops}
+      <BusinessTable
+        businesses={businesses}
         loading={loading}
-        onToggle={toggleShop}
-        onDelete={setDeletingShop}
+        onToggle={toggleBusiness}
+        onDelete={setDeletingBusiness}
       />
 
       {/* Pagination */}
@@ -70,11 +70,11 @@ export default function ShopsPage() {
       )}
 
       {/* Delete confirmation */}
-      <DeleteShopModal
-        open={!!deletingShop}
-        shop={deletingShop}
-        onClose={() => setDeletingShop(null)}
-        onConfirm={deleteShop}
+      <DeleteBusinessModal
+        open={!!deletingBusiness}
+        business={deletingBusiness}
+        onClose={() => setDeletingBusiness(null)}
+        onConfirm={deleteBusiness}
       />
     </div>
   );
