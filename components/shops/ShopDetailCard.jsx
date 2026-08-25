@@ -73,8 +73,8 @@ export default function ShopDetailCard({ shop, staffCount }) {
       <div className="card p-6">
         <h3 className="text-sm font-semibold text-text-secondary mb-1">Business Details</h3>
         <div className="mt-3">
-          <InfoRow icon={<MapPin />} label="Address" value={shop.address} />
-          <InfoRow icon={<Phone />}  label="WhatsApp Number" value={shop.whatsappNumber} />
+          <InfoRow icon={MapPin} label="Address" value={shop.address} />
+          <InfoRow icon={Phone}  label="WhatsApp Number" value={shop.whatsappNumber} />
         </div>
 
         {/* WhatsApp connection status */}
