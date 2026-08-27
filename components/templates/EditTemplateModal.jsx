@@ -4,26 +4,29 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
-import { MessageSquare, ClipboardList } from 'lucide-react';
+import { MessageSquare, ClipboardList, Languages } from 'lucide-react';
 import Modal   from '@/components/ui/Modal';
 import Button  from '@/components/ui/Button';
 import RuleEditor  from './RuleEditor';
 import FieldEditor from './FieldEditor';
+import BookingQuestionsEditor from './BookingQuestionsEditor';
 import api     from '@/lib/api';
 import { API } from '@/lib/constants';
 import { getBusinessEmoji, capitalize } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 
 const TABS = [
-  { id: 'rules',  label: 'Default Rules',   icon: MessageSquare },
-  { id: 'fields', label: 'Booking Fields',  icon: ClipboardList },
+  { id: 'rules',        label: 'Default Rules',    icon: MessageSquare },
+  { id: 'fields',       label: 'Booking Fields',    icon: ClipboardList },
+  { id: 'translations', label: 'Booking Questions', icon: Languages },
 ];
 
 /**
  * EditTemplateModal — tabbed modal for editing a business type template
  * Tab 1: defaultRules  — managed by RuleEditor
  * Tab 2: bookingFields — managed by FieldEditor
- * Both saved together in one PUT request when "Save" is clicked
+ * Tab 3: bookingFields translations (labelTranslations) — managed by BookingQuestionsEditor
+ * All saved together in one PUT request when "Save" is clicked
  */
 export default function EditTemplateModal({ open, onClose, template, onSuccess }) {
   const [activeTab, setActiveTab] = useState('rules');
@@ -160,8 +163,10 @@ export default function EditTemplateModal({ open, onClose, template, onSuccess }
       <AnimatedTab tabKey={activeTab}>
         {activeTab === 'rules' ? (
           <RuleEditor rules={rules} onChange={setRules} />
-        ) : (
+        ) : activeTab === 'fields' ? (
           <FieldEditor fields={fields} onChange={setFields} />
+        ) : (
+          <BookingQuestionsEditor fields={fields} onChange={setFields} />
         )}
       </AnimatedTab>
     </Modal>
