@@ -10,7 +10,6 @@ const PAGE_TITLES = {
   '/dashboard':  { title: 'Dashboard',  subtitle: 'Platform overview and stats' },
   '/businesses': { title: 'Business',   subtitle: 'Manage all registered businesses' },
   '/plans':      { title: 'Plans',      subtitle: 'Subscription plan management' },
-  '/templates':  { title: 'Templates',  subtitle: 'Business type chatbot templates' },
 };
 
 function getPageInfo(pathname) {
