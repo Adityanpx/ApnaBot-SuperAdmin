@@ -71,21 +71,16 @@ export default function EditPlanModal({ open, plan, onClose, onSuccess }) {
     setLoading(true);
     try {
       const payload = {
-        name: form.name.trim().toLowerCase(),
         displayName: form.displayName.trim(),
         price: Number(form.price),
-        limits: {
-          msgLimit: Number(form.msgLimit)    || 0,
-          ruleLimit: Number(form.ruleLimit)  || 0,
-          customerLimit: Number(form.customerLimit) || 0,
-        },
+        msgLimit: Number(form.msgLimit) || 0,
+        ruleLimit: Number(form.ruleLimit) || 0,
+        customerLimit: Number(form.customerLimit) || 0,
         isActive: form.isActive,
-        features: {
-          bookingEnabled: form.bookingEnabled,
-          paymentLinkEnabled: form.paymentLinkEnabled,
-          staffEnabled: form.staffEnabled,
-          maxStaff: form.staffEnabled ? Number(form.maxStaff) || 1 : 0,
-        },
+        bookingEnabled: form.bookingEnabled,
+        paymentLinkEnabled: form.paymentLinkEnabled,
+        staffEnabled: form.staffEnabled,
+        maxStaff: form.staffEnabled ? Number(form.maxStaff) || 1 : 0,
       };
 
       await api.put(`${API.PLANS}/${plan._id}`, payload);
