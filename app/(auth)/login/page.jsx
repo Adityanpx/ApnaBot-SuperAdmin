@@ -25,8 +25,10 @@ export default function LoginPage() {
   // instead of potentially resolving from a stale cached response.
   useEffect(() => {
     if (isLoggedIn) {
-      router.replace('/dashboard');
       router.refresh();
+      setTimeout(() => {
+        router.replace('/dashboard');
+      }, 100);
     }
   }, [isLoggedIn, router]);
 
