@@ -99,6 +99,26 @@ export default function PlanCard({ plan, onEdit, onDelete, delay = 0 }) {
         )}
       </div>
 
+      {/* Duration options */}
+      {plan.durationOptions && plan.durationOptions.length > 1 && (
+        <div className="space-y-1.5 mb-5">
+          <p className="text-xs font-semibold text-text-tertiary uppercase tracking-wider">Pricing</p>
+          {plan.durationOptions.map(opt => (
+            <div key={opt.months} className="flex items-center justify-between text-sm">
+              <span className="text-text-secondary">{opt.label}</span>
+              <div className="flex items-center gap-2">
+                <span className="font-semibold text-text-primary">{formatCurrency(opt.price)}</span>
+                {opt.discount > 0 && (
+                  <span className="text-xs font-medium text-success-text bg-success-bg px-1.5 py-0.5 rounded-full">
+                    -{opt.discount}%
+                  </span>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* Feature flags */}
       <div className="flex flex-wrap gap-2 pb-5 mb-5 border-b border-border-subtle">
         <FeaturePill icon={BookOpen}   label="Bookings" enabled={plan.bookingEnabled} />

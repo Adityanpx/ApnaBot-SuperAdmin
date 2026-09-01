@@ -35,11 +35,33 @@ export default function EditPlanModal({ open, plan, onClose, onSuccess }) {
     paymentLinkEnabled: false,
     staffEnabled: false,
     maxStaff: '',
+    durationOptions: [
+      { months: 1,  price: '', label: 'Monthly',     discount: 0 },
+      { months: 3,  price: '', label: 'Quarterly',   discount: 10 },
+      { months: 6,  price: '', label: 'Half-Yearly', discount: 20 },
+      { months: 12, price: '', label: 'Yearly',      discount: 30 },
+    ],
   });
 
   // Populate form when plan changes
   useEffect(() => {
     if (plan) {
+      const defaultDurations = [
+        { months: 1,  price: '0', label: 'Monthly',     discount: 0 },
+        { months: 3,  price: '0', label: 'Quarterly',   discount: 10 },
+        { months: 6,  price: '0', label: 'Half-Yearly', discount: 20 },
+        { months: 12, price: '0', label: 'Yearly',      discount: 30 },
+      ];
+
+      // Merge existing duration_options with defaults
+      const existingOptions = plan.durationOptions || [];
+      const mergedOptions = defaultDurations.map(def => {
+        const existing = existingOptions.find(e => e.months === def.months);
+        return existing
+          ? { ...def, price: existing.price?.toString() || '0', discount: existing.discount || 0 }
+          : { ...def, price: '0' };
+      });
+
       setForm({
         name: plan.name || '',
         displayName: plan.displayName || '',
@@ -52,6 +74,7 @@ export default function EditPlanModal({ open, plan, onClose, onSuccess }) {
         paymentLinkEnabled: plan.paymentLinkEnabled ?? false,
         staffEnabled: plan.staffEnabled ?? false,
         maxStaff: plan.maxStaff?.toString() || '1',
+        durationOptions: mergedOptions,
       });
     }
   }, [plan]);
@@ -81,6 +104,14 @@ export default function EditPlanModal({ open, plan, onClose, onSuccess }) {
         paymentLinkEnabled: form.paymentLinkEnabled,
         staffEnabled: form.staffEnabled,
         maxStaff: form.staffEnabled ? Number(form.maxStaff) || 1 : 0,
+        durationOptions: form.durationOptions
+          .filter(opt => opt.price && Number(opt.price) > 0)
+          .map(opt => ({
+            months: opt.months,
+            price: Number(opt.price),
+            label: opt.label,
+            discount: opt.discount || 0,
+          })),
       };
 
       await api.put(`${API.PLANS}/${plan._id}`, payload);
@@ -158,6 +189,52 @@ export default function EditPlanModal({ open, plan, onClose, onSuccess }) {
                 onChange={update('customerLimit')}
                 min="0"
               />
+            </div>
+
+            {/* Duration Pricing */}
+            <div className="space-y-3">
+              <p className="text-sm font-medium text-text-secondary">
+                Duration Pricing
+                <span className="text-xs text-text-tertiary ml-2">(total price for each duration)</span>
+              </p>
+              <div className="grid grid-cols-2 gap-3">
+                {form.durationOptions.map((opt, idx) => (
+                  <div key={opt.months} className="flex items-center gap-2">
+                    <span className="text-xs text-text-tertiary w-20 flex-shrink-0">{opt.label}</span>
+                    <Input
+                      type="number"
+                      placeholder="₹ total"
+                      value={opt.price}
+                      onChange={(e) => {
+                        const updated = [...form.durationOptions];
+                        updated[idx] = { ...updated[idx], price: e.target.value };
+                        setForm(prev => ({ ...prev, durationOptions: updated }));
+                      }}
+                      min="0"
+                    />
+                    {opt.months > 1 && (
+                      <Input
+                        type="number"
+                        placeholder="%"
+                        value={opt.discount}
+                        onChange={(e) => {
+                          const discount = Number(e.target.value) || 0;
+                          const basePrice = Number(form.price) || 0;
+                          const updated = [...form.durationOptions];
+                          updated[idx] = {
+                            ...updated[idx],
+                            discount,
+                            price: Math.round(basePrice * opt.months * (1 - discount / 100)).toString()
+                          };
+                          setForm(prev => ({ ...prev, durationOptions: updated }));
+                        }}
+                        min="0"
+                        max="100"
+                      />
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
 
             {/* Staff limit (conditional) */}
