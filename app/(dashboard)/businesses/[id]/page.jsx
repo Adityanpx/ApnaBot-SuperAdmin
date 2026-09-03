@@ -4,7 +4,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { ArrowLeft, ToggleLeft, ToggleRight, RefreshCcw, CreditCard, Trash2, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, ToggleLeft, ToggleRight, RefreshCcw, CreditCard, Trash2, ShieldCheck, Eye } from 'lucide-react';
 import { toast } from 'sonner';
 import Link from 'next/link';
 import api from '@/lib/api';
@@ -21,6 +21,7 @@ import ToggleBusinessModal    from '@/components/businesses/ToggleBusinessModal'
 import ChangePlanModal        from '@/components/businesses/ChangePlanModal';
 import ExtendSubModal         from '@/components/businesses/ExtendSubModal';
 import GrantSubscriptionModal from '@/components/businesses/GrantSubscriptionModal';
+import GrantPreviewCreditsModal from '@/components/businesses/GrantPreviewCreditsModal';
 import DeleteBusinessModal    from '@/components/businesses/DeleteBusinessModal';
 
 export default function BusinessDetailPage() {
@@ -39,6 +40,7 @@ export default function BusinessDetailPage() {
   const [planModal,   setPlanModal]    = useState(false);
   const [extendModal, setExtendModal]  = useState(false);
   const [grantModal,  setGrantModal]   = useState(false);
+  const [creditsModal, setCreditsModal] = useState(false);
   const [deleteModal, setDeleteModal]  = useState(false);
 
   // ── Delete business (permanent — removes all related data) ─────────────
@@ -166,6 +168,15 @@ export default function BusinessDetailPage() {
           </Button>
 
           <Button
+            variant="secondary"
+            size="sm"
+            icon={<Eye className="w-4 h-4" />}
+            onClick={() => setCreditsModal(true)}
+          >
+            Grant Previews
+          </Button>
+
+          <Button
             variant="danger"
             size="sm"
             icon={<Trash2 className="w-4 h-4" />}
@@ -219,6 +230,14 @@ export default function BusinessDetailPage() {
         businessId={id}
         businessName={business.name}
         onSuccess={() => { fetchBusiness(); fetchSubHistory(); setGrantModal(false); }}
+      />
+
+      <GrantPreviewCreditsModal
+        open={creditsModal}
+        onClose={() => setCreditsModal(false)}
+        businessId={id}
+        businessName={business.name}
+        onSuccess={() => { fetchBusiness(); setCreditsModal(false); }}
       />
 
       <DeleteBusinessModal
