@@ -49,11 +49,42 @@ export function useCategoryTemplates() {
     }
   };
 
+  // Server-side this deletes any existing template for `category` before
+  // inserting the import — callers should warn before submitting.
+  const importFromJson = async (payload) => {
+    try {
+      const res = await api.post(API.CATEGORY_TEMPLATE_IMPORT_JSON, payload);
+      toast.success('Category template imported successfully');
+      await fetchTemplates();
+      return res.data.data;
+    } catch (err) {
+      toast.error(err.userMessage || 'Failed to import category template');
+      throw err;
+    }
+  };
+
+  const exportTemplate = async (id) => {
+    try {
+      const res = await api.get(API.CATEGORY_TEMPLATE_EXPORT(id));
+      const blob = new Blob([JSON.stringify(res.data.data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${res.data.data.category}-template.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      toast.error(err.userMessage || 'Failed to export category template');
+    }
+  };
+
   return {
     templates,
     loading,
     refetch: fetchTemplates,
     cloneFromBusiness,
     deleteTemplate,
+    importFromJson,
+    exportTemplate,
   };
 }

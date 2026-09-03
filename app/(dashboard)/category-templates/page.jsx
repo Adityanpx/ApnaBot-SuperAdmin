@@ -3,10 +3,11 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Plus } from 'lucide-react';
+import { Plus, Upload } from 'lucide-react';
 import { useCategoryTemplates } from '@/hooks/useCategoryTemplates';
 import CategoryTemplateTable from '@/components/categoryTemplates/CategoryTemplateTable';
 import CloneCategoryTemplateModal from '@/components/categoryTemplates/CloneCategoryTemplateModal';
+import ImportJsonTemplateModal from '@/components/categoryTemplates/ImportJsonTemplateModal';
 import DeleteCategoryTemplateModal from '@/components/categoryTemplates/DeleteCategoryTemplateModal';
 import Button from '@/components/ui/Button';
 
@@ -14,10 +15,12 @@ export default function CategoryTemplatesPage() {
   const {
     templates, loading,
     cloneFromBusiness, deleteTemplate,
+    importFromJson, exportTemplate,
   } = useCategoryTemplates();
 
   // Modal state
   const [showClone, setShowClone]             = useState(false);
+  const [showImportJson, setShowImportJson]   = useState(false);
   const [deletingTemplate, setDeletingTemplate] = useState(null);
 
   return (
@@ -35,12 +38,21 @@ export default function CategoryTemplatesPage() {
             One reusable chatbot rule set per business category, cloned from an existing business
           </p>
         </div>
-        <Button
-          icon={Plus}
-          onClick={() => setShowClone(true)}
-        >
-          Clone from Business
-        </Button>
+        <div className="flex items-center gap-3">
+          <Button
+            variant="secondary"
+            icon={Upload}
+            onClick={() => setShowImportJson(true)}
+          >
+            Import from JSON
+          </Button>
+          <Button
+            icon={Plus}
+            onClick={() => setShowClone(true)}
+          >
+            Clone from Business
+          </Button>
+        </div>
       </div>
 
       {/* Table */}
@@ -48,6 +60,7 @@ export default function CategoryTemplatesPage() {
         templates={templates}
         loading={loading}
         onDelete={setDeletingTemplate}
+        onExport={exportTemplate}
       />
 
       {/* Modals — mutation hook toasts + refetches internally on success */}
@@ -56,6 +69,12 @@ export default function CategoryTemplatesPage() {
         onClose={() => setShowClone(false)}
         templates={templates}
         cloneFromBusiness={cloneFromBusiness}
+      />
+      <ImportJsonTemplateModal
+        open={showImportJson}
+        onClose={() => setShowImportJson(false)}
+        templates={templates}
+        importFromJson={importFromJson}
       />
       <DeleteCategoryTemplateModal
         open={!!deletingTemplate}

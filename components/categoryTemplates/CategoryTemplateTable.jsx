@@ -2,7 +2,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Download } from 'lucide-react';
 import Badge from '@/components/ui/Badge';
 import { SkeletonTableRow } from '@/components/ui/Skeleton';
 import EmptyState from '@/components/ui/EmptyState';
@@ -24,7 +24,7 @@ const TD = ({ children, className }) => (
   </td>
 );
 
-export default function CategoryTemplateTable({ templates, loading, onDelete }) {
+export default function CategoryTemplateTable({ templates, loading, onDelete, onExport }) {
   return (
     <div className="card overflow-hidden">
       <div className="overflow-x-auto">
@@ -96,17 +96,30 @@ export default function CategoryTemplateTable({ templates, loading, onDelete }) 
 
                   {/* Actions */}
                   <TD className="text-right">
-                    <button
-                      onClick={() => onDelete(template)}
-                      title="Delete category template"
-                      className="
-                        w-8 h-8 flex items-center justify-center rounded-lg
-                        text-text-tertiary hover:text-danger-text hover:bg-danger-bg
-                        transition-colors duration-150
-                      "
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
+                    <div className="flex items-center justify-end gap-1">
+                      <button
+                        onClick={() => onExport(template._id)}
+                        title="Export category template"
+                        className="
+                          w-8 h-8 flex items-center justify-center rounded-lg
+                          text-text-tertiary hover:text-text-primary hover:bg-bg-subtle
+                          transition-colors duration-150
+                        "
+                      >
+                        <Download className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => onDelete(template)}
+                        title="Delete category template"
+                        className="
+                          w-8 h-8 flex items-center justify-center rounded-lg
+                          text-text-tertiary hover:text-danger-text hover:bg-danger-bg
+                          transition-colors duration-150
+                        "
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </TD>
                 </motion.tr>
               );
