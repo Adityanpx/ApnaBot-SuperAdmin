@@ -2,35 +2,28 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
-import { Eye, EyeOff, Bot, Loader2 } from 'lucide-react';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import api from '@/lib/api';
 import { API } from '@/lib/constants';
 import useAuthStore from '@/store/authStore';
 
 export default function LoginPage() {
-  const router   = useRouter();
   const { loginSuccess, isLoggedIn } = useAuthStore();
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading]   = useState(false);
 
-  // Single source of truth for post-auth navigation: fires whenever
-  // isLoggedIn flips true, whether from a fresh login or landing here
-  // already authenticated. router.refresh() invalidates the client
-  // Router Cache so the /dashboard request re-runs middleware fresh
-  // instead of potentially resolving from a stale cached response.
   useEffect(() => {
     if (isLoggedIn) {
-      router.refresh();
-      setTimeout(() => {
-        router.replace('/dashboard');
-      }, 100);
+      // Full document navigation — guarantees middleware runs against the
+      // fresh cookie with no App Router race. Soft navigation (router.replace
+      // + router.refresh) fires two competing navigations that cancel out.
+      window.location.replace('/dashboard');
     }
-  }, [isLoggedIn, router]);
+  }, [isLoggedIn]);
 
   const {
     register,
@@ -119,9 +112,9 @@ export default function LoginPage() {
             <motion.div
               animate={{ y: [0, -6, 0] }}
               transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-              className="w-14 h-14 rounded-2xl bg-gradient-brand flex items-center justify-center shadow-glow-brand"
+              className="w-14 h-14 rounded-2xl shadow-glow-brand overflow-hidden"
             >
-              <Bot className="w-7 h-7 text-white" />
+              <img src="/logo.png" alt="ApnaBot" className="w-full h-full object-cover" />
             </motion.div>
             <div className="text-center">
               <h1 className="text-2xl font-bold text-text-primary tracking-tight">

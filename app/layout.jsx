@@ -6,6 +6,12 @@ import './globals.css';
 export const metadata = {
   title: 'ApnaBot — Superadmin',
   description: 'ApnaBot platform control panel',
+  openGraph: {
+    title: 'ApnaBot — Superadmin',
+    description: 'ApnaBot platform control panel',
+    siteName: 'ApnaBot',
+    type: 'website',
+  },
 };
 
 export default function RootLayout({ children }) {

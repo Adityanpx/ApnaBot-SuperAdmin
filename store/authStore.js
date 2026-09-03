@@ -17,9 +17,12 @@ import {
 function setAuthCookie(token) {
   if (typeof document === 'undefined') return;
   if (token) {
-    // Expires in 15 minutes — matches JWT_EXPIRY
-    const expires = new Date(Date.now() + 15 * 60 * 1000).toUTCString();
-    document.cookie = `apnabot_token=${token}; path=/; expires=${expires}; SameSite=Strict`;
+    // 7 days — matches refresh token lifetime, not the 15-min access token.
+    // The cookie is only a hint for middleware; real auth is the Bearer
+    // token on API calls. A 15-min cookie desyncs from localStorage and
+    // causes a middleware/client redirect loop.
+    const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toUTCString();
+    document.cookie = `apnabot_token=${token}; path=/; expires=${expires}; SameSite=Lax`;
   } else {
     // Clear cookie by setting past expiry
     document.cookie = 'apnabot_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
