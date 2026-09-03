@@ -2,7 +2,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
@@ -13,24 +12,18 @@ import { API } from '@/lib/constants';
 import useAuthStore from '@/store/authStore';
 
 export default function LoginPage() {
-  const router   = useRouter();
   const { loginSuccess, isLoggedIn } = useAuthStore();
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading]   = useState(false);
 
-  // Single source of truth for post-auth navigation: fires whenever
-  // isLoggedIn flips true, whether from a fresh login or landing here
-  // already authenticated. router.refresh() invalidates the client
-  // Router Cache so the /dashboard request re-runs middleware fresh
-  // instead of potentially resolving from a stale cached response.
   useEffect(() => {
     if (isLoggedIn) {
-      router.refresh();
-      setTimeout(() => {
-        router.replace('/dashboard');
-      }, 100);
+      // Full document navigation — guarantees middleware runs against the
+      // fresh cookie with no App Router race. Soft navigation (router.replace
+      // + router.refresh) fires two competing navigations that cancel out.
+      window.location.replace('/dashboard');
     }
-  }, [isLoggedIn, router]);
+  }, [isLoggedIn]);
 
   const {
     register,
