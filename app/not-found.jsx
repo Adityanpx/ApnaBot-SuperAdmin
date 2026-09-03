@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Bot, ArrowLeft } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import Button from '@/components/ui/Button';
 
 export default function NotFound() {
@@ -20,8 +20,8 @@ export default function NotFound() {
         className="relative z-10 flex flex-col items-center text-center max-w-md"
       >
         {/* Logo */}
-        <div className="w-16 h-16 rounded-2xl bg-gradient-brand flex items-center justify-center shadow-glow-brand mb-8">
-          <Bot className="w-8 h-8 text-white" />
+        <div className="w-16 h-16 rounded-2xl shadow-glow-brand overflow-hidden mb-8">
+          <img src="/logo.png" alt="ApnaBot" className="w-full h-full object-cover" />
         </div>
 
         {/* 404 number */}

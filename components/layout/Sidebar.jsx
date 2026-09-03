@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import {
   LayoutDashboard, Store, CreditCard,
-  FileText, LogOut, Bot, X, Car, Workflow, IndianRupee, FolderKanban, Library,
+  FileText, LogOut, X, Car, Workflow, IndianRupee, FolderKanban, Library,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { NAV_ITEMS, API } from '@/lib/constants';
@@ -49,9 +49,7 @@ export default function Sidebar() {
       {/* Logo */}
       <div className="px-6 py-5 border-b border-sidebar-border">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-gradient-brand flex items-center justify-center flex-shrink-0">
-            <Bot className="w-5 h-5 text-white" />
-          </div>
+          <img src="/logo.png" alt="ApnaBot" className="w-8 h-8 rounded-lg flex-shrink-0" />
           <div>
             <p className="text-[15px] font-bold text-text-primary leading-tight tracking-tight">
               ApnaBot
