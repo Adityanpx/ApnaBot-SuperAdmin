@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Upload } from 'lucide-react';
+import { Plus, Upload, Info } from 'lucide-react';
 import { useCategoryTemplates } from '@/hooks/useCategoryTemplates';
 import CategoryTemplateTable from '@/components/categoryTemplates/CategoryTemplateTable';
 import CloneCategoryTemplateModal from '@/components/categoryTemplates/CloneCategoryTemplateModal';
@@ -52,6 +52,26 @@ export default function CategoryTemplatesPage() {
           >
             Clone from Business
           </Button>
+        </div>
+      </div>
+
+      {/* How to edit a template */}
+      <div className="flex items-start gap-3 p-4 rounded-xl bg-info-bg text-info-text">
+        <Info className="w-5 h-5 flex-shrink-0 mt-0.5" />
+        <div className="text-sm">
+          <p className="font-semibold mb-1">Want to edit an existing template?</p>
+          <p>
+            There&apos;s no in-place editor here yet. Edit it via a real business instead:
+          </p>
+          <ol className="list-decimal list-inside mt-1 space-y-0.5">
+            <li>Pick a business already on this category (or create one).</li>
+            <li>
+              In that business&apos;s dashboard → Auto-Replies → Versions, click
+              &ldquo;Import starter template&rdquo; and choose the one you want to edit.
+            </li>
+            <li>Edit it visually in that business&apos;s Canvas tab.</li>
+            <li>Come back here and use &ldquo;Clone from Business&rdquo; to save your edits as a template again.</li>
+          </ol>
         </div>
       </div>
 
