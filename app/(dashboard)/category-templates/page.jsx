@@ -35,7 +35,7 @@ export default function CategoryTemplatesPage() {
         <div>
           <h1 className="page-title">Category Templates</h1>
           <p className="text-sm text-text-secondary mt-1">
-            One reusable chatbot rule set per business category, cloned from an existing business
+            Reusable chatbot rule sets for business categories, cloned from an existing business
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -67,13 +67,11 @@ export default function CategoryTemplatesPage() {
       <CloneCategoryTemplateModal
         open={showClone}
         onClose={() => setShowClone(false)}
-        templates={templates}
         cloneFromBusiness={cloneFromBusiness}
       />
       <ImportJsonTemplateModal
         open={showImportJson}
         onClose={() => setShowImportJson(false)}
-        templates={templates}
         importFromJson={importFromJson}
       />
       <DeleteCategoryTemplateModal

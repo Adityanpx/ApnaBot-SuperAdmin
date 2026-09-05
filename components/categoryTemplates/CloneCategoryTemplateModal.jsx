@@ -1,39 +1,30 @@
 // components/categoryTemplates/CloneCategoryTemplateModal.jsx
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { toast } from 'sonner';
-import { AlertTriangle } from 'lucide-react';
 import Modal  from '@/components/ui/Modal';
 import Input  from '@/components/ui/Input';
 import Select from '@/components/ui/Select';
 import Button from '@/components/ui/Button';
 import BusinessPicker from './BusinessPicker';
 import { CATEGORY_TEMPLATE_CATEGORIES } from '@/lib/constants';
-import { formatDate } from '@/lib/utils';
 
-const EMPTY_FORM = { business: null, category: '', name: '' };
+const EMPTY_FORM = { business: null, category: '', name: '', description: '' };
 
 /**
  * CloneCategoryTemplateModal — clones a business's chatbot rules into a
- * reusable per-category template. Server-side this deletes any existing
- * template for the chosen category before inserting the clone, so this
- * warns before submit if one already exists rather than overwriting silently.
+ * reusable category template. A category can hold multiple templates, so
+ * this always adds a new template rather than replacing one.
  *
  * Props:
  *   open              boolean — is the modal visible?
  *   onClose           fn      — hide modal
- *   templates         array   — existing templates, used to detect an overwrite
  *   cloneFromBusiness fn      — useCategoryTemplates().cloneFromBusiness (toasts + refetches internally)
  */
-export default function CloneCategoryTemplateModal({ open, onClose, templates, cloneFromBusiness }) {
+export default function CloneCategoryTemplateModal({ open, onClose, cloneFromBusiness }) {
   const [form, setForm]       = useState(EMPTY_FORM);
   const [loading, setLoading] = useState(false);
-
-  const existingForCategory = useMemo(
-    () => templates.find((t) => t.category === form.category) || null,
-    [templates, form.category]
-  );
 
   const resetForm = () => setForm(EMPTY_FORM);
 
@@ -63,6 +54,7 @@ export default function CloneCategoryTemplateModal({ open, onClose, templates, c
         businessId: form.business._id,
         category: form.category,
         name: form.name.trim(),
+        description: form.description.trim() || undefined,
       });
       handleClose();
     } catch {
@@ -99,28 +91,19 @@ export default function CloneCategoryTemplateModal({ open, onClose, templates, c
           required
         />
 
-        {/* Overwrite warning — clone-from-business deletes the existing
-            template for this category before inserting the new one */}
-        {existingForCategory && (
-          <div className="flex items-start gap-3 p-4 rounded-xl bg-warning-bg text-warning-text">
-            <AlertTriangle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-            <div className="text-sm">
-              <p className="font-semibold mb-1">This will replace an existing template</p>
-              <p>
-                <strong>{existingForCategory.name}</strong> already covers this category
-                (last updated {formatDate(existingForCategory.updatedAt)}). Cloning will
-                permanently delete it and put this one in its place.
-              </p>
-            </div>
-          </div>
-        )}
-
         <Input
           label="Template Name"
           placeholder="e.g. Salon starter kit"
           value={form.name}
           onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
           required
+        />
+
+        <Input
+          label="Description (optional)"
+          placeholder="e.g. A lighter starter kit for small salons"
+          value={form.description}
+          onChange={(e) => setForm((prev) => ({ ...prev, description: e.target.value }))}
         />
 
         {/* Actions */}

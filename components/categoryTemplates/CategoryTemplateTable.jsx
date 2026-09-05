@@ -82,6 +82,9 @@ export default function CategoryTemplateTable({ templates, loading, onDelete, on
                   {/* Name */}
                   <TD>
                     <span className="font-semibold text-text-primary">{template.name}</span>
+                    {template.description && (
+                      <p className="text-xs text-text-tertiary mt-0.5">{template.description}</p>
+                    )}
                   </TD>
 
                   {/* Created */}

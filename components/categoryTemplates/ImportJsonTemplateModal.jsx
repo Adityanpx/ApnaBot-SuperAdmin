@@ -1,43 +1,34 @@
 // components/categoryTemplates/ImportJsonTemplateModal.jsx
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { toast } from 'sonner';
-import { AlertTriangle } from 'lucide-react';
 import Modal  from '@/components/ui/Modal';
 import Input  from '@/components/ui/Input';
 import Select from '@/components/ui/Select';
 import Button from '@/components/ui/Button';
 import { CATEGORY_TEMPLATE_CATEGORIES } from '@/lib/constants';
-import { formatDate } from '@/lib/utils';
 
-const EMPTY_FORM = { category: '', name: '' };
+const EMPTY_FORM = { category: '', name: '', description: '' };
 
 /**
  * ImportJsonTemplateModal — imports a category template from a previously
- * exported (or hand-authored) JSON file. Server-side this deletes any
- * existing template for the chosen category before inserting the import,
- * so this warns before submit if one already exists rather than overwriting
- * silently. The file's own top-level `category`/`name` keys (if present,
- * e.g. from an exported file) are ignored in favor of the form's fields.
+ * exported (or hand-authored) JSON file. A category can hold multiple
+ * templates, so this always adds a new template rather than replacing one.
+ * The file's own top-level `category`/`name` keys (if present, e.g. from an
+ * exported file) are ignored in favor of the form's fields.
  *
  * Props:
  *   open           boolean — is the modal visible?
  *   onClose        fn      — hide modal
- *   templates      array   — existing templates, used to detect an overwrite
  *   importFromJson fn      — useCategoryTemplates().importFromJson (toasts + refetches internally)
  */
-export default function ImportJsonTemplateModal({ open, onClose, templates, importFromJson }) {
+export default function ImportJsonTemplateModal({ open, onClose, importFromJson }) {
   const [form, setForm]           = useState(EMPTY_FORM);
   const [fileName, setFileName]   = useState('');
   const [parsedJson, setParsedJson] = useState(null);
   const [parseError, setParseError] = useState('');
   const [loading, setLoading]     = useState(false);
-
-  const existingForCategory = useMemo(
-    () => templates.find((t) => t.category === form.category) || null,
-    [templates, form.category]
-  );
 
   const resetForm = () => {
     setForm(EMPTY_FORM);
@@ -91,6 +82,7 @@ export default function ImportJsonTemplateModal({ open, onClose, templates, impo
       await importFromJson({
         category: form.category,
         name: form.name.trim(),
+        description: form.description.trim() || undefined,
         nodes: parsedJson.nodes,
         edges: parsedJson.edges,
       });
@@ -119,28 +111,19 @@ export default function ImportJsonTemplateModal({ open, onClose, templates, impo
           required
         />
 
-        {/* Overwrite warning — import-from-json deletes the existing
-            template for this category before inserting the new one */}
-        {existingForCategory && (
-          <div className="flex items-start gap-3 p-4 rounded-xl bg-warning-bg text-warning-text">
-            <AlertTriangle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-            <div className="text-sm">
-              <p className="font-semibold mb-1">This will replace an existing template</p>
-              <p>
-                <strong>{existingForCategory.name}</strong> already covers this category
-                (last updated {formatDate(existingForCategory.updatedAt)}). Importing will
-                permanently delete it and put this one in its place.
-              </p>
-            </div>
-          </div>
-        )}
-
         <Input
           label="Template Name"
           placeholder="e.g. Salon starter kit"
           value={form.name}
           onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
           required
+        />
+
+        <Input
+          label="Description (optional)"
+          placeholder="e.g. A lighter starter kit for small salons"
+          value={form.description}
+          onChange={(e) => setForm((prev) => ({ ...prev, description: e.target.value }))}
         />
 
         <div className="space-y-1.5">

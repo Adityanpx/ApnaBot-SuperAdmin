@@ -24,8 +24,6 @@ export function useCategoryTemplates() {
 
   useEffect(() => { fetchTemplates(); }, [fetchTemplates]);
 
-  // Server-side this deletes any existing template for `category` before
-  // inserting the clone — callers should warn before submitting.
   const cloneFromBusiness = async (payload) => {
     try {
       const res = await api.post(API.CATEGORY_TEMPLATE_CLONE, payload);
@@ -49,8 +47,6 @@ export function useCategoryTemplates() {
     }
   };
 
-  // Server-side this deletes any existing template for `category` before
-  // inserting the import — callers should warn before submitting.
   const importFromJson = async (payload) => {
     try {
       const res = await api.post(API.CATEGORY_TEMPLATE_IMPORT_JSON, payload);
