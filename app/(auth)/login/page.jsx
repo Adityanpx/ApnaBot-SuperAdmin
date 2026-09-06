@@ -17,11 +17,22 @@ export default function LoginPage() {
   const [loading, setLoading]   = useState(false);
 
   useEffect(() => {
-    if (isLoggedIn) {
+    if (!isLoggedIn) return;
+
+    // localStorage (isLoggedIn) and the middleware's apnabot_token cookie are
+    // two separate sources of truth with different lifetimes. If the cookie
+    // expired/was cleared but localStorage wasn't, redirecting to /dashboard
+    // would just bounce straight back here (middleware has no cookie) —
+    // an infinite reload loop. Only redirect when both agree; otherwise the
+    // local auth is stale, so clear it and let the login form render.
+    const hasCookie = document.cookie.includes('apnabot_token=');
+    if (hasCookie) {
       // Full document navigation — guarantees middleware runs against the
       // fresh cookie with no App Router race. Soft navigation (router.replace
       // + router.refresh) fires two competing navigations that cancel out.
       window.location.replace('/dashboard');
+    } else {
+      useAuthStore.getState().logout();
     }
   }, [isLoggedIn]);
 

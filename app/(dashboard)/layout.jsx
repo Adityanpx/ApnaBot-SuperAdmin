@@ -17,6 +17,12 @@ export default function DashboardLayout({ children }) {
   useEffect(() => {
     // Check auth on every dashboard navigation
     if (!isLoggedIn) {
+      // The middleware only checks the apnabot_token cookie, not localStorage.
+      // If localStorage's auth was cleared/expired while the cookie is still
+      // present, redirecting to /login would just bounce straight back here
+      // (middleware sees the cookie and sends us to /dashboard) — an infinite
+      // loop. Clear the cookie too so middleware agrees we're logged out.
+      useAuthStore.getState().logout();
       router.replace('/login');
     } else {
       setChecking(false);
