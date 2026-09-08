@@ -2,11 +2,20 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Tag } from 'lucide-react';
+import { Tag, icons as lucideIcons } from 'lucide-react';
 import Badge from '@/components/ui/Badge';
 import { SkeletonTableRow } from '@/components/ui/Skeleton';
 import EmptyState from '@/components/ui/EmptyState';
 import { cn } from '@/lib/utils';
+
+// business_categories.icon stores a lucide-react icon name in kebab-case
+// (e.g. 'graduation-cap'); lucide's `icons` map is keyed by the PascalCase
+// component name (GraduationCap), so convert before lookup.
+function getCategoryIcon(iconName) {
+  if (!iconName) return null;
+  const pascalName = iconName.split('-').map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join('');
+  return lucideIcons[pascalName] || null;
+}
 
 const TH = ({ children, className }) => (
   <th className={cn(
@@ -60,63 +69,62 @@ export default function BusinessCategoryTable({ categories, loading, onToggle })
             )}
 
             {/* Data rows */}
-            {!loading && categories.map((category, i) => (
-              <motion.tr
-                key={category.value}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: i * 0.03, duration: 0.25 }}
-                className="table-row"
-              >
-                {/* Category */}
-                <TD>
-                  <span className="flex items-center gap-2 font-semibold text-text-primary">
-                    {category.emoji ? (
-                      <span>{category.emoji}</span>
+            {!loading && categories.map((category, i) => {
+              const CategoryIcon = getCategoryIcon(category.icon) || Tag;
+              return (
+                <motion.tr
+                  key={category.value}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: i * 0.03, duration: 0.25 }}
+                  className="table-row"
+                >
+                  {/* Category */}
+                  <TD>
+                    <span className="flex items-center gap-2 font-semibold text-text-primary">
+                      <CategoryIcon className="w-3.5 h-3.5 text-text-tertiary" />
+                      {category.label}
+                    </span>
+                  </TD>
+
+                  {/* Value */}
+                  <TD className="hidden md:table-cell">
+                    <span className="font-mono text-xs text-text-tertiary">{category.value}</span>
+                  </TD>
+
+                  {/* Status */}
+                  <TD>
+                    {category.isEnabled ? (
+                      <Badge variant="success">Enabled</Badge>
                     ) : (
-                      <Tag className="w-3.5 h-3.5 text-text-tertiary" />
+                      <Badge variant="neutral">Disabled</Badge>
                     )}
-                    {category.label}
-                  </span>
-                </TD>
+                  </TD>
 
-                {/* Value */}
-                <TD className="hidden md:table-cell">
-                  <span className="font-mono text-xs text-text-tertiary">{category.value}</span>
-                </TD>
-
-                {/* Status */}
-                <TD>
-                  {category.isEnabled ? (
-                    <Badge variant="success">Enabled</Badge>
-                  ) : (
-                    <Badge variant="neutral">Disabled</Badge>
-                  )}
-                </TD>
-
-                {/* Toggle */}
-                <TD className="text-right">
-                  <button
-                    role="switch"
-                    aria-checked={category.isEnabled}
-                    onClick={() => onToggle(category.value, !category.isEnabled)}
-                    className={cn(
-                      'relative inline-flex h-6 w-11 items-center rounded-full border transition-colors duration-200',
-                      category.isEnabled
-                        ? 'bg-brand-500 border-brand-500'
-                        : 'bg-bg-overlay border-border'
-                    )}
-                  >
-                    <span
+                  {/* Toggle */}
+                  <TD className="text-right">
+                    <button
+                      role="switch"
+                      aria-checked={category.isEnabled}
+                      onClick={() => onToggle(category.value, !category.isEnabled)}
                       className={cn(
-                        'inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200',
-                        category.isEnabled ? 'translate-x-6' : 'translate-x-1'
+                        'relative inline-flex h-6 w-11 items-center rounded-full border transition-colors duration-200',
+                        category.isEnabled
+                          ? 'bg-brand-500 border-brand-500'
+                          : 'bg-bg-overlay border-border'
                       )}
-                    />
-                  </button>
-                </TD>
-              </motion.tr>
-            ))}
+                    >
+                      <span
+                        className={cn(
+                          'inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200',
+                          category.isEnabled ? 'translate-x-6' : 'translate-x-1'
+                        )}
+                      />
+                    </button>
+                  </TD>
+                </motion.tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
