@@ -1,16 +1,19 @@
 // components/categoryTemplates/CloneCategoryTemplateModal.jsx
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import Modal  from '@/components/ui/Modal';
 import Input  from '@/components/ui/Input';
 import Select from '@/components/ui/Select';
 import Button from '@/components/ui/Button';
 import BusinessPicker from './BusinessPicker';
-import { CATEGORY_TEMPLATE_CATEGORIES } from '@/lib/constants';
+import api from '@/lib/api';
+import { API, CATEGORY_TEMPLATE_CATEGORIES } from '@/lib/constants';
+import { formatDate } from '@/lib/utils';
 
-const EMPTY_FORM = { business: null, category: '', name: '', description: '' };
+const EMPTY_FORM = { business: null, category: '', name: '', description: '', sourceSnapshotId: '' };
+const CURRENT_LIVE_FLOW = { value: '', label: 'Current live flow' };
 
 /**
  * CloneCategoryTemplateModal — clones a business's chatbot rules into a
@@ -25,6 +28,8 @@ const EMPTY_FORM = { business: null, category: '', name: '', description: '' };
 export default function CloneCategoryTemplateModal({ open, onClose, cloneFromBusiness }) {
   const [form, setForm]       = useState(EMPTY_FORM);
   const [loading, setLoading] = useState(false);
+  const [snapshots, setSnapshots]               = useState([]);
+  const [snapshotsLoading, setSnapshotsLoading]  = useState(false);
 
   const resetForm = () => setForm(EMPTY_FORM);
 
@@ -32,6 +37,38 @@ export default function CloneCategoryTemplateModal({ open, onClose, cloneFromBus
     resetForm();
     onClose();
   };
+
+  // Refetch saved versions whenever the selected business changes, and reset
+  // the version choice back to "Current live flow" so it can't point at a
+  // snapshot belonging to the previous business
+  useEffect(() => {
+    setForm((prev) => ({ ...prev, sourceSnapshotId: '' }));
+    if (!form.business) {
+      setSnapshots([]);
+      return;
+    }
+    let cancelled = false;
+    setSnapshotsLoading(true);
+    api.get(API.BUSINESS_FLOW_SNAPSHOTS(form.business._id))
+      .then((res) => {
+        if (!cancelled) setSnapshots(res.data.data.snapshots);
+      })
+      .catch(() => {
+        if (!cancelled) setSnapshots([]);
+      })
+      .finally(() => {
+        if (!cancelled) setSnapshotsLoading(false);
+      });
+    return () => { cancelled = true; };
+  }, [form.business]);
+
+  const snapshotOptions = [
+    CURRENT_LIVE_FLOW,
+    ...snapshots.map((snap) => ({
+      value: snap._id,
+      label: snap.createdAt ? `${snap.name} — ${formatDate(snap.createdAt)}` : snap.name,
+    })),
+  ];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -55,6 +92,7 @@ export default function CloneCategoryTemplateModal({ open, onClose, cloneFromBus
         category: form.category,
         name: form.name.trim(),
         description: form.description.trim() || undefined,
+        sourceSnapshotId: form.sourceSnapshotId || undefined,
       });
       handleClose();
     } catch {
@@ -82,6 +120,15 @@ export default function CloneCategoryTemplateModal({ open, onClose, cloneFromBus
             onChange={(business) => setForm((prev) => ({ ...prev, business }))}
           />
         </div>
+
+        <Select
+          label="Version to clone"
+          options={snapshotOptions}
+          value={form.sourceSnapshotId}
+          onChange={(e) => setForm((prev) => ({ ...prev, sourceSnapshotId: e.target.value }))}
+          placeholder={null}
+          disabled={snapshotsLoading}
+        />
 
         <Select
           label="Category"
