@@ -44,7 +44,7 @@ export default function NodeLibraryPage() {
   };
 
   const handleDelete = (entry) => {
-    if (!window.confirm(`Remove "${entry.label}" from the node library?`)) return;
+    if (!window.confirm(`Remove "${entry.nodeData?.label}" from the node library?`)) return;
     deleteEntry(entry._id);
   };
 

@@ -64,7 +64,7 @@ export default function NodeLibraryTable({ entries, loading, onDelete }) {
             {/* Data rows */}
             {!loading && entries.map((entry, i) => {
               const category = CATEGORY_TEMPLATE_CATEGORIES.find((c) => c.value === entry.category);
-              const identifier = entry.nodeType === 'question' ? entry.fieldKey : entry.keyword;
+              const identifier = entry.nodeType === 'question' ? entry.nodeData?.fieldKey : entry.nodeData?.keyword;
               return (
                 <motion.tr
                   key={entry._id}
@@ -89,9 +89,9 @@ export default function NodeLibraryTable({ entries, loading, onDelete }) {
 
                   {/* Label / keyword */}
                   <TD>
-                    {entry.label ? (
+                    {entry.nodeData?.label ? (
                       <>
-                        <span className="font-semibold text-text-primary">{entry.label}</span>
+                        <span className="font-semibold text-text-primary">{entry.nodeData.label}</span>
                         {identifier && (
                           <span className="block text-text-tertiary text-xs mt-0.5">{identifier}</span>
                         )}
