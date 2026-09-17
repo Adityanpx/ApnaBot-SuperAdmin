@@ -89,9 +89,15 @@ export default function NodeLibraryTable({ entries, loading, onDelete }) {
 
                   {/* Label / keyword */}
                   <TD>
-                    <span className="font-semibold text-text-primary">{entry.label}</span>
-                    {identifier && (
-                      <span className="block text-text-tertiary text-xs mt-0.5">{identifier}</span>
+                    {entry.label ? (
+                      <>
+                        <span className="font-semibold text-text-primary">{entry.label}</span>
+                        {identifier && (
+                          <span className="block text-text-tertiary text-xs mt-0.5">{identifier}</span>
+                        )}
+                      </>
+                    ) : (
+                      <span className="font-semibold text-text-primary">{identifier}</span>
                     )}
                   </TD>
 
