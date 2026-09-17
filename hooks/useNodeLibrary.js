@@ -20,6 +20,10 @@ export function useNodeLibrary() {
     setEntriesLoading(true);
     try {
       const res = await api.get(API.NODE_LIBRARY, { params: category ? { category } : undefined });
+      // TEMP DEBUG — remove after diagnosing blank Label/Keyword rows
+      res.data.data.entries
+        .filter((e) => !e.label)
+        .forEach((e) => console.log('[node-library] empty-label entry:', e));
       setEntries(res.data.data.entries);
     } catch (err) {
       toast.error(err.userMessage || 'Failed to load node library');
