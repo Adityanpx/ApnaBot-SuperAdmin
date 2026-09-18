@@ -43,10 +43,10 @@ export default function NodeLibraryCard({ entry, index = 0, onDelete }) {
       className="card overflow-hidden flex flex-col"
     >
       {/* WhatsApp-style chat preview */}
-      <div className="p-4 bg-[#0b141a]">
-        <div className="rounded-lg overflow-hidden shadow-md bg-[#202c33]">
+      <div className="p-4 bg-[#e5ddd5]">
+        <div className="rounded-lg overflow-hidden shadow-md bg-white">
           {data.imageUrl && (
-            <div className="h-32 w-full bg-black/30">
+            <div className="h-32 w-full bg-black/10">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={data.imageUrl} alt="" className="w-full h-full object-cover" />
             </div>
@@ -54,35 +54,35 @@ export default function NodeLibraryCard({ entry, index = 0, onDelete }) {
 
           <div className="px-3 py-2.5">
             {isLocation ? (
-              <div className="rounded-md overflow-hidden border border-white/10">
-                <div className="h-20 flex items-center justify-center bg-[#2a3942] text-[#00a884]">
+              <div className="rounded-md overflow-hidden border border-gray-200">
+                <div className="h-20 flex items-center justify-center bg-gray-100 text-[#008069]">
                   <MapPin className="w-7 h-7" />
                 </div>
-                <div className="px-2.5 py-2 bg-[#1f2c33]">
-                  <p className="text-[13px] font-medium text-white truncate">
+                <div className="px-2.5 py-2 bg-white">
+                  <p className="text-[13px] font-medium text-[#111b21] truncate">
                     {data.locationName || 'Shared location'}
                   </p>
                   {data.address && (
-                    <p className="text-[11px] text-white/55 truncate mt-0.5">{data.address}</p>
+                    <p className="text-[11px] text-gray-500 truncate mt-0.5">{data.address}</p>
                   )}
                 </div>
               </div>
             ) : data.label ? (
-              <p className="text-[13px] leading-snug text-white/90 whitespace-pre-wrap break-words">
+              <p className="text-[13px] leading-snug text-[#111b21] whitespace-pre-wrap break-words">
                 {data.label}
               </p>
             ) : (
-              <p className="text-[13px] leading-snug text-white/35 italic">No message text</p>
+              <p className="text-[13px] leading-snug text-gray-400 italic">No message text</p>
             )}
           </div>
 
-          {/* Buttons / list / CTA affordances — rendered as real-looking tappable rows */}
+          {/* Buttons / list / CTA affordances — rendered as rows inside the same bubble card */}
           {isButtons && (
-            <div className="border-t border-white/10">
+            <div className="border-t border-gray-200">
               {options.slice(0, 3).map((opt, i) => (
                 <div
                   key={i}
-                  className="px-3 py-2 text-center text-[13px] font-medium text-[#00a884] border-b border-white/10 last:border-b-0"
+                  className="px-3 py-2 text-center text-[13px] font-medium text-[#008069] border-b border-gray-200 last:border-b-0"
                 >
                   {optionLabel(opt, i)}
                 </div>
@@ -91,14 +91,14 @@ export default function NodeLibraryCard({ entry, index = 0, onDelete }) {
           )}
 
           {isList && (
-            <div className="border-t border-white/10 px-3 py-2 flex items-center justify-center gap-1.5 text-[13px] font-medium text-[#00a884]">
+            <div className="border-t border-gray-200 px-3 py-2 flex items-center justify-center gap-1.5 text-[13px] font-medium text-[#008069]">
               <ListIcon className="w-3.5 h-3.5" />
               Choose an option
             </div>
           )}
 
           {data.buttonText && (
-            <div className="border-t border-white/10 px-3 py-2 flex items-center justify-center gap-1.5 text-[13px] font-medium text-[#00a884]">
+            <div className="border-t border-gray-200 px-3 py-2 flex items-center justify-center gap-1.5 text-[13px] font-medium text-[#008069]">
               <ExternalLink className="w-3.5 h-3.5" />
               {data.buttonText}
             </div>
