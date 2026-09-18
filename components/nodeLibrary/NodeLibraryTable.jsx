@@ -8,7 +8,10 @@ import NodeLibraryCard from './NodeLibraryCard';
 export default function NodeLibraryTable({ entries, loading, onDelete }) {
   if (loading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div
+        className="grid gap-4"
+        style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))' }}
+      >
         {Array.from({ length: 6 }).map((_, i) => (
           <SkeletonCard key={i} lines={4} />
         ))}
@@ -29,7 +32,10 @@ export default function NodeLibraryTable({ entries, loading, onDelete }) {
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div
+      className="grid gap-4"
+      style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))' }}
+    >
       {entries.map((entry, i) => (
         <NodeLibraryCard key={entry._id} entry={entry} index={i} onDelete={onDelete} />
       ))}
