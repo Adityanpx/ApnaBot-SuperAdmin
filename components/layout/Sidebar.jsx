@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import {
   LayoutDashboard, Store, CreditCard,
-  FileText, LogOut, Bot, X, Car, Workflow, IndianRupee, FolderKanban, Library, Tag, MessageSquareCode,
+  FileText, LogOut, Bot, X, Car, Workflow, IndianRupee, FolderKanban, Library, Tag, MessageSquareCode, ClipboardList,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { NAV_ITEMS, API } from '@/lib/constants';
@@ -16,7 +16,7 @@ import api from '@/lib/api';
 import useAuthStore  from '@/store/authStore';
 import useSidebar    from '@/hooks/useSidebar';
 
-const ICON_MAP = { LayoutDashboard, Store, CreditCard, FileText, Car, Workflow, IndianRupee, FolderKanban, Library, Tag, MessageSquareCode };
+const ICON_MAP = { LayoutDashboard, Store, CreditCard, FileText, Car, Workflow, IndianRupee, FolderKanban, Library, Tag, MessageSquareCode, ClipboardList };
 
 export default function Sidebar() {
   const pathname              = usePathname();
