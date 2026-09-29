@@ -9,6 +9,7 @@ import { useBusinessCategories } from '@/hooks/useBusinessCategories';
 import { CATEGORY_SETTINGS_TABS } from '@/lib/constants';
 import VehicleCatalogPanel from '@/components/vehicleCatalog/VehicleCatalogPanel';
 import CourseCatalogPanel from '@/components/courseCatalog/CourseCatalogPanel';
+import CategoryFeaturesPanel from '@/components/categoryFeatures/CategoryFeaturesPanel';
 import EmptyState from '@/components/ui/EmptyState';
 import { cn } from '@/lib/utils';
 
@@ -17,6 +18,7 @@ import { cn } from '@/lib/utils';
 const PANELS = {
   'vehicle-types': () => <VehicleCatalogPanel />,
   courses: (category) => <CourseCatalogPanel category={category} />,
+  features: (category) => <CategoryFeaturesPanel category={category} />,
 };
 
 /**
