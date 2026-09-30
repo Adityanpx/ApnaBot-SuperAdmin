@@ -38,6 +38,9 @@ export default function CourseCatalogCard({
             {entry.description && (
               <p className="text-xs text-text-secondary mt-0.5 line-clamp-2">{entry.description}</p>
             )}
+            {entry.groupName && (
+              <p className="text-xs text-text-tertiary mt-0.5">Group: {entry.groupName}</p>
+            )}
           </div>
         </div>
         <button

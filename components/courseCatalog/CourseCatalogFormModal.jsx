@@ -20,7 +20,7 @@ import { COURSE_LIMITS } from '@/lib/constants';
  */
 export default function CourseCatalogFormModal({ open, entry, onClose, onSubmit }) {
   const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState({ name: '', description: '', details: '' });
+  const [form, setForm] = useState({ name: '', description: '', details: '', groupName: '' });
 
   useEffect(() => {
     if (open) {
@@ -28,6 +28,7 @@ export default function CourseCatalogFormModal({ open, entry, onClose, onSubmit 
         name: entry?.name || '',
         description: entry?.description || '',
         details: entry?.details || '',
+        groupName: entry?.groupName || '',
       });
     }
   }, [open, entry]);
@@ -35,7 +36,8 @@ export default function CourseCatalogFormModal({ open, entry, onClose, onSubmit 
   const update = (field) => (e) => setForm((prev) => ({ ...prev, [field]: e.target.value }));
   const tooLong = form.name.trim().length > COURSE_LIMITS.NAME
     || form.description.trim().length > COURSE_LIMITS.DESCRIPTION
-    || form.details.trim().length > COURSE_LIMITS.DETAILS;
+    || form.details.trim().length > COURSE_LIMITS.DETAILS
+    || form.groupName.trim().length > COURSE_LIMITS.GROUP;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -53,6 +55,7 @@ export default function CourseCatalogFormModal({ open, entry, onClose, onSubmit 
         name: form.name.trim(),
         description: form.description.trim() || null,
         details: form.details.trim() || null,
+        groupName: form.groupName.trim() || null,
       });
       onClose();
     } catch {
@@ -92,6 +95,13 @@ export default function CourseCatalogFormModal({ open, entry, onClose, onSubmit 
               value={form.description}
               onChange={update('description')}
               helper={<>Shown under the course name in the list · {counter(form.description, COURSE_LIMITS.DESCRIPTION)}</>}
+            />
+            <Input
+              label="Suggested group (optional)"
+              placeholder="e.g. JEE / NEET, Foundation, Skill classes"
+              value={form.groupName}
+              onChange={update('groupName')}
+              helper={<>Copied to a business when they add this course; they can change it. With 2+ groups, WhatsApp shows groups first · {counter(form.groupName, COURSE_LIMITS.GROUP)}</>}
             />
             <div className="space-y-1.5">
               <label className="block text-sm font-medium text-text-secondary">Details page (starting text)</label>
