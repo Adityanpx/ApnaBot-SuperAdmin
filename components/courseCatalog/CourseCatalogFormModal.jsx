@@ -8,6 +8,7 @@ import Modal  from '@/components/ui/Modal';
 import Input  from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import { COURSE_LIMITS } from '@/lib/constants';
+import { COURSE_MODE_LABELS, coursePageText, hasStructuredDetails } from '@/lib/coursePage';
 
 /**
  * CourseCatalogFormModal — add or edit a course catalog entry
@@ -20,7 +21,9 @@ import { COURSE_LIMITS } from '@/lib/constants';
  */
 export default function CourseCatalogFormModal({ open, entry, onClose, onSubmit }) {
   const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState({ name: '', description: '', details: '', groupName: '' });
+  const [form, setForm] = useState({
+    name: '', description: '', details: '', groupName: '', ageGroup: '', duration: '', fees: '', mode: '', moreDetails: '',
+  });
 
   useEffect(() => {
     if (open) {
@@ -29,15 +32,24 @@ export default function CourseCatalogFormModal({ open, entry, onClose, onSubmit 
         description: entry?.description || '',
         details: entry?.details || '',
         groupName: entry?.groupName || '',
+        ageGroup: entry?.ageGroup || '',
+        duration: entry?.duration || '',
+        fees: entry?.fees || '',
+        mode: entry?.mode || '',
+        moreDetails: entry?.moreDetails || '',
       });
     }
   }, [open, entry]);
 
   const update = (field) => (e) => setForm((prev) => ({ ...prev, [field]: e.target.value }));
+  const usesFields = hasStructuredDetails(form);
+  const page = coursePageText(form);
   const tooLong = form.name.trim().length > COURSE_LIMITS.NAME
     || form.description.trim().length > COURSE_LIMITS.DESCRIPTION
     || form.details.trim().length > COURSE_LIMITS.DETAILS
-    || form.groupName.trim().length > COURSE_LIMITS.GROUP;
+    || form.groupName.trim().length > COURSE_LIMITS.GROUP
+    || [form.ageGroup, form.duration, form.fees].some((v) => v.trim().length > COURSE_LIMITS.LINE)
+    || form.moreDetails.trim().length > COURSE_LIMITS.MORE_DETAILS;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -56,6 +68,11 @@ export default function CourseCatalogFormModal({ open, entry, onClose, onSubmit 
         description: form.description.trim() || null,
         details: form.details.trim() || null,
         groupName: form.groupName.trim() || null,
+        ageGroup: form.ageGroup.trim() || null,
+        duration: form.duration.trim() || null,
+        fees: form.fees.trim() || null,
+        mode: form.mode || null,
+        moreDetails: form.moreDetails.trim() || null,
       });
       onClose();
     } catch {
@@ -103,19 +120,58 @@ export default function CourseCatalogFormModal({ open, entry, onClose, onSubmit 
               onChange={update('groupName')}
               helper={<>Copied to a business when they add this course; they can change it. With 2+ groups, WhatsApp shows groups first · {counter(form.groupName, COURSE_LIMITS.GROUP)}</>}
             />
-            <div className="space-y-1.5">
-              <label className="block text-sm font-medium text-text-secondary">Details page (starting text)</label>
-              <textarea
-                className="input-field w-full min-h-[160px] resize-y"
-                placeholder={'🎯 JEE Main + Advanced\n📚 Subjects: Physics, Chemistry, Maths\n🕘 Duration: ____\n💰 Fees: ₹____'}
-                value={form.details}
-                onChange={update('details')}
-              />
-              <p className="text-xs text-text-tertiary">
-                Use <strong>____</strong> for things each institute must fill in (fees, duration) — they can&apos;t publish
-                until they do · {counter(form.details, COURSE_LIMITS.DETAILS)}
-              </p>
+            <p className="text-xs text-text-tertiary">
+              Course page details — use <strong>____</strong> for things each institute must fill in (fees, duration);
+              they can&apos;t publish until they do.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <Input label="👦 Age / eligibility" placeholder="e.g. 6 years and above" value={form.ageGroup} onChange={update('ageGroup')}
+                helper={counter(form.ageGroup, COURSE_LIMITS.LINE)} />
+              <Input label="🕘 Duration" placeholder="e.g. ____ per level" value={form.duration} onChange={update('duration')}
+                helper={counter(form.duration, COURSE_LIMITS.LINE)} />
+              <Input label="💰 Fees" placeholder="e.g. ₹____ per level" value={form.fees} onChange={update('fees')}
+                helper={counter(form.fees, COURSE_LIMITS.LINE)} />
+              <div className="space-y-1.5">
+                <label className="block text-sm font-medium text-text-secondary">💻 Mode</label>
+                <select className="input-field w-full" value={form.mode} onChange={update('mode')}>
+                  <option value="">Leave to the institute</option>
+                  {Object.entries(COURSE_MODE_LABELS).map(([value, label]) => (
+                    <option key={value} value={value}>{label}</option>
+                  ))}
+                </select>
+              </div>
             </div>
+            <div className="space-y-1.5">
+              <label className="block text-sm font-medium text-text-secondary">More details (optional)</label>
+              <textarea
+                className="input-field w-full min-h-[90px] resize-y"
+                placeholder={'e.g. 📚 Subjects: Physics, Chemistry, Maths\n📝 Regular tests & doubt sessions'}
+                value={form.moreDetails}
+                onChange={update('moreDetails')}
+              />
+              <p className="text-xs text-text-tertiary">{counter(form.moreDetails, COURSE_LIMITS.MORE_DETAILS)}</p>
+            </div>
+            {(form.details.trim() || !usesFields) && (
+              <div className="space-y-1.5">
+                <label className="block text-sm font-medium text-text-secondary">Old details text</label>
+                <textarea
+                  className="input-field w-full min-h-[90px] resize-y"
+                  value={form.details}
+                  onChange={update('details')}
+                  disabled={usesFields}
+                />
+                <p className="text-xs text-text-tertiary">
+                  {usesFields ? 'Not used — the course page is built from the fields above.' : 'Used only while the fields above are empty.'}
+                  {' '}· {counter(form.details, COURSE_LIMITS.DETAILS)}
+                </p>
+              </div>
+            )}
+            {page && (
+              <div className="space-y-1.5">
+                <label className="block text-sm font-medium text-text-secondary">WhatsApp course page</label>
+                <div className="text-xs text-text-secondary bg-bg-subtle rounded-lg px-3 py-2 whitespace-pre-line">{page}</div>
+              </div>
+            )}
 
             <div className="flex justify-end gap-3 pt-4 border-t border-border-subtle">
               <Button type="button" variant="secondary" onClick={onClose}>Cancel</Button>

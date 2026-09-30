@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { Edit2, Trash2, ToggleLeft, ToggleRight, ArrowUp, ArrowDown, GraduationCap } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { cn } from '@/lib/utils';
+import { coursePageText } from '@/lib/coursePage';
 
 /**
  * CourseCatalogCard — one course catalog entry
@@ -18,7 +19,9 @@ export default function CourseCatalogCard({
   entry, onEdit, onDelete, onToggle, onMoveUp, onMoveDown, isFirst, isLast, delay = 0,
 }) {
   const isInactive = !entry.isActive;
-  const hasBlanks = /_{3,}/.test(entry.details || '') || /_{3,}/.test(entry.description || '');
+  // What the course page will say on WhatsApp (structured fields, else old text).
+  const page = coursePageText(entry);
+  const hasBlanks = /_{3,}/.test(page || '') || /_{3,}/.test(entry.description || '');
 
   return (
     <motion.div
@@ -60,7 +63,7 @@ export default function CourseCatalogCard({
 
       {/* Details preview */}
       <div className="text-xs text-text-secondary bg-bg-subtle rounded-lg px-3 py-2 mb-4 whitespace-pre-line line-clamp-5 min-h-[3rem]">
-        {entry.details || <span className="text-text-tertiary italic">No starting details text</span>}
+        {page || <span className="text-text-tertiary italic">No starting details text</span>}
       </div>
       {hasBlanks && (
         <p className="text-[11px] text-text-tertiary -mt-2 mb-4">
