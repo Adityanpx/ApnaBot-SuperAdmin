@@ -22,7 +22,7 @@ import { COURSE_MODE_LABELS, coursePageText, hasStructuredDetails } from '@/lib/
 export default function CourseCatalogFormModal({ open, entry, onClose, onSubmit }) {
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
-    name: '', description: '', details: '', groupName: '', ageGroup: '', duration: '', fees: '', mode: '', moreDetails: '',
+    name: '', description: '', details: '', groupName: '', ageGroup: '', duration: '', fees: '', mode: '', moreDetails: '', batchesText: '',
   });
 
   useEffect(() => {
@@ -37,13 +37,23 @@ export default function CourseCatalogFormModal({ open, entry, onClose, onSubmit 
         fees: entry?.fees || '',
         mode: entry?.mode || '',
         moreDetails: entry?.moreDetails || '',
+        batchesText: (entry?.batches || []).join('\n'),
       });
     }
   }, [open, entry]);
 
   const update = (field) => (e) => setForm((prev) => ({ ...prev, [field]: e.target.value }));
+  // Suggested batches: one per line in the box, a list on the server.
+  const batches = form.batchesText.split('\n').map((b) => b.trim()).filter(Boolean);
+  const batchProblem = batches.length > COURSE_LIMITS.BATCHES
+    ? `At most ${COURSE_LIMITS.BATCHES} batches`
+    : batches.some((b) => b.length > COURSE_LIMITS.BATCH)
+      ? `Each batch must be ${COURSE_LIMITS.BATCH} characters or less`
+      : batches.some((b, i) => batches.findIndex((x) => x.toLowerCase() === b.toLowerCase()) !== i)
+        ? 'A batch is listed twice'
+        : null;
   const usesFields = hasStructuredDetails(form);
-  const page = coursePageText(form);
+  const page = coursePageText({ ...form, batches });
   const tooLong = form.name.trim().length > COURSE_LIMITS.NAME
     || form.description.trim().length > COURSE_LIMITS.DESCRIPTION
     || form.details.trim().length > COURSE_LIMITS.DETAILS
@@ -61,6 +71,10 @@ export default function CourseCatalogFormModal({ open, entry, onClose, onSubmit 
       toast.error('Some text is too long — see the character counters');
       return;
     }
+    if (batchProblem) {
+      toast.error(batchProblem);
+      return;
+    }
     setLoading(true);
     try {
       await onSubmit({
@@ -73,6 +87,7 @@ export default function CourseCatalogFormModal({ open, entry, onClose, onSubmit 
         fees: form.fees.trim() || null,
         mode: form.mode || null,
         moreDetails: form.moreDetails.trim() || null,
+        batches,
       });
       onClose();
     } catch {
@@ -150,6 +165,18 @@ export default function CourseCatalogFormModal({ open, entry, onClose, onSubmit 
                 onChange={update('moreDetails')}
               />
               <p className="text-xs text-text-tertiary">{counter(form.moreDetails, COURSE_LIMITS.MORE_DETAILS)}</p>
+            </div>
+            <div className="space-y-1.5">
+              <label className="block text-sm font-medium text-text-secondary">🗓 Suggested batches (optional, one per line)</label>
+              <textarea
+                className="input-field w-full min-h-[70px] resize-y"
+                placeholder={'e.g. Mon–Fri 5–6 pm\nSat–Sun 10–11 am'}
+                value={form.batchesText}
+                onChange={update('batchesText')}
+              />
+              <p className={`text-xs ${batchProblem ? 'text-danger-text font-semibold' : 'text-text-tertiary'}`}>
+                {batchProblem || 'Copied to a business when they add this course — usually best left empty, since timings differ per institute.'}
+              </p>
             </div>
             {(form.details.trim() || !usesFields) && (
               <div className="space-y-1.5">
