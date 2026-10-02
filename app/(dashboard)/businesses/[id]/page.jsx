@@ -12,6 +12,7 @@ import { API } from '@/lib/constants';
 import { summarizeDeletedCounts } from '@/hooks/useBusinesses';
 import BusinessDetailCard from '@/components/businesses/BusinessDetailCard';
 import BusinessSubscriptionCard from '@/components/businesses/BusinessSubscriptionCard';
+import BusinessFeaturesCard from '@/components/businesses/BusinessFeaturesCard';
 import SubscriptionHistoryCard from '@/components/businesses/SubscriptionHistoryCard';
 import Button from '@/components/ui/Button';
 import { SkeletonCard } from '@/components/ui/Skeleton';
@@ -189,8 +190,11 @@ export default function BusinessDetailPage() {
 
       {/* Two-column layout */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Left — business info */}
-        <BusinessDetailCard business={business} staffCount={staffCount} />
+        {/* Left — business info + per-business feature overrides */}
+        <div className="space-y-6">
+          <BusinessDetailCard business={business} staffCount={staffCount} />
+          <BusinessFeaturesCard businessId={id} />
+        </div>
 
         {/* Right — subscription */}
         <div className="space-y-6">
