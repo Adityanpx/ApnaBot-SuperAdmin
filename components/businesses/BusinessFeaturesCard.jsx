@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import api from '@/lib/api';
 import { API } from '@/lib/constants';
 import Badge from '@/components/ui/Badge';
+import OwnerMediaSwitch from '@/components/businesses/OwnerMediaSwitch';
 
 /**
  * BusinessFeaturesCard — Businesses → <business> → Features.
@@ -35,14 +36,16 @@ export default function BusinessFeaturesCard({ businessId }) {
   useEffect(() => { fetchFeatures(); }, [fetchFeatures]);
 
   const setOverride = async (feature, override) => {
-    if (override === feature.override) return;
+    if (override === feature.override) return false;
     setSaving(feature.feature);
     try {
       const res = await api.put(API.BUSINESS_FEATURE(businessId, feature.feature), { override });
       setFeatures(res.data.data.features);
       toast.success(res.data.message || 'Saved');
+      return true;
     } catch (err) {
       toast.error(err.userMessage || 'Failed to update feature');
+      return false;
     } finally {
       setSaving(null);
     }
@@ -58,6 +61,17 @@ export default function BusinessFeaturesCard({ businessId }) {
       </p>
       <div className="space-y-4">
         {features.map((f) => {
+          if (f.feature === 'owner_phone_media') {
+            return (
+              <OwnerMediaSwitch
+                key={f.feature}
+                businessId={businessId}
+                feature={f}
+                saving={saving === f.feature}
+                onChange={(override) => setOverride(f, override)}
+              />
+            );
+          }
           const choices = [
             { value: null, label: `Follow category — currently ${f.categoryEnabled ? 'On' : 'Off'}` },
             { value: true, label: 'On for this business' },
