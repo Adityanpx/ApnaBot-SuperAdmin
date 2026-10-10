@@ -9,6 +9,7 @@ import {
   getSavedUser,
   setAccessToken,
   setRefreshToken,
+  setTokens,
   saveUser,
   clearAuth,
 } from '@/lib/auth';
@@ -53,14 +54,18 @@ const useAuthStore = create((set, get) => ({
   },
 
   /**
-   * Called after token refresh — only access token changes
+   * Called after token refresh. The refresh token rotates, so a new one is
+   * persisted when the server sends it; otherwise the old one is kept.
    * Also refreshes the middleware cookie
    */
-  updateAccessToken: (accessToken) => {
-    setAccessToken(accessToken);
-    setAuthCookie(accessToken);         // ← NEW: refresh cookie too
+  updateTokens: (accessToken, refreshToken) => {
+    setTokens(accessToken, refreshToken);
+    setAuthCookie(accessToken);
     set({ token: accessToken });
   },
+
+  /** Access-token-only variant — kept for existing callers */
+  updateAccessToken: (accessToken) => get().updateTokens(accessToken),
 
   /**
    * Called on logout — clears everything
