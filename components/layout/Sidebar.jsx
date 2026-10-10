@@ -12,8 +12,8 @@ import {
   SlidersHorizontal, HardDrive,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { NAV_ITEMS, API } from '@/lib/constants';
-import api from '@/lib/api';
+import { NAV_ITEMS } from '@/lib/constants';
+import { serverLogout } from '@/lib/api';
 import useAuthStore  from '@/store/authStore';
 import useSidebar    from '@/hooks/useSidebar';
 
@@ -36,10 +36,8 @@ export default function Sidebar() {
   }, []);
 
   const handleLogout = async () => {
-    try {
-      const { getRefreshToken } = await import('@/lib/auth');
-      await api.post(API.LOGOUT, { refreshToken: getRefreshToken() });
-    } catch { /* silent */ }
+    // Best effort (never throws, short timeout) — local logout always follows
+    await serverLogout();
     logout();
     toast.success('Logged out successfully');
     router.replace('/login');
