@@ -13,6 +13,7 @@ import { summarizeDeletedCounts } from '@/hooks/useBusinesses';
 import BusinessDetailCard from '@/components/businesses/BusinessDetailCard';
 import BusinessSubscriptionCard from '@/components/businesses/BusinessSubscriptionCard';
 import BusinessFeaturesCard from '@/components/businesses/BusinessFeaturesCard';
+import CopySetupCard from '@/components/businesses/CopySetupCard';
 import SubscriptionHistoryCard from '@/components/businesses/SubscriptionHistoryCard';
 import Button from '@/components/ui/Button';
 import { SkeletonCard } from '@/components/ui/Skeleton';
@@ -194,6 +195,7 @@ export default function BusinessDetailPage() {
         <div className="space-y-6">
           <BusinessDetailCard business={business} staffCount={staffCount} />
           <BusinessFeaturesCard businessId={id} />
+          <CopySetupCard business={business} />
         </div>
 
         {/* Right — subscription */}
