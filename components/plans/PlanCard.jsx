@@ -6,7 +6,7 @@ import {
   Edit2, Trash2,
   CheckCircle2, XCircle,
   Users, Zap, MessageSquare,
-  BookOpen, CreditCard,
+  BookOpen, CreditCard, Image,
 } from 'lucide-react';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
@@ -97,6 +97,11 @@ export default function PlanCard({ plan, onEdit, onDelete, delay = 0 }) {
             value={`Up to ${plan.maxStaff}`}
           />
         )}
+        <LimitRow
+          icon={Image}
+          label="Media per reply"
+          value={`${plan.imagesPerReply ?? 1} photos/reply${plan.videoPerReply ? ' + video' : ''}`}
+        />
       </div>
 
       {/* Duration options */}

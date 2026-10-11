@@ -34,6 +34,8 @@ export default function CreatePlanModal({ open, onClose, onSuccess }) {
     paymentLinkEnabled: false,
     staffEnabled: false,
     maxStaff: '',
+    imagesPerReply: '1',
+    videoPerReply: false,
     durationOptions: [
       { months: 1,  price: '', label: 'Monthly',     discount: 0 },
       { months: 3,  price: '', label: 'Quarterly',   discount: 10 },
@@ -69,6 +71,11 @@ export default function CreatePlanModal({ open, onClose, onSuccess }) {
       toast.error('Please fill required fields');
       return;
     }
+    const imagesPerReply = Number(form.imagesPerReply);
+    if (!Number.isInteger(imagesPerReply) || imagesPerReply < 1 || imagesPerReply > 10) {
+      toast.error('Photos per reply must be a whole number from 1 to 10');
+      return;
+    }
 
     setLoading(true);
     try {
@@ -84,6 +91,8 @@ export default function CreatePlanModal({ open, onClose, onSuccess }) {
         paymentLinkEnabled: form.paymentLinkEnabled,
         staffEnabled: form.staffEnabled,
         maxStaff: form.staffEnabled ? Number(form.maxStaff) || 1 : 0,
+        imagesPerReply,
+        videoPerReply: form.videoPerReply,
         durationOptions: form.durationOptions
           .filter(opt => opt.price && Number(opt.price) > 0)
           .map(opt => ({
@@ -104,6 +113,7 @@ export default function CreatePlanModal({ open, onClose, onSuccess }) {
         isActive: true, isPopular: false,
         bookingEnabled: false, paymentLinkEnabled: false,
         staffEnabled: false, maxStaff: '',
+        imagesPerReply: '1', videoPerReply: false,
         durationOptions: [
           { months: 1,  price: '', label: 'Monthly',     discount: 0 },
           { months: 3,  price: '', label: 'Quarterly',   discount: 10 },
@@ -185,6 +195,18 @@ export default function CreatePlanModal({ open, onClose, onSuccess }) {
                 min="0"
               />
             </div>
+
+            <Input
+              label="Photos per reply"
+              type="number"
+              placeholder="1"
+              value={form.imagesPerReply}
+              onChange={update('imagesPerReply')}
+              min="1"
+              max="10"
+              step="1"
+              hint="1–10"
+            />
 
             {/* Duration Pricing */}
             <div className="space-y-3">
@@ -271,6 +293,11 @@ export default function CreatePlanModal({ open, onClose, onSuccess }) {
                 label="Staff management"
                 checked={form.staffEnabled}
                 onChange={update('staffEnabled')}
+              />
+              <Toggle
+                label="Video in replies (16 MB)"
+                checked={form.videoPerReply}
+                onChange={update('videoPerReply')}
               />
             </div>
 
