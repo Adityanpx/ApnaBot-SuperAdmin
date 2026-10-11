@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { NAV_ITEMS } from '@/lib/constants';
-import { serverLogout } from '@/lib/api';
+import { performLogout } from '@/lib/api';
 import useAuthStore  from '@/store/authStore';
 import useSidebar    from '@/hooks/useSidebar';
 
@@ -35,13 +35,14 @@ export default function Sidebar() {
     return () => window.removeEventListener('keydown', handler);
   }, []);
 
-  const handleLogout = async () => {
-    // Best effort (never throws, short timeout) — local logout always follows
-    await serverLogout();
-    logout();
-    toast.success('Logged out successfully');
-    router.replace('/login');
-  };
+  // Server call is best effort (3s timeout, errors swallowed); the local
+  // clear and redirect always run afterwards
+  const handleLogout = () =>
+    performLogout(() => {
+      logout();
+      toast.success('Logged out successfully');
+      router.replace('/login');
+    });
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
