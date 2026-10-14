@@ -3,130 +3,41 @@
 
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import { motion, AnimatePresence } from 'framer-motion';
 import api from '@/lib/api';
 import { API } from '@/lib/constants';
-import Modal   from '@/components/ui/Modal';
-import Input   from '@/components/ui/Input';
-import Button  from '@/components/ui/Button';
-import { cn } from '@/lib/utils';
+import Modal from '@/components/ui/Modal';
+import Button from '@/components/ui/Button';
+import PlanForm from '@/components/plans/PlanForm';
+import PriceChangeModal from '@/components/plans/PriceChangeModal';
+import {
+  emptyPlanForm, planToForm, validatePlanForm, formToPayload, pricingChange,
+} from '@/lib/planForm';
 
 /**
- * EditPlanModal — form to edit an existing subscription plan
+ * EditPlanModal — form to edit an existing subscription plan. Saving a changed
+ * monthly price or discount first asks the admin to confirm.
  * Props:
- *   open     boolean — is the modal visible?
- *   plan     object  — the plan being edited (null when closed)
- *   onClose  fn      — hide modal
- *   onSuccess fn     — called after successful update (to refresh list)
+ *   open      boolean — is the modal visible?
+ *   plan      object  — the plan being edited (null when closed)
+ *   onClose   fn      — hide modal
+ *   onSuccess fn      — called after successful update (to refresh list)
  */
 export default function EditPlanModal({ open, plan, onClose, onSuccess }) {
   const [loading, setLoading] = useState(false);
-  const [initializing, setInitializing] = useState(false);
+  const [form, setForm] = useState(emptyPlanForm);
+  const [pending, setPending] = useState(null);
 
-  const [form, setForm] = useState({
-    name: '',           // internal ID (read‑only after create)
-    displayName: '',    // visible name
-    price: '',          // monthly price
-    msgLimit: '',       // messages per month
-    ruleLimit: '',      // chatbot rules
-    customerLimit: '',  // max customers
-    isActive: true,
-    bookingEnabled: false,
-    paymentLinkEnabled: false,
-    staffEnabled: false,
-    maxStaff: '',
-    imagesPerReply: '1',
-    videoPerReply: false,
-    durationOptions: [
-      { months: 1,  price: '', label: 'Monthly',     discount: 0 },
-      { months: 3,  price: '', label: 'Quarterly',   discount: 10 },
-      { months: 6,  price: '', label: 'Half-Yearly', discount: 20 },
-      { months: 12, price: '', label: 'Yearly',      discount: 30 },
-    ],
-  });
-
-  // Populate form when plan changes
   useEffect(() => {
-    if (plan) {
-      const defaultDurations = [
-        { months: 1,  price: '0', label: 'Monthly',     discount: 0 },
-        { months: 3,  price: '0', label: 'Quarterly',   discount: 10 },
-        { months: 6,  price: '0', label: 'Half-Yearly', discount: 20 },
-        { months: 12, price: '0', label: 'Yearly',      discount: 30 },
-      ];
-
-      // Merge existing duration_options with defaults
-      const existingOptions = plan.durationOptions || [];
-      const mergedOptions = defaultDurations.map(def => {
-        const existing = existingOptions.find(e => e.months === def.months);
-        return existing
-          ? { ...def, price: existing.price?.toString() || '0', discount: existing.discount || 0 }
-          : { ...def, price: '0' };
-      });
-
-      setForm({
-        name: plan.name || '',
-        displayName: plan.displayName || '',
-        price: plan.price?.toString() || '0',
-        msgLimit: plan.msgLimit?.toString() || '0',
-        ruleLimit: plan.ruleLimit?.toString() || '0',
-        customerLimit: plan.customerLimit?.toString() || '0',
-        isActive: plan.isActive ?? true,
-        bookingEnabled: plan.bookingEnabled ?? false,
-        paymentLinkEnabled: plan.paymentLinkEnabled ?? false,
-        staffEnabled: plan.staffEnabled ?? false,
-        maxStaff: plan.maxStaff?.toString() || '1',
-        imagesPerReply: plan.imagesPerReply?.toString() || '1',
-        videoPerReply: plan.videoPerReply ?? false,
-        durationOptions: mergedOptions,
-      });
-    }
+    if (plan) setForm(planToForm(plan));
+    setPending(null);
   }, [plan]);
 
-  const update = field => e => setForm(prev => ({
-    ...prev,
-    [field]: e.target.type === 'checkbox' ? e.target.checked : e.target.value
-  }));
-
-  const handleSubmit = async e => {
-    e.preventDefault();
-    if (!form.name || !form.displayName || !form.price) {
-      toast.error('Please fill required fields');
-      return;
-    }
-    const imagesPerReply = Number(form.imagesPerReply);
-    if (!Number.isInteger(imagesPerReply) || imagesPerReply < 1 || imagesPerReply > 10) {
-      toast.error('Photos per reply must be a whole number from 1 to 10');
-      return;
-    }
-
+  const save = async () => {
     setLoading(true);
     try {
-      const payload = {
-        displayName: form.displayName.trim(),
-        price: Number(form.price),
-        msgLimit: Number(form.msgLimit) || 0,
-        ruleLimit: Number(form.ruleLimit) || 0,
-        customerLimit: Number(form.customerLimit) || 0,
-        isActive: form.isActive,
-        bookingEnabled: form.bookingEnabled,
-        paymentLinkEnabled: form.paymentLinkEnabled,
-        staffEnabled: form.staffEnabled,
-        maxStaff: form.staffEnabled ? Number(form.maxStaff) || 1 : 0,
-        imagesPerReply,
-        videoPerReply: form.videoPerReply,
-        durationOptions: form.durationOptions
-          .filter(opt => opt.price && Number(opt.price) > 0)
-          .map(opt => ({
-            months: opt.months,
-            price: Number(opt.price),
-            label: opt.label,
-            discount: opt.discount || 0,
-          })),
-      };
-
-      await api.put(`${API.PLANS}/${plan._id}`, payload);
+      await api.put(`${API.PLANS}/${plan._id}`, formToPayload(form, { isEdit: true }));
       toast.success('Plan updated successfully');
+      setPending(null);
       onSuccess();
       onClose();
     } catch (err) {
@@ -136,219 +47,46 @@ export default function EditPlanModal({ open, plan, onClose, onSuccess }) {
     }
   };
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const error = validatePlanForm(form, { isEdit: true });
+    if (error) {
+      toast.error(error);
+      return;
+    }
+    const change = pricingChange(plan, form);
+    if (change) setPending(change);
+    else save();
+  };
+
   return (
-    <AnimatePresence>
-      {open && (
-        <Modal
-          open={open}
-          onClose={onClose}
-          title="Edit Plan"
-          description="Update an existing subscription plan"
-          className="max-w-lg"
-        >
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Basic info - name is read-only */}
-            <div className="grid grid-cols-2 gap-4">
-              <Input
-                label="Internal ID"
-                value={form.name}
-                disabled
-                hint="Cannot be changed after creation"
-              />
-              <Input
-                label="Display Name"
-                placeholder="e.g. Starter"
-                value={form.displayName}
-                onChange={update('displayName')}
-                required
-              />
-            </div>
-
-            <Input
-              label="Monthly Price (₹)"
-              type="number"
-              placeholder="0"
-              value={form.price}
-              onChange={update('price')}
-              required
-              min="0"
-            />
-
-            {/* Limits */}
-            <div className="grid grid-cols-3 gap-3">
-              <Input
-                label="Messages/mo"
-                type="number"
-                placeholder="0"
-                value={form.msgLimit}
-                onChange={update('msgLimit')}
-                min="0"
-              />
-              <Input
-                label="Chatbot Rules"
-                type="number"
-                placeholder="0"
-                value={form.ruleLimit}
-                onChange={update('ruleLimit')}
-                min="0"
-              />
-              <Input
-                label="Customers"
-                type="number"
-                placeholder="0"
-                value={form.customerLimit}
-                onChange={update('customerLimit')}
-                min="0"
-              />
-            </div>
-
-            <Input
-              label="Photos per reply"
-              type="number"
-              placeholder="1"
-              value={form.imagesPerReply}
-              onChange={update('imagesPerReply')}
-              min="1"
-              max="10"
-              step="1"
-              hint="1–10"
-            />
-
-            {/* Duration Pricing */}
-            <div className="space-y-3">
-              <p className="text-sm font-medium text-text-secondary">
-                Duration Pricing
-                <span className="text-xs text-text-tertiary ml-2">(total price for each duration)</span>
-              </p>
-              <div className="grid grid-cols-2 gap-3">
-                {form.durationOptions.map((opt, idx) => (
-                  <div key={opt.months} className="flex items-center gap-2">
-                    <span className="text-xs text-text-tertiary w-20 flex-shrink-0">{opt.label}</span>
-                    <Input
-                      type="number"
-                      placeholder="₹ total"
-                      value={opt.price}
-                      onChange={(e) => {
-                        const updated = [...form.durationOptions];
-                        updated[idx] = { ...updated[idx], price: e.target.value };
-                        setForm(prev => ({ ...prev, durationOptions: updated }));
-                      }}
-                      min="0"
-                    />
-                    {opt.months > 1 && (
-                      <Input
-                        type="number"
-                        placeholder="%"
-                        value={opt.discount}
-                        onChange={(e) => {
-                          const discount = Number(e.target.value) || 0;
-                          const basePrice = Number(form.price) || 0;
-                          const updated = [...form.durationOptions];
-                          updated[idx] = {
-                            ...updated[idx],
-                            discount,
-                            price: Math.round(basePrice * opt.months * (1 - discount / 100)).toString()
-                          };
-                          setForm(prev => ({ ...prev, durationOptions: updated }));
-                        }}
-                        min="0"
-                        max="100"
-                      />
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Staff limit (conditional) */}
-            <AnimatePresence mode="wait">
-              {form.staffEnabled && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <Input
-                    label="Max Staff Count"
-                    type="number"
-                    placeholder="e.g. 5"
-                    value={form.maxStaff}
-                    onChange={update('maxStaff')}
-                    min="1"
-                  />
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* Toggles */}
-            <div className="flex flex-wrap gap-4 pt-2">
-              <Toggle
-                label="Active (visible to customers)"
-                checked={form.isActive}
-                onChange={update('isActive')}
-              />
-              <Toggle
-                label="Booking feature"
-                checked={form.bookingEnabled}
-                onChange={update('bookingEnabled')}
-              />
-              <Toggle
-                label="Payment link feature"
-                checked={form.paymentLinkEnabled}
-                onChange={update('paymentLinkEnabled')}
-              />
-              <Toggle
-                label="Staff management"
-                checked={form.staffEnabled}
-                onChange={update('staffEnabled')}
-              />
-              <Toggle
-                label="Video in replies (16 MB)"
-                checked={form.videoPerReply}
-                onChange={update('videoPerReply')}
-              />
-            </div>
-
-            {/* Actions */}
-            <div className="flex justify-end gap-3 pt-4 border-t border-border-subtle">
-              <Button type="button" variant="secondary" onClick={onClose}>
-                Cancel
-              </Button>
-              <Button type="submit" loading={loading}>
-                Save Changes
-              </Button>
-            </div>
-          </form>
-        </Modal>
-      )}
-    </AnimatePresence>
-  );
-}
-
-function Toggle({ label, checked, onChange }) {
-  return (
-    <label className="flex items-center gap-2 cursor-pointer group">
-      <div className="relative">
-        <input
-          type="checkbox"
-          className="sr-only peer"
-          checked={checked}
-          onChange={onChange}
-        />
-        <div className={cn(
-          'w-9 h-5 rounded-full transition-colors',
-          'bg-bg-subtle peer-checked:bg-brand-500'
-        )} />
-        <div className={cn(
-          'absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow-sm',
-          'transition-transform peer-checked:translate-x-4',
-          'group-hover:ring-2 group-hover:ring-brand-500/30'
-        )} />
-      </div>
-      <span className="text-sm text-text-secondary group-hover:text-text-primary">
-        {label}
-      </span>
-    </label>
+    <>
+      <Modal
+        open={open}
+        onClose={() => (pending ? setPending(null) : onClose())}
+        title="Edit Plan"
+        subtitle="Update an existing subscription plan"
+        size="lg"
+      >
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <PlanForm form={form} onChange={setForm} isEdit />
+          <div className="flex justify-end gap-3 pt-4 border-t border-border-subtle">
+            <Button type="button" variant="secondary" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button type="submit" loading={loading && !pending}>
+              Save Changes
+            </Button>
+          </div>
+        </form>
+      </Modal>
+      <PriceChangeModal
+        open={!!pending}
+        change={pending}
+        loading={loading}
+        onClose={() => setPending(null)}
+        onConfirm={save}
+      />
+    </>
   );
 }

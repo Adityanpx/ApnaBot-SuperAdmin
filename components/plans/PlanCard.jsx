@@ -6,12 +6,12 @@ import {
   Edit2, Trash2,
   CheckCircle2, XCircle,
   Users, Zap, MessageSquare,
-  BookOpen, CreditCard, Image,
+  BookOpen, CreditCard, Image, HardDrive,
 } from 'lucide-react';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
-import { formatCurrency, formatLimit } from '@/lib/utils';
-import { cn } from '@/lib/utils';
+import { formatCurrency, formatLimit, cn } from '@/lib/utils';
+import { planPricing } from '@/lib/planForm';
 
 /**
  * PlanCard — displays one subscription plan with all its features
@@ -22,7 +22,7 @@ import { cn } from '@/lib/utils';
  *   delay    number  — stagger animation delay
  */
 export default function PlanCard({ plan, onEdit, onDelete, delay = 0 }) {
-  const isPopular  = plan.name === 'pro';
+  const isPopular  = !!plan.isPopular;
   const isInactive = !plan.isActive;
 
   return (
@@ -102,26 +102,34 @@ export default function PlanCard({ plan, onEdit, onDelete, delay = 0 }) {
           label="Media per reply"
           value={`${plan.imagesPerReply ?? 1} photos/reply${plan.videoPerReply ? ' + video' : ''}`}
         />
+        {plan.storageLimitMb !== null && plan.storageLimitMb !== undefined && (
+          <LimitRow icon={HardDrive} label="Storage" value={`${plan.storageLimitMb} MB`} />
+        )}
       </div>
 
-      {/* Duration options */}
-      {plan.durationOptions && plan.durationOptions.length > 1 && (
-        <div className="space-y-1.5 mb-5">
-          <p className="text-xs font-semibold text-text-tertiary uppercase tracking-wider">Pricing</p>
-          {plan.durationOptions.map(opt => (
-            <div key={opt.months} className="flex items-center justify-between text-sm">
-              <span className="text-text-secondary">{opt.label}</span>
-              <div className="flex items-center gap-2">
-                <span className="font-semibold text-text-primary">{formatCurrency(opt.price)}</span>
-                {opt.discount > 0 && (
-                  <span className="text-xs font-medium text-success-text bg-success-bg px-1.5 py-0.5 rounded-full">
-                    -{opt.discount}%
-                  </span>
-                )}
-              </div>
+      {/* Pricing — derived from the monthly price, same as the Create/Edit form */}
+      <div className="space-y-1.5 mb-5">
+        <p className="text-xs font-semibold text-text-tertiary uppercase tracking-wider">Pricing</p>
+        {planPricing(plan).map(opt => (
+          <div key={opt.months} className="flex items-center justify-between text-sm">
+            <span className="text-text-secondary">{opt.label}</span>
+            <div className="flex items-center gap-2">
+              <span className="font-semibold text-text-primary">{formatCurrency(opt.price)}</span>
+              {opt.discount > 0 && (
+                <span className="text-xs font-medium text-success-text bg-success-bg px-1.5 py-0.5 rounded-full">
+                  -{opt.discount}%
+                </span>
+              )}
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Feature list shown to customers */}
+      {plan.features?.length > 0 && (
+        <ul className="space-y-1 mb-5 text-sm text-text-secondary list-disc list-inside">
+          {plan.features.map((feature, i) => <li key={i}>{feature}</li>)}
+        </ul>
       )}
 
       {/* Feature flags */}
