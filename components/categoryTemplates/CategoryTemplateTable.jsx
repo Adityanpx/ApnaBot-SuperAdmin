@@ -2,7 +2,8 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Trash2, Download } from 'lucide-react';
+import Link from 'next/link';
+import { Trash2, Download, Star, StarOff } from 'lucide-react';
 import Badge from '@/components/ui/Badge';
 import { SkeletonTableRow } from '@/components/ui/Skeleton';
 import EmptyState from '@/components/ui/EmptyState';
@@ -24,7 +25,9 @@ const TD = ({ children, className }) => (
   </td>
 );
 
-export default function CategoryTemplateTable({ templates, loading, onDelete, onExport }) {
+export default function CategoryTemplateTable({
+  templates, loading, onDelete, onExport, onSetDefault, onUnsetDefault,
+}) {
   return (
     <div className="card overflow-hidden">
       <div className="overflow-x-auto">
@@ -81,7 +84,15 @@ export default function CategoryTemplateTable({ templates, loading, onDelete, on
 
                   {/* Name */}
                   <TD>
-                    <span className="font-semibold text-text-primary">{template.name}</span>
+                    <Link
+                      href={`/category-templates/${template._id}`}
+                      className="font-semibold text-text-primary hover:text-brand-400"
+                    >
+                      {template.name}
+                    </Link>
+                    {template.isDefault && (
+                      <Badge variant="success" className="ml-2">Default</Badge>
+                    )}
                     {template.description && (
                       <p className="text-xs text-text-tertiary mt-0.5">{template.description}</p>
                     )}
@@ -100,6 +111,31 @@ export default function CategoryTemplateTable({ templates, loading, onDelete, on
                   {/* Actions */}
                   <TD className="text-right">
                     <div className="flex items-center justify-end gap-1">
+                      {template.isDefault ? (
+                        <button
+                          onClick={() => onUnsetDefault(template)}
+                          title="Remove default"
+                          className="
+                            w-8 h-8 flex items-center justify-center rounded-lg
+                            text-text-tertiary hover:text-text-primary hover:bg-bg-subtle
+                            transition-colors duration-150
+                          "
+                        >
+                          <StarOff className="w-3.5 h-3.5" />
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => onSetDefault(template)}
+                          title="Set as default"
+                          className="
+                            w-8 h-8 flex items-center justify-center rounded-lg
+                            text-text-tertiary hover:text-text-primary hover:bg-bg-subtle
+                            transition-colors duration-150
+                          "
+                        >
+                          <Star className="w-3.5 h-3.5" />
+                        </button>
+                      )}
                       <button
                         onClick={() => onExport(template._id)}
                         title="Export category template"

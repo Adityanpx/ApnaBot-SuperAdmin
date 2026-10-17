@@ -5,6 +5,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
 import api from '@/lib/api';
 import { API } from '@/lib/constants';
+import { parseCloneResult, stashWarnings } from '@/lib/categoryTemplates';
 
 export function useCategoryTemplates() {
   const [templates, setTemplates] = useState([]);
@@ -27,7 +28,12 @@ export function useCategoryTemplates() {
   const cloneFromBusiness = async (payload) => {
     try {
       const res = await api.post(API.CATEGORY_TEMPLATE_CLONE, payload);
+      const { id, warnings } = parseCloneResult(res.data.data);
+      stashWarnings(id, warnings);
       toast.success('Category template cloned successfully');
+      if (warnings.length > 0) {
+        toast.warning('Some replies mention the source business name. Open the template to fix.');
+      }
       await fetchTemplates();
       return res.data.data;
     } catch (err) {
@@ -43,6 +49,28 @@ export function useCategoryTemplates() {
       await fetchTemplates();
     } catch (err) {
       toast.error(err.userMessage || 'Failed to delete category template');
+      throw err;
+    }
+  };
+
+  const setDefault = async (id) => {
+    try {
+      await api.post(API.CATEGORY_TEMPLATE_SET_DEFAULT(id));
+      toast.success('Default flow updated');
+      await fetchTemplates();
+    } catch (err) {
+      toast.error(err.userMessage || 'Failed to set the default flow');
+      throw err;
+    }
+  };
+
+  const unsetDefault = async (id) => {
+    try {
+      await api.post(API.CATEGORY_TEMPLATE_UNSET_DEFAULT(id));
+      toast.success('Default flow removed');
+      await fetchTemplates();
+    } catch (err) {
+      toast.error(err.userMessage || 'Failed to remove the default flow');
       throw err;
     }
   };
@@ -80,6 +108,8 @@ export function useCategoryTemplates() {
     refetch: fetchTemplates,
     cloneFromBusiness,
     deleteTemplate,
+    setDefault,
+    unsetDefault,
     importFromJson,
     exportTemplate,
   };

@@ -3,25 +3,48 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Upload, Info } from 'lucide-react';
+import { Plus, Upload, Info, Star, AlertTriangle } from 'lucide-react';
 import { useCategoryTemplates } from '@/hooks/useCategoryTemplates';
 import CategoryTemplateTable from '@/components/categoryTemplates/CategoryTemplateTable';
 import CloneCategoryTemplateModal from '@/components/categoryTemplates/CloneCategoryTemplateModal';
 import ImportJsonTemplateModal from '@/components/categoryTemplates/ImportJsonTemplateModal';
 import DeleteCategoryTemplateModal from '@/components/categoryTemplates/DeleteCategoryTemplateModal';
+import DefaultFlowModal from '@/components/categoryTemplates/DefaultFlowModal';
+import CreateDefaultFlowModal from '@/components/categoryTemplates/CreateDefaultFlowModal';
 import Button from '@/components/ui/Button';
+import Select from '@/components/ui/Select';
+import { CATEGORY_TEMPLATE_CATEGORIES } from '@/lib/constants';
+import {
+  defaultFor, filterByCategory, noDefaultNotice, categoriesMissingDefault,
+} from '@/lib/categoryTemplates';
+
+const ALL_CATEGORIES = [{ value: 'all', label: 'All categories' }, ...CATEGORY_TEMPLATE_CATEGORIES];
+const labelOf = (v) => CATEGORY_TEMPLATE_CATEGORIES.find((c) => c.value === v)?.label || v;
 
 export default function CategoryTemplatesPage() {
   const {
     templates, loading,
     cloneFromBusiness, deleteTemplate,
-    importFromJson, exportTemplate,
+    importFromJson, exportTemplate, setDefault, unsetDefault,
   } = useCategoryTemplates();
 
   // Modal state
   const [showClone, setShowClone]             = useState(false);
   const [showImportJson, setShowImportJson]   = useState(false);
   const [deletingTemplate, setDeletingTemplate] = useState(null);
+  const [showCreateDefault, setShowCreateDefault] = useState(false);
+  const [defaultAction, setDefaultAction] = useState(null); // { mode, template }
+  const [category, setCategory] = useState('all');
+
+  const selected = category === 'all' ? '' : category;
+  const visible = filterByCategory(templates, selected);
+  const missing = categoriesMissingDefault(templates).map(labelOf);
+  let notice = null;
+  if (!loading && selected) notice = noDefaultNotice(templates, selected, labelOf(selected));
+  else if (!loading && missing.length > 0) {
+    notice = `No default yet for: ${missing.join(', ')}. New businesses there get the General default.`;
+  }
+  const actionCategory = defaultAction?.template.category;
 
   return (
     <motion.div
@@ -39,6 +62,9 @@ export default function CategoryTemplatesPage() {
           </p>
         </div>
         <div className="flex items-center gap-3">
+          <Button variant="secondary" icon={Star} onClick={() => setShowCreateDefault(true)}>
+            Create default from business
+          </Button>
           <Button
             variant="secondary"
             icon={Upload}
@@ -59,28 +85,42 @@ export default function CategoryTemplatesPage() {
       <div className="flex items-start gap-3 p-4 rounded-xl bg-info-bg text-info-text">
         <Info className="w-5 h-5 flex-shrink-0 mt-0.5" />
         <div className="text-sm">
-          <p className="font-semibold mb-1">Want to edit an existing template?</p>
+          <p className="font-semibold mb-1">Defaults and editing</p>
           <p>
-            There&apos;s no in-place editor here yet. Edit it via a real business instead:
+            The default template of a category is what new businesses in that category start
+            with. Open a template to review its replies and edit their text and Hindi / Marathi
+            translations. To change the flow itself, edit it through a real business and use
+            &ldquo;Clone from Business&rdquo; to save it again.
           </p>
-          <ol className="list-decimal list-inside mt-1 space-y-0.5">
-            <li>Pick a business already on this category (or create one).</li>
-            <li>
-              In that business&apos;s dashboard → Auto-Replies → Versions, click
-              &ldquo;Import starter template&rdquo; and choose the one you want to edit.
-            </li>
-            <li>Edit it visually in that business&apos;s Canvas tab.</li>
-            <li>Come back here and use &ldquo;Clone from Business&rdquo; to save your edits as a template again.</li>
-          </ol>
         </div>
+      </div>
+
+      {/* Category filter + no-default notice */}
+      <div className="space-y-3">
+        <Select
+          label="Category"
+          options={ALL_CATEGORIES}
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          placeholder={null}
+          containerClassName="max-w-xs"
+        />
+        {notice && (
+          <div className="flex items-start gap-3 p-4 rounded-xl bg-warning-bg text-warning-text">
+            <AlertTriangle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+            <p className="text-sm">{notice}</p>
+          </div>
+        )}
       </div>
 
       {/* Table */}
       <CategoryTemplateTable
-        templates={templates}
+        templates={visible}
         loading={loading}
         onDelete={setDeletingTemplate}
         onExport={exportTemplate}
+        onSetDefault={(template) => setDefaultAction({ mode: 'set', template })}
+        onUnsetDefault={(template) => setDefaultAction({ mode: 'unset', template })}
       />
 
       {/* Modals — mutation hook toasts + refetches internally on success */}
@@ -93,6 +133,21 @@ export default function CategoryTemplatesPage() {
         open={showImportJson}
         onClose={() => setShowImportJson(false)}
         importFromJson={importFromJson}
+      />
+      <DefaultFlowModal
+        open={!!defaultAction}
+        mode={defaultAction?.mode}
+        template={defaultAction?.template}
+        categoryLabel={labelOf(actionCategory)}
+        replacing={defaultAction?.mode === 'set' ? defaultFor(templates, actionCategory) : undefined}
+        onClose={() => setDefaultAction(null)}
+        onConfirm={(t) => (defaultAction.mode === 'set' ? setDefault(t._id) : unsetDefault(t._id))}
+      />
+      <CreateDefaultFlowModal
+        open={showCreateDefault}
+        onClose={() => setShowCreateDefault(false)}
+        cloneFromBusiness={cloneFromBusiness}
+        setDefault={setDefault}
       />
       <DeleteCategoryTemplateModal
         open={!!deletingTemplate}
