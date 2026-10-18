@@ -102,6 +102,11 @@ export default function PlanCard({ plan, onEdit, onDelete, delay = 0 }) {
           label="Media per reply"
           value={`${plan.imagesPerReply ?? 1} photos/reply${plan.videoPerReply ? ' + video' : ''}`}
         />
+        <LimitRow
+          icon={Image}
+          label="Carousel cards per reply"
+          value={`${plan.carouselMaxCards ?? 3} cards`}
+        />
         {plan.storageLimitMb !== null && plan.storageLimitMb !== undefined && (
           <LimitRow icon={HardDrive} label="Storage" value={`${plan.storageLimitMb} MB`} />
         )}
