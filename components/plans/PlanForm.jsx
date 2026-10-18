@@ -67,6 +67,9 @@ export default function PlanForm({ form, onChange, isEdit = false }) {
       <div className="grid grid-cols-3 gap-3">
         <Input label="Photos per reply" type="number" placeholder="1" min="1" max="10" step="1"
           value={form.imagesPerReply} onChange={set('imagesPerReply')} helper="1–10" />
+        <Input label="Carousel cards per reply" type="number" placeholder="3" min="2" max="10" step="1"
+          value={form.carouselMaxCards} onChange={set('carouselMaxCards')}
+          helper="Max swipe cards in one bot carousel reply" />
         <Input label="Storage limit (MB)" type="number" placeholder="Default" min="0" step="1"
           value={form.storageLimitMb} onChange={set('storageLimitMb')} />
         <Input label="Display order" type="number" placeholder="0" step="1"
