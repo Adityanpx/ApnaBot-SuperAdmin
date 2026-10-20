@@ -75,6 +75,17 @@ export function useCategoryTemplates() {
     }
   };
 
+  // Translating many strings can outlast the default 15s request timeout.
+  const translateTemplate = async (id, to) => {
+    try {
+      const res = await api.post(API.CATEGORY_TEMPLATE_TRANSLATE(id), { to }, { timeout: 120000 });
+      return res.data.data;
+    } catch (err) {
+      toast.error(err.userMessage || 'Failed to translate category template');
+      throw err;
+    }
+  };
+
   const importFromJson = async (payload) => {
     try {
       const res = await api.post(API.CATEGORY_TEMPLATE_IMPORT_JSON, payload);
@@ -110,6 +121,7 @@ export function useCategoryTemplates() {
     deleteTemplate,
     setDefault,
     unsetDefault,
+    translateTemplate,
     importFromJson,
     exportTemplate,
   };

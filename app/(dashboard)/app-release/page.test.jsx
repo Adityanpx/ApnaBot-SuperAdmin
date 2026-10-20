@@ -13,6 +13,8 @@ const config = {
   forceUpdate: false,
   maintenanceMode: false,
   playStoreUrl: 'https://play.google.com/store/apps/details?id=com.apnabot.app',
+  translateMonthlyCharCap: 20000,
+  translateGlobalMonthlyCap: 1800000,
   updatedAt: null,
   updatedBy: null,
 };

@@ -7,6 +7,7 @@ import { API } from '@/lib/constants';
 
 const EDITABLE = [
   'androidMinVersion', 'androidLatestVersion', 'forceUpdate', 'maintenanceMode', 'playStoreUrl',
+  'translateMonthlyCharCap', 'translateGlobalMonthlyCap',
 ];
 
 /**

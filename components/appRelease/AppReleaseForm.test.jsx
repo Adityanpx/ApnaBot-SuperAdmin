@@ -11,6 +11,8 @@ const data = {
   forceUpdate: false,
   maintenanceMode: false,
   playStoreUrl: 'https://play.google.com/store/apps/details?id=com.apnabot.app',
+  translateMonthlyCharCap: 20000,
+  translateGlobalMonthlyCap: 1800000,
   updatedAt: null,
   updatedBy: null,
 };
@@ -64,6 +66,25 @@ describe('AppReleaseForm', () => {
     click(buttonByText(document.body, 'Yes, save'));
     await flush();
     expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ forceUpdate: true }));
+    unmount();
+  });
+
+  it('saves an edited translate cap as a number', async () => {
+    const { container, onSave, unmount } = setup();
+    type(inputs(container)[3], '50000');
+    click(saveButton(container));
+    await flush();
+    expect(onSave).toHaveBeenCalledWith(expect.objectContaining({
+      translateMonthlyCharCap: 50000, translateGlobalMonthlyCap: 1800000,
+    }));
+    unmount();
+  });
+
+  it('rejects a non-numeric translate cap', () => {
+    const { container, unmount } = setup();
+    type(inputs(container)[4], '12.5');
+    expect(container.textContent).toContain('Whole number');
+    expect(saveButton(container).disabled).toBe(true);
     unmount();
   });
 

@@ -7,18 +7,24 @@ import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Switch from '@/components/ui/Switch';
 import SaveWarningModal from '@/components/appRelease/SaveWarningModal';
-import { validateAppConfig, warningFlags, PLAY_STORE_PREFIX } from '@/lib/appVersion';
+import { validateAppConfig, warningFlags, PLAY_STORE_PREFIX, CAP_FIELDS } from '@/lib/appVersion';
 
 const FIELDS = [
   'androidMinVersion', 'androidLatestVersion', 'forceUpdate', 'maintenanceMode', 'playStoreUrl',
+  ...CAP_FIELDS,
 ];
 
-const pick = (src) => Object.fromEntries(FIELDS.map((k) => [k, src[k]]));
+// Caps are edited as text; a clean whole number becomes a number, anything else stays text (and fails validation).
+const toCap = (s) => (/^\d{1,9}$/.test(s) ? Number(s) : s);
+const pick = (src) => Object.fromEntries(FIELDS.map((k) => [
+  k, CAP_FIELDS.includes(k) ? String(src[k] ?? '') : src[k],
+]));
 const clean = (v) => ({
   ...v,
   androidMinVersion: v.androidMinVersion.trim(),
   androidLatestVersion: v.androidLatestVersion.trim(),
   playStoreUrl: v.playStoreUrl.trim(),
+  ...Object.fromEntries(CAP_FIELDS.map((k) => [k, toCap(v[k].trim())])),
 });
 
 /** One row: title + helper text on the left, a switch on the right. */
@@ -64,6 +70,31 @@ function TextFields({ values, errors, touched, set }) {
         error={err('playStoreUrl')}
       />
     </>
+  );
+}
+
+/** The two auto-translate character caps. */
+function CapFields({ values, errors, touched, set }) {
+  const err = (f) => (touched[f] ? errors[f] : undefined);
+  return (
+    <div className="grid gap-4 sm:grid-cols-2 border-t border-border-subtle pt-4">
+      <Input
+        label="Translate cap per business / month"
+        inputMode="numeric"
+        value={values.translateMonthlyCharCap}
+        onChange={(e) => set('translateMonthlyCharCap', e.target.value)}
+        error={err('translateMonthlyCharCap')}
+        helper="Source characters one business can auto-translate each month."
+      />
+      <Input
+        label="Translate cap, all businesses / month"
+        inputMode="numeric"
+        value={values.translateGlobalMonthlyCap}
+        onChange={(e) => set('translateGlobalMonthlyCap', e.target.value)}
+        error={err('translateGlobalMonthlyCap')}
+        helper="Source characters sent to Azure across everyone each month."
+      />
+    </div>
   );
 }
 
@@ -138,6 +169,7 @@ export default function AppReleaseForm({ data, onSave }) {
     <div className="card p-5 sm:p-6 max-w-2xl space-y-4">
       <TextFields values={values} errors={errors} touched={touched} set={set} />
       <FlagRows values={values} set={set} />
+      <CapFields values={values} errors={errors} touched={touched} set={set} />
       <Button
         loading={saving && !confirmOpen}
         disabled={!dirty || Object.keys(errors).length > 0}

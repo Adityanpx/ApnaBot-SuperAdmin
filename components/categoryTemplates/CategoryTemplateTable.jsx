@@ -3,7 +3,7 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { Trash2, Download, Star, StarOff } from 'lucide-react';
+import { Trash2, Download, Star, StarOff, Languages } from 'lucide-react';
 import Badge from '@/components/ui/Badge';
 import { SkeletonTableRow } from '@/components/ui/Skeleton';
 import EmptyState from '@/components/ui/EmptyState';
@@ -26,7 +26,7 @@ const TD = ({ children, className }) => (
 );
 
 export default function CategoryTemplateTable({
-  templates, loading, onDelete, onExport, onSetDefault, onUnsetDefault,
+  templates, loading, onDelete, onExport, onSetDefault, onUnsetDefault, onTranslate,
 }) {
   return (
     <div className="card overflow-hidden">
@@ -136,6 +136,17 @@ export default function CategoryTemplateTable({
                           <Star className="w-3.5 h-3.5" />
                         </button>
                       )}
+                      <button
+                        onClick={() => onTranslate(template)}
+                        title="Translate…"
+                        className="
+                          w-8 h-8 flex items-center justify-center rounded-lg
+                          text-text-tertiary hover:text-text-primary hover:bg-bg-subtle
+                          transition-colors duration-150
+                        "
+                      >
+                        <Languages className="w-3.5 h-3.5" />
+                      </button>
                       <button
                         onClick={() => onExport(template._id)}
                         title="Export category template"

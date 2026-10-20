@@ -9,6 +9,7 @@ import CategoryTemplateTable from '@/components/categoryTemplates/CategoryTempla
 import CloneCategoryTemplateModal from '@/components/categoryTemplates/CloneCategoryTemplateModal';
 import ImportJsonTemplateModal from '@/components/categoryTemplates/ImportJsonTemplateModal';
 import DeleteCategoryTemplateModal from '@/components/categoryTemplates/DeleteCategoryTemplateModal';
+import TranslateCategoryTemplateModal from '@/components/categoryTemplates/TranslateCategoryTemplateModal';
 import DefaultFlowModal from '@/components/categoryTemplates/DefaultFlowModal';
 import CreateDefaultFlowModal from '@/components/categoryTemplates/CreateDefaultFlowModal';
 import Button from '@/components/ui/Button';
@@ -26,6 +27,7 @@ export default function CategoryTemplatesPage() {
     templates, loading,
     cloneFromBusiness, deleteTemplate,
     importFromJson, exportTemplate, setDefault, unsetDefault,
+    translateTemplate,
   } = useCategoryTemplates();
 
   // Modal state
@@ -34,6 +36,7 @@ export default function CategoryTemplatesPage() {
   const [deletingTemplate, setDeletingTemplate] = useState(null);
   const [showCreateDefault, setShowCreateDefault] = useState(false);
   const [defaultAction, setDefaultAction] = useState(null); // { mode, template }
+  const [translatingTemplate, setTranslatingTemplate] = useState(null);
   const [category, setCategory] = useState('all');
 
   const selected = category === 'all' ? '' : category;
@@ -121,6 +124,7 @@ export default function CategoryTemplatesPage() {
         onExport={exportTemplate}
         onSetDefault={(template) => setDefaultAction({ mode: 'set', template })}
         onUnsetDefault={(template) => setDefaultAction({ mode: 'unset', template })}
+        onTranslate={setTranslatingTemplate}
       />
 
       {/* Modals — mutation hook toasts + refetches internally on success */}
@@ -148,6 +152,12 @@ export default function CategoryTemplatesPage() {
         onClose={() => setShowCreateDefault(false)}
         cloneFromBusiness={cloneFromBusiness}
         setDefault={setDefault}
+      />
+      <TranslateCategoryTemplateModal
+        open={!!translatingTemplate}
+        template={translatingTemplate}
+        onClose={() => setTranslatingTemplate(null)}
+        translateTemplate={translateTemplate}
       />
       <DeleteCategoryTemplateModal
         open={!!deletingTemplate}
