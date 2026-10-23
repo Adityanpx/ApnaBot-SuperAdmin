@@ -70,7 +70,7 @@ export default function EditPlanModal({ open, plan, onClose, onSuccess }) {
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <PlanForm form={form} onChange={setForm} isEdit />
-          <div className="flex justify-end gap-3 pt-4 border-t border-border-subtle">
+          <div className="modal-actions">
             <Button type="button" variant="secondary" onClick={onClose}>
               Cancel
             </Button>

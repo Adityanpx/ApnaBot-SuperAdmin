@@ -74,9 +74,9 @@ export default function CourseCatalogCard({
       {/* Actions */}
       <div className="flex gap-2 mt-auto">
         <Button variant="secondary" icon={Edit2} size="sm" onClick={onEdit} className="flex-1">Edit</Button>
-        <Button variant="secondary" icon={ArrowUp} size="sm" onClick={onMoveUp} disabled={isFirst} className="w-9 px-0 flex-shrink-0" title="Move up" />
-        <Button variant="secondary" icon={ArrowDown} size="sm" onClick={onMoveDown} disabled={isLast} className="w-9 px-0 flex-shrink-0" title="Move down" />
-        <Button variant="danger" icon={Trash2} size="sm" onClick={onDelete} className="w-9 px-0 flex-shrink-0" />
+        <Button variant="secondary" icon={ArrowUp} size="sm" onClick={onMoveUp} disabled={isFirst} className="w-9 max-md:w-11 px-0 flex-shrink-0" title="Move up" />
+        <Button variant="secondary" icon={ArrowDown} size="sm" onClick={onMoveDown} disabled={isLast} className="w-9 max-md:w-11 px-0 flex-shrink-0" title="Move down" />
+        <Button variant="danger" icon={Trash2} size="sm" onClick={onDelete} className="w-9 max-md:w-11 px-0 flex-shrink-0" />
       </div>
     </motion.div>
   );

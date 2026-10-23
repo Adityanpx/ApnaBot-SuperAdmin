@@ -19,10 +19,11 @@ import { API } from '@/lib/constants';
  *   open          — boolean
  *   onClose       — () => void
  *   businessId    — string
+ *   businessName  — string (shown in the header so it is clear which business is changing)
  *   currentPlanId — string (to highlight current plan)
  *   onSuccess     — () => void — called after plan change
  */
-export default function ChangePlanModal({ open, onClose, businessId, currentPlanId, onSuccess }) {
+export default function ChangePlanModal({ open, onClose, businessId, businessName, currentPlanId, onSuccess }) {
   const [plans,        setPlans]        = useState([]);
   const [selected,     setSelected]     = useState(currentPlanId || '');
   const [loadingPlans, setLoadingPlans] = useState(true);
@@ -56,7 +57,7 @@ export default function ChangePlanModal({ open, onClose, businessId, currentPlan
       setSaving(true);
       await api.put(API.BUSINESS_PLAN(businessId), { planId: selected });
       const chosenPlan = plans.find((p) => p._id === selected);
-      toast.success(`Plan changed to ${chosenPlan?.displayName}.`);
+      toast.success(`${businessName ? `${businessName}: plan` : 'Plan'} changed to ${chosenPlan?.displayName}.`);
       onSuccess();
     } catch (err) {
       toast.error(err.userMessage || 'Failed to change plan.');
@@ -70,7 +71,7 @@ export default function ChangePlanModal({ open, onClose, businessId, currentPlan
       open={open}
       onClose={onClose}
       title="Change Subscription Plan"
-      subtitle="Select a new plan to assign to this business."
+      subtitle={businessName ? `${businessName} — select a new plan` : 'Select a new plan to assign to this business.'}
       size="md"
     >
       <div className="space-y-5">
@@ -141,7 +142,7 @@ export default function ChangePlanModal({ open, onClose, businessId, currentPlan
         )}
 
         {/* Actions */}
-        <div className="flex items-center gap-3 justify-end pt-2 border-t border-border-subtle">
+        <div className="modal-actions">
           <Button variant="ghost" size="md" onClick={onClose} disabled={saving}>
             Cancel
           </Button>

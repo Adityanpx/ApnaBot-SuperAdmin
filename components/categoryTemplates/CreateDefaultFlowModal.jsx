@@ -44,7 +44,7 @@ function PickStep({ form, setForm, loading, onNext, onCancel }) {
         value={form.name}
         onChange={(e) => setForm({ ...form, name: e.target.value })}
       />
-      <div className="flex justify-end gap-3 pt-4 border-t border-border-subtle">
+      <div className="modal-actions">
         <Button variant="secondary" onClick={onCancel}>Cancel</Button>
         <Button loading={loading} disabled={!ready} onClick={onNext}>Clone as template</Button>
       </div>
@@ -72,7 +72,7 @@ function ConfirmStep({ created, categoryLabel, loading, onSet, onSkip }) {
         Template cloned. Make it the default? New businesses in {categoryLabel} will start with
         this flow.
       </p>
-      <div className="flex justify-end gap-3 pt-4 border-t border-border-subtle">
+      <div className="modal-actions">
         <Button variant="ghost" onClick={onSkip} disabled={loading}>Not now</Button>
         <Button loading={loading} onClick={onSet}>Yes, set as default</Button>
       </div>

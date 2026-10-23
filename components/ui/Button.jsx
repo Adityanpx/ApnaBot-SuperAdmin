@@ -50,8 +50,8 @@ const variants = {
 };
 
 const sizes = {
-  sm: 'h-8 px-3 text-xs gap-1.5 rounded-lg',
-  md: 'h-10 px-4 text-sm gap-2 rounded-xl',
+  sm: 'h-8 max-md:h-11 px-3 text-xs max-md:text-sm gap-1.5 rounded-lg',
+  md: 'h-10 max-md:h-11 px-4 text-sm gap-2 rounded-xl',
   lg: 'h-11 px-6 text-sm gap-2 rounded-xl',
 };
 

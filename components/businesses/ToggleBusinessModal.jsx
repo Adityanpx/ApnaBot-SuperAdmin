@@ -73,7 +73,7 @@ export default function ToggleBusinessModal({ open, onClose, business, onSuccess
         </div>
 
         {/* Confirm / cancel */}
-        <div className="flex items-center gap-3 justify-end pt-2">
+        <div className="modal-actions">
           <Button variant="ghost" size="md" onClick={onClose} disabled={loading}>
             Cancel
           </Button>

@@ -155,7 +155,7 @@ export default function EditVehicleCatalogModal({ open, entry, onClose, updateEn
               required
             />
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Input
                 label="Seats"
                 type="number"
@@ -176,7 +176,7 @@ export default function EditVehicleCatalogModal({ open, entry, onClose, updateEn
             </div>
 
             {/* Actions */}
-            <div className="flex justify-end gap-3 pt-4 border-t border-border-subtle">
+            <div className="modal-actions">
               <Button type="button" variant="secondary" onClick={onClose}>
                 Cancel
               </Button>

@@ -84,13 +84,13 @@ export default function DeleteBusinessModal({ open, business, onClose, onConfirm
             value={confirmText}
             onChange={(e) => setConfirmText(e.target.value)}
             placeholder={`Type "${business.name}"`}
-            className="input input-bordered w-full"
+            className="input-field"
             autoFocus
           />
         </div>
 
         {/* Actions */}
-        <div className="flex items-center gap-3 justify-end pt-2 border-t border-border-subtle">
+        <div className="modal-actions">
           <Button variant="ghost" size="md" onClick={handleClose} disabled={loading}>
             Cancel
           </Button>

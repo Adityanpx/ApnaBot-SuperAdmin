@@ -11,14 +11,13 @@ import VehicleCatalogPanel from '@/components/vehicleCatalog/VehicleCatalogPanel
 import CourseCatalogPanel from '@/components/courseCatalog/CourseCatalogPanel';
 import CategoryFeaturesPanel from '@/components/categoryFeatures/CategoryFeaturesPanel';
 import EmptyState from '@/components/ui/EmptyState';
-import { cn } from '@/lib/utils';
 
 // Tab key -> panel. Add a new category setting by adding its tab to
 // CATEGORY_SETTINGS_TABS (lib/constants.js) and its panel here.
 const PANELS = {
   'vehicle-types': () => <VehicleCatalogPanel />,
   courses: (category) => <CourseCatalogPanel category={category} />,
-  features: (category) => <CategoryFeaturesPanel category={category} />,
+  features: (category, label) => <CategoryFeaturesPanel category={category} categoryLabel={label} />,
 };
 
 /**
@@ -40,7 +39,7 @@ export default function CategorySettingsPage({ params, searchParams }) {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }} className="space-y-6">
       <div>
-        <Link href="/business-settings" className="inline-flex items-center gap-1.5 text-sm text-text-secondary hover:text-text-primary mb-3">
+        <Link href="/business-settings" className="inline-flex items-center gap-1.5 min-h-[44px] md:min-h-0 text-sm text-text-secondary hover:text-text-primary mb-1 md:mb-3">
           <ArrowLeft className="w-4 h-4" /> Business Settings
         </Link>
         <h1 className="page-title">{label}</h1>
@@ -57,24 +56,21 @@ export default function CategorySettingsPage({ params, searchParams }) {
 
       {tabs.length > 0 && (
         <>
-          <div className="flex gap-1 border-b border-border-subtle">
+          <div className="tab-bar" role="tablist">
             {tabs.map((tab) => (
               <button
                 key={tab.key}
                 type="button"
+                role="tab"
+                aria-selected={tab.key === activeKey}
                 onClick={() => selectTab(tab.key)}
-                className={cn(
-                  'px-4 py-2.5 text-sm font-medium -mb-px border-b-2 transition-colors',
-                  tab.key === activeKey
-                    ? 'border-brand-500 text-text-primary'
-                    : 'border-transparent text-text-secondary hover:text-text-primary'
-                )}
+                className="tab-btn"
               >
                 {tab.label}
               </button>
             ))}
           </div>
-          {PANELS[activeKey]?.(category)}
+          {PANELS[activeKey]?.(category, label)}
         </>
       )}
     </motion.div>

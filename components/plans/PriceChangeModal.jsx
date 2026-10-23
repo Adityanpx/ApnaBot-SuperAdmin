@@ -35,7 +35,7 @@ export default function PriceChangeModal({ open, change, loading, onClose, onCon
           ))}
         </div>
 
-        <div className="flex items-center gap-3 justify-end pt-2">
+        <div className="modal-actions">
           <Button variant="ghost" onClick={onClose} disabled={loading}>Cancel</Button>
           <Button loading={loading} onClick={onConfirm}>Yes, save</Button>
         </div>

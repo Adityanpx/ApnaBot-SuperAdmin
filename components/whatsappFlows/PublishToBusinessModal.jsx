@@ -63,7 +63,7 @@ export default function PublishToBusinessModal({ open, flow, onClose, publishToB
         </div>
 
         {/* Actions */}
-        <div className="flex justify-end gap-3 pt-4 border-t border-border-subtle">
+        <div className="modal-actions">
           <Button type="button" variant="secondary" onClick={handleClose}>
             Cancel
           </Button>

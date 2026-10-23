@@ -2,9 +2,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Search, X } from 'lucide-react';
+import { Search, X, SlidersHorizontal } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { BUSINESS_TYPES } from '@/lib/constants';
+import Modal from '@/components/ui/Modal';
+import Button from '@/components/ui/Button';
+import Select from '@/components/ui/Select';
+import { useIsMobile } from '@/hooks/useMediaQuery';
 
 // Debounce hook — prevents API call on every keystroke
 function useDebounce(value, delay = 400) {
@@ -37,6 +41,24 @@ export default function BusinessFilters({
   totalBusinesses,
 }) {
   const [localSearch, setLocalSearch] = useState(search);
+  const isMobile = useIsMobile();
+  const [sheetOpen, setSheetOpen] = useState(false);
+  // Draft values inside the Filters sheet — applied only on "Apply"
+  const [draftActive, setDraftActive] = useState(isActive);
+  const [draftType, setDraftType] = useState(businessType);
+  const activeFilterCount = (isActive !== '' ? 1 : 0) + (businessType !== '' ? 1 : 0);
+
+  const openSheet = () => {
+    setDraftActive(isActive);
+    setDraftType(businessType);
+    setSheetOpen(true);
+  };
+  const applySheet = () => {
+    if (draftActive !== isActive) onActiveChange(draftActive);
+    if (draftType !== businessType) onTypeChange(draftType);
+    setSheetOpen(false);
+  };
+  const resetSheet = () => { setDraftActive(''); setDraftType(''); };
   const debouncedSearch = useDebounce(localSearch, 400);
 
   // Sync debounced value up to parent
@@ -55,10 +77,10 @@ export default function BusinessFilters({
   `;
 
   return (
-    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
 
       {/* Search input */}
-      <div className="relative flex-1 min-w-0 max-w-sm">
+      <div className="relative flex-1 min-w-0 sm:max-w-sm">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-tertiary pointer-events-none" />
         <input
           type="text"
@@ -70,14 +92,62 @@ export default function BusinessFilters({
         {localSearch && (
           <button
             onClick={() => { setLocalSearch(''); onSearchChange(''); }}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-text-tertiary hover:text-text-primary transition-colors"
+            aria-label="Clear search"
+            className="absolute right-0 top-1/2 -translate-y-1/2 w-11 h-11 sm:w-10 sm:h-10 flex items-center justify-center text-text-tertiary hover:text-text-primary transition-colors"
           >
             <X className="w-3.5 h-3.5" />
           </button>
         )}
       </div>
 
-      <div className="flex items-center gap-2 flex-wrap">
+      {/* Phones: filters collapse into a bottom sheet */}
+      {isMobile && (
+        <>
+          <button
+            type="button"
+            onClick={openSheet}
+            className="h-11 px-4 rounded-xl flex items-center justify-center gap-2 text-sm font-medium bg-bg-raised border border-border text-text-primary"
+          >
+            <SlidersHorizontal className="w-4 h-4" />
+            Filters
+            {activeFilterCount > 0 && (
+              <span className="min-w-5 h-5 px-1.5 rounded-full bg-brand-500 text-white text-xs font-semibold flex items-center justify-center">
+                {activeFilterCount}
+              </span>
+            )}
+            {totalBusinesses !== undefined && (
+              <span className="text-text-tertiary font-normal">· {totalBusinesses}</span>
+            )}
+          </button>
+
+          <Modal
+            open={sheetOpen}
+            onClose={() => setSheetOpen(false)}
+            title="Filters"
+            variant="sheet"
+            size="sm"
+            footer={(
+              <div className="flex gap-3">
+                <Button variant="ghost" className="flex-1" onClick={resetSheet}>Reset</Button>
+                <Button className="flex-1" onClick={applySheet}>Apply</Button>
+              </div>
+            )}
+          >
+            <div className="space-y-4">
+              <Select label="Status" placeholder={null} options={STATUS_OPTIONS} value={draftActive} onChange={(e) => setDraftActive(e.target.value)} />
+              <Select
+                label="Business type"
+                placeholder={null}
+                options={TYPE_OPTIONS}
+                value={draftType}
+                onChange={(e) => setDraftType(e.target.value)}
+              />
+            </div>
+          </Modal>
+        </>
+      )}
+
+      <div className={cn('items-center gap-2 flex-wrap', isMobile ? 'hidden' : 'flex')}>
 
         {/* Status filter */}
         <div className="relative">

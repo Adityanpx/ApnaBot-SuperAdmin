@@ -154,7 +154,7 @@ export default function CloneCategoryTemplateModal({ open, onClose, cloneFromBus
         />
 
         {/* Actions */}
-        <div className="flex justify-end gap-3 pt-4 border-t border-border-subtle">
+        <div className="modal-actions">
           <Button type="button" variant="secondary" onClick={handleClose}>
             Cancel
           </Button>

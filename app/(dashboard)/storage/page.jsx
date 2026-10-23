@@ -3,7 +3,6 @@
 import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { RefreshCw } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { useStorage } from '@/hooks/useStorage';
 import Button from '@/components/ui/Button';
 import StorageOverview from '@/components/storage/StorageOverview';
@@ -52,18 +51,15 @@ export default function StoragePage() {
         <Button variant="outline" icon={RefreshCw} onClick={refreshAll}>Refresh</Button>
       </div>
 
-      <div className="flex gap-1 overflow-x-auto border-b border-border-subtle -mx-1 px-1">
+      <div className="tab-bar" role="tablist">
         {TABS.map((t) => (
           <button
             key={t.id}
             type="button"
+            role="tab"
+            aria-selected={tab === t.id}
             onClick={() => setTab(t.id)}
-            className={cn(
-              'px-3 py-2.5 text-sm font-medium whitespace-nowrap border-b-2 -mb-px transition-colors',
-              tab === t.id
-                ? 'border-brand-500 text-text-primary'
-                : 'border-transparent text-text-secondary hover:text-text-primary'
-            )}
+            className="tab-btn"
           >
             {t.label}
           </button>

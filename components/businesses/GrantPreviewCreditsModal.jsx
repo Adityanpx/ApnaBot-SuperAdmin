@@ -86,7 +86,7 @@ export default function GrantPreviewCreditsModal({ open, onClose, businessId, bu
         />
 
         {/* Actions */}
-        <div className="flex items-center gap-3 justify-end pt-2 border-t border-border-subtle">
+        <div className="modal-actions">
           <Button variant="ghost" size="md" onClick={onClose} disabled={saving}>
             Cancel
           </Button>

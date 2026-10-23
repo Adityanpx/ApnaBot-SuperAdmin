@@ -27,11 +27,11 @@ export default function BusinessCategoryTemplateCard({ template, onApply }) {
 
   return (
     <div className="card overflow-hidden">
-      <div className="p-5 flex items-center justify-between gap-4">
+      <div className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
         <button
           type="button"
           onClick={() => setExpanded((prev) => !prev)}
-          className="flex items-center gap-3 min-w-0 text-left flex-1"
+          className="flex items-center gap-3 min-w-0 text-left flex-1 min-h-[44px]"
         >
           <span className="text-2xl flex-shrink-0">{category?.emoji || '📋'}</span>
           <div className="min-w-0">
@@ -46,14 +46,15 @@ export default function BusinessCategoryTemplateCard({ template, onApply }) {
         </button>
 
         <div className="flex items-center gap-2 flex-shrink-0">
-          <Button size="sm" onClick={() => onApply(template)}>
+          <Button size="sm" className="flex-1 sm:flex-none" onClick={() => onApply(template)}>
             Apply to Business
           </Button>
           <button
             type="button"
             onClick={() => setExpanded((prev) => !prev)}
             title={expanded ? 'Hide fields' : 'Show fields'}
-            className="w-8 h-8 flex items-center justify-center rounded-lg text-text-tertiary hover:text-text-primary hover:bg-bg-subtle transition-colors duration-150"
+            aria-label={expanded ? 'Hide fields' : 'Show fields'}
+            className="icon-btn text-text-tertiary hover:text-text-primary hover:bg-bg-subtle"
           >
             <ChevronDown className={cn('w-4 h-4 transition-transform duration-200', expanded && 'rotate-180')} />
           </button>
@@ -80,7 +81,24 @@ export default function BusinessCategoryTemplateCard({ template, onApply }) {
                   No fields defined for this template.
                 </div>
               ) : (
-                <div className="overflow-x-auto">
+                <>
+                <ul className="md:hidden divide-y divide-border-subtle">
+                  {template.flowFields.map((field, i) => (
+                    <li key={field.name || i} className="py-3 space-y-1 text-sm">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-mono text-xs text-text-primary break-all">{field.name}</span>
+                        <Badge variant="neutral">{field.type}</Badge>
+                      </div>
+                      <p className="text-text-secondary break-words">{field.label}</p>
+                      {field.visibleWhen && (
+                        <p className="text-xs text-text-tertiary break-words">
+                          when {field.visibleWhen.field} = &quot;{field.visibleWhen.equals}&quot;
+                        </p>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+                <div className="hidden md:block overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="text-left text-xs font-semibold text-text-tertiary uppercase tracking-wider">
@@ -108,6 +126,7 @@ export default function BusinessCategoryTemplateCard({ template, onApply }) {
                     </tbody>
                   </table>
                 </div>
+                </>
               )}
             </div>
           </motion.div>

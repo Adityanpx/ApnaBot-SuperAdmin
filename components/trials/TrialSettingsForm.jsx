@@ -75,7 +75,7 @@ export default function TrialSettingsForm({ settings, plans, onSave }) {
         error={touched ? errors.trialDays : undefined}
       />
       <div className="flex justify-end pt-2 border-t border-border-subtle">
-        <Button type="submit" loading={saving}>Save settings</Button>
+        <Button type="submit" loading={saving} className="w-full sm:w-auto">Save settings</Button>
       </div>
     </form>
   );

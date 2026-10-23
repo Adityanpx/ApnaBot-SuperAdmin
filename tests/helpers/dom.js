@@ -6,17 +6,21 @@ import { createRoot } from 'react-dom/client';
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
-/** Mount `element` into the document and return { container, unmount }. */
+/**
+ * Mount `element` into the document and return { container, unmount }.
+ * `container` is document.body: modals render in a portal on <body>, so queries must start
+ * there to find them (unmount removes everything this call mounted).
+ */
 export function mount(element) {
-  const container = document.createElement('div');
-  document.body.appendChild(container);
-  const root = createRoot(container);
+  const host = document.createElement('div');
+  document.body.appendChild(host);
+  const root = createRoot(host);
   act(() => root.render(element));
   const unmount = () => {
     act(() => root.unmount());
-    container.remove();
+    host.remove();
   };
-  return { container, unmount };
+  return { container: document.body, unmount };
 }
 
 /** Click an element inside act(). */

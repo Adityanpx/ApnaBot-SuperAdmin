@@ -104,7 +104,7 @@ export default function TranslateCategoryTemplateModal({ open, template, onClose
           </div>
         )}
 
-        <div className="flex justify-end gap-3 pt-4 border-t border-border-subtle">
+        <div className="modal-actions">
           <Button type="button" variant="secondary" onClick={handleClose}>
             {result ? 'Close' : 'Cancel'}
           </Button>

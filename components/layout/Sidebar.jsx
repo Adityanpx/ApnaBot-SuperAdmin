@@ -4,7 +4,7 @@
 import { useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import {
   LayoutDashboard, Store, CreditCard,
@@ -28,6 +28,20 @@ export default function Sidebar() {
   // Close drawer on route change (mobile)
   useEffect(() => { close(); }, [pathname]);
 
+  // Lock page scroll behind the open drawer; close it if the window grows to desktop width
+  useEffect(() => {
+    if (!isOpen) return undefined;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const mql = window.matchMedia('(min-width: 1024px)');
+    const onChange = (e) => { if (e.matches) close(); };
+    mql.addEventListener('change', onChange);
+    return () => {
+      document.body.style.overflow = previous;
+      mql.removeEventListener('change', onChange);
+    };
+  }, [isOpen]);
+
   // Close drawer on Escape
   useEffect(() => {
     const handler = (e) => { if (e.key === 'Escape') close(); };
@@ -44,7 +58,7 @@ export default function Sidebar() {
       router.replace('/login');
     });
 
-  const SidebarContent = () => (
+  const renderContent = (showClose) => (
     <div className="flex flex-col h-full">
       {/* Logo */}
       <div className="px-6 py-5 border-b border-sidebar-border">
@@ -58,6 +72,16 @@ export default function Sidebar() {
               Superadmin
             </p>
           </div>
+          {showClose && (
+            <button
+              type="button"
+              onClick={close}
+              aria-label="Close menu"
+              className="icon-btn ml-auto -mr-3 text-text-tertiary hover:text-text-primary hover:bg-bg-subtle"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          )}
         </div>
       </div>
 
@@ -85,7 +109,7 @@ export default function Sidebar() {
                   <span className="text-sm">{item.label}</span>
                   {isActive && (
                     <motion.div
-                      layoutId="active-nav-indicator"
+                      layoutId={showClose ? 'active-nav-indicator-drawer' : 'active-nav-indicator'}
                       className="absolute left-0 w-[3px] h-6 bg-brand-500 rounded-r-full"
                       transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                     />
@@ -115,7 +139,7 @@ export default function Sidebar() {
           whileTap={{ scale: 0.97 }}
           onClick={handleLogout}
           className="
-            w-full flex items-center gap-3 px-3 py-2.5 rounded-xl
+            w-full min-h-[44px] flex items-center gap-3 px-3 py-2.5 rounded-xl
             text-sm font-medium text-text-secondary
             hover:text-danger-text hover:bg-danger-bg
             transition-colors duration-150
@@ -136,42 +160,33 @@ export default function Sidebar() {
         fixed left-0 top-0 h-screen w-sidebar z-30
         bg-sidebar-bg border-r border-sidebar-border
       ">
-        <SidebarContent />
+        {renderContent(false)}
       </aside>
 
-      {/* ── Mobile: drawer + backdrop ── */}
-      <AnimatePresence>
-        {isOpen && (
-          <>
-            {/* Backdrop */}
-            <motion.div
-              key="sidebar-backdrop"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              onClick={close}
-              className="lg:hidden fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
-            />
-
-            {/* Drawer panel */}
-            <motion.aside
-              key="sidebar-drawer"
-              initial={{ x: '-100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '-100%' }}
-              transition={{ type: 'spring', stiffness: 350, damping: 35 }}
-              className="
-                lg:hidden fixed left-0 top-0 h-screen w-[280px] z-50
-                bg-sidebar-bg border-r border-sidebar-border
-                flex flex-col
-              "
-            >
-              <SidebarContent />
-            </motion.aside>
-          </>
+      {/* ── Mobile: drawer + backdrop ──
+          Always mounted and slid with CSS (not AnimatePresence): an exiting drawer was left in the
+          DOM after a route change. `invisible` when closed keeps its links out of the tab order. */}
+      <div
+        onClick={close}
+        aria-hidden="true"
+        className={cn(
+          'lg:hidden fixed inset-0 z-40 bg-black/60 backdrop-blur-sm transition-opacity duration-200',
+          isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
         )}
-      </AnimatePresence>
+      />
+      <aside
+        role="dialog"
+        aria-modal={isOpen}
+        aria-label="Navigation"
+        className={cn(
+          'lg:hidden fixed left-0 top-0 h-[100dvh] w-[280px] max-w-[85vw] z-50',
+          'bg-sidebar-bg border-r border-sidebar-border flex flex-col',
+          'transition-[transform,visibility] duration-300 ease-out',
+          isOpen ? 'translate-x-0 visible' : '-translate-x-full invisible'
+        )}
+      >
+        {renderContent(true)}
+      </aside>
     </>
   );
 }

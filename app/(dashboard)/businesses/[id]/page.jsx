@@ -121,18 +121,18 @@ export default function BusinessDetailPage() {
       className="space-y-6 max-w-screen-lg"
     >
       {/* Back + action buttons */}
-      <div className="flex items-center justify-between gap-4 flex-wrap">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:flex-wrap">
 
         {/* Back */}
-        <Link href="/businesses">
-          <button className="flex items-center gap-2 text-sm text-text-secondary hover:text-text-primary transition-colors">
+        <Link href="/businesses" className="self-start">
+          <button className="flex items-center gap-2 min-h-[44px] sm:min-h-0 text-sm text-text-secondary hover:text-text-primary transition-colors">
             <ArrowLeft className="w-4 h-4" />
             Back to Business
           </button>
         </Link>
 
-        {/* Actions */}
-        <div className="flex items-center gap-2 flex-wrap">
+        {/* Actions — a two-column grid of full-width buttons on phones */}
+        <div className="grid grid-cols-2 gap-2 sm:flex sm:items-center sm:flex-wrap">
           <Button
             variant="secondary"
             size="sm"
@@ -181,6 +181,7 @@ export default function BusinessDetailPage() {
           <Button
             variant="danger"
             size="sm"
+            className="col-span-2 sm:col-span-1"
             icon={<Trash2 className="w-4 h-4" />}
             onClick={() => setDeleteModal(true)}
           >
@@ -194,7 +195,7 @@ export default function BusinessDetailPage() {
         {/* Left — business info + per-business feature overrides */}
         <div className="space-y-6">
           <BusinessDetailCard business={business} staffCount={staffCount} />
-          <BusinessFeaturesCard businessId={id} />
+          <BusinessFeaturesCard businessId={id} businessName={business.name} />
           <CopySetupCard business={business} />
         </div>
 
@@ -217,6 +218,7 @@ export default function BusinessDetailPage() {
         open={planModal}
         onClose={() => setPlanModal(false)}
         businessId={id}
+        businessName={business.name}
         currentPlanId={plan?._id}
         onSuccess={() => { fetchBusiness(); setPlanModal(false); }}
       />

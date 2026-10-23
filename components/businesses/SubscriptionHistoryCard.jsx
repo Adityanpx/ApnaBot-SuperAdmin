@@ -13,7 +13,7 @@ import { History, ShieldCheck, CreditCard } from 'lucide-react';
  */
 export default function SubscriptionHistoryCard({ history = [] }) {
   return (
-    <div className="card p-6">
+    <div className="card p-4 sm:p-6">
       <h3 className="text-sm font-semibold text-text-secondary mb-4">Subscription History</h3>
 
       {history.length === 0 ? (

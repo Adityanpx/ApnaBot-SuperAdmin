@@ -170,7 +170,7 @@ export default function GrantSubscriptionModal({ open, onClose, businessId, busi
         </div>
 
         {/* Actions */}
-        <div className="flex items-center gap-3 justify-end pt-2 border-t border-border-subtle">
+        <div className="modal-actions">
           <Button variant="ghost" size="md" onClick={onClose} disabled={saving}>
             Cancel
           </Button>

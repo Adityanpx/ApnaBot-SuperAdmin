@@ -12,7 +12,7 @@ export default function ThemeToggle() {
 
   // Avoid hydration mismatch — only render after mount
   useEffect(() => setMounted(true), []);
-  if (!mounted) return <div className="w-9 h-9" />;
+  if (!mounted) return <div className="w-11 h-11 sm:w-9 sm:h-9" />;
 
   const isDark = theme === 'dark';
 
@@ -20,7 +20,7 @@ export default function ThemeToggle() {
     <button
       onClick={() => setTheme(isDark ? 'light' : 'dark')}
       className="
-        w-9 h-9 rounded-lg flex items-center justify-center
+        w-11 h-11 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center
         bg-bg-subtle border border-border
         text-text-secondary hover:text-text-primary
         hover:bg-bg-overlay

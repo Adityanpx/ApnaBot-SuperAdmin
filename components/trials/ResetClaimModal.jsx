@@ -58,7 +58,7 @@ export default function ResetClaimModal({ open, claim, onClose, onConfirm }) {
             onChange={(e) => setReason(e.target.value)}
           />
         </label>
-        <div className="flex items-center gap-3 justify-end">
+        <div className="modal-actions">
           <Button variant="ghost" onClick={close} disabled={loading}>Cancel</Button>
           <Button variant="danger" loading={loading} disabled={!isValidReason(trimmed)} onClick={confirm}>
             Reset claim

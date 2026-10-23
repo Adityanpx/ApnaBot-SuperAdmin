@@ -13,6 +13,7 @@ import Input from '@/components/ui/Input';
 import EmptyState from '@/components/ui/EmptyState';
 import ErrorState from '@/components/ui/ErrorState';
 import Skeleton, { SkeletonStatCard } from '@/components/ui/Skeleton';
+import { useIsMobile } from '@/hooks/useMediaQuery';
 import { kindLabel, MIN_RETENTION_DAYS } from './storageShared';
 
 function StatCard({ icon: Icon, label, value, hint }) {
@@ -49,6 +50,7 @@ export default function StorageOverview({ summary, runs, platformDays, onCleanUp
   // businessId → 'never' | number | null — only what was set during this visit
   const [overrides, setOverrides] = useState({});
   const [editing, setEditing] = useState(null);
+  const isMobile = useIsMobile();
 
   const lastCleanup = useMemo(() => {
     const map = {};
@@ -139,9 +141,45 @@ export default function StorageOverview({ summary, runs, platformDays, onCleanUp
         </div>
         {data.byBusiness.length === 0 ? (
           <EmptyState icon={HardDrive} title="No files yet" description="Once businesses upload or receive media it will show up here." />
+        ) : isMobile ? (
+          <ul className="divide-y divide-border-subtle border-t border-border-subtle">
+            {data.byBusiness.map((b) => {
+              const id = b.businessId;
+              return (
+                <li key={id || 'none'} className="p-4 space-y-2 text-sm">
+                  <p className="font-semibold text-text-primary break-words">{b.name || 'Unknown business'}</p>
+                  <div className="flex justify-between gap-3">
+                    <span className="text-xs text-text-tertiary">Size · files</span>
+                    <span className="text-text-secondary">{formatBytes(b.bytes)} · {formatNumber(b.count)} files</span>
+                  </div>
+                  <div className="flex justify-between gap-3">
+                    <span className="text-xs text-text-tertiary">Last cleanup</span>
+                    <span className="text-text-secondary">{id && lastCleanup(id) ? formatDate(lastCleanup(id)) : '—'}</span>
+                  </div>
+                  {id && (
+                    <>
+                      <div className="flex justify-between items-center gap-3">
+                        <span className="text-xs text-text-tertiary">Auto-delete chat media</span>
+                        <button
+                          type="button"
+                          onClick={() => setEditing(b)}
+                          className="text-info-text min-h-[44px] text-right"
+                        >
+                          {retentionText(overrides[id], platformDays)}
+                        </button>
+                      </div>
+                      <Button size="sm" variant="outline" icon={Trash2} className="w-full" onClick={() => onCleanUp(b)}>
+                        Clean up {b.name || 'this business'}
+                      </Button>
+                    </>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-sm min-w-[720px]">
+            <table className="w-full text-sm min-w-[640px]">
               <thead>
                 <tr className="text-left text-xs text-text-tertiary border-y border-border-subtle">
                   <th className="px-5 py-2.5 font-medium">Business</th>

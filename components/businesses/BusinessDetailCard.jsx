@@ -1,5 +1,6 @@
 // components/businesses/BusinessDetailCard.jsx
 import Badge from '@/components/ui/Badge';
+import CopyId from '@/components/ui/CopyId';
 import {
   getInitials,
   capitalize,
@@ -38,15 +39,15 @@ export default function BusinessDetailCard({ business, staffCount }) {
     <div className="space-y-5">
 
       {/* Header card */}
-      <div className="card p-6">
+      <div className="card p-4 sm:p-6">
         <div className="flex items-start justify-between gap-4">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 min-w-0">
             {/* Business type emoji avatar */}
             <div className="w-14 h-14 rounded-2xl bg-bg-subtle flex items-center justify-center text-3xl flex-shrink-0">
               {getBusinessEmoji(business.businessCategory)}
             </div>
-            <div>
-              <h2 className="text-xl font-bold text-text-primary leading-tight">
+            <div className="min-w-0">
+              <h2 className="text-xl font-bold text-text-primary leading-tight break-words">
                 {business.name}
               </h2>
               <p className="text-sm text-text-secondary mt-1">
@@ -55,6 +56,7 @@ export default function BusinessDetailCard({ business, staffCount }) {
               <p className="text-xs text-text-tertiary mt-1">
                 Joined {formatDate(business.createdAt)}
               </p>
+              <CopyId value={business._id} label="business ID" className="mt-1" />
             </div>
           </div>
 
@@ -70,7 +72,7 @@ export default function BusinessDetailCard({ business, staffCount }) {
       </div>
 
       {/* Info rows */}
-      <div className="card p-6">
+      <div className="card p-4 sm:p-6">
         <h3 className="text-sm font-semibold text-text-secondary mb-1">Business Details</h3>
         <div className="mt-3">
           <InfoRow icon={MapPin} label="Address" value={business.address} />
@@ -96,7 +98,7 @@ export default function BusinessDetailCard({ business, staffCount }) {
 
       {/* Owner card */}
       {business.ownerUserId && (
-        <div className="card p-6">
+        <div className="card p-4 sm:p-6">
           <h3 className="text-sm font-semibold text-text-secondary mb-4">Owner</h3>
           <div className="flex items-center gap-3">
             <div className="
@@ -106,10 +108,10 @@ export default function BusinessDetailCard({ business, staffCount }) {
               {getInitials(business.ownerUserId.name)}
             </div>
             <div className="min-w-0">
-              <p className="text-sm font-semibold text-text-primary">
+              <p className="text-sm font-semibold text-text-primary break-words">
                 {business.ownerUserId.name}
               </p>
-              <p className="text-xs text-text-tertiary mt-0.5 flex items-center gap-1.5">
+              <p className="text-xs text-text-tertiary mt-0.5 flex items-center gap-1.5 break-all">
                 <Mail className="w-3 h-3 flex-shrink-0" />
                 {business.ownerUserId.email}
               </p>

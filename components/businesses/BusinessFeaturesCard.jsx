@@ -7,6 +7,7 @@ import api from '@/lib/api';
 import { API } from '@/lib/constants';
 import Badge from '@/components/ui/Badge';
 import OwnerMediaSwitch from '@/components/businesses/OwnerMediaSwitch';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
 
 /**
  * BusinessFeaturesCard — Businesses → <business> → Features.
@@ -16,10 +17,11 @@ import OwnerMediaSwitch from '@/components/businesses/OwnerMediaSwitch';
  * features that apply to the business's category; renders nothing when none do.
  * Turning a feature off hides its dashboard pages — it deletes nothing.
  */
-export default function BusinessFeaturesCard({ businessId }) {
+export default function BusinessFeaturesCard({ businessId, businessName }) {
   const [features, setFeatures] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(null);
+  const [pendingOff, setPendingOff] = useState(null); // { feature } awaiting "Off for this business" confirmation
 
   const fetchFeatures = useCallback(async () => {
     setLoading(true);
@@ -54,7 +56,7 @@ export default function BusinessFeaturesCard({ businessId }) {
   if (loading || features.length === 0) return null;
 
   return (
-    <div className="card p-5">
+    <div className="card p-4 sm:p-5">
       <h3 className="text-base font-bold text-text-primary tracking-tight">Features</h3>
       <p className="text-xs text-text-secondary mt-0.5 mb-4">
         Follow the category&apos;s switch (Business Settings → Features), or turn a feature on or off for just this business.
@@ -66,6 +68,7 @@ export default function BusinessFeaturesCard({ businessId }) {
               <OwnerMediaSwitch
                 key={f.feature}
                 businessId={businessId}
+                businessName={businessName}
                 feature={f}
                 saving={saving === f.feature}
                 onChange={(override) => setOverride(f, override)}
@@ -88,13 +91,14 @@ export default function BusinessFeaturesCard({ businessId }) {
               </div>
               <div className="mt-3 space-y-1.5">
                 {choices.map((c) => (
-                  <label key={String(c.value)} className="flex items-center gap-2 text-sm text-text-secondary cursor-pointer">
+                  <label key={String(c.value)} className="flex items-center gap-3 sm:gap-2 min-h-[44px] sm:min-h-0 text-sm text-text-secondary cursor-pointer">
                     <input
                       type="radio"
+                      className="w-5 h-5 sm:w-4 sm:h-4 flex-shrink-0"
                       name={`feature-${f.feature}`}
                       checked={f.override === c.value}
                       disabled={saving === f.feature}
-                      onChange={() => setOverride(f, c.value)}
+                      onChange={() => (c.value === false ? setPendingOff(f) : setOverride(f, c.value))}
                     />
                     {c.label}
                   </label>
@@ -104,6 +108,20 @@ export default function BusinessFeaturesCard({ businessId }) {
           );
         })}
       </div>
+
+      <ConfirmDialog
+        open={!!pendingOff}
+        onClose={() => setPendingOff(null)}
+        title="Turn this feature off?"
+        subject={`${pendingOff?.label ?? ''} · ${businessName ?? 'this business'}`}
+        confirmLabel="Yes, turn off"
+        onConfirm={() => setOverride(pendingOff, false)}
+      >
+        <p>
+          <strong>{pendingOff?.label}</strong> will be hidden for <strong>{businessName ?? 'this business'}</strong> only.
+          Nothing is deleted.
+        </p>
+      </ConfirmDialog>
     </div>
   );
 }

@@ -81,7 +81,7 @@ export default function DeleteVehicleCatalogModal({ open, entry, onClose, delete
             </div>
 
             {/* Actions */}
-            <div className="flex justify-end gap-3 pt-2 border-t border-border-subtle">
+            <div className="modal-actions">
               <Button variant="secondary" onClick={handleClose}>
                 Cancel
               </Button>

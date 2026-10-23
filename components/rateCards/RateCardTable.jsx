@@ -3,6 +3,8 @@
 
 import { motion } from 'framer-motion';
 import Badge from '@/components/ui/Badge';
+import { MobileCardList, MobileCard, CardField } from '@/components/ui/MobileCards';
+import { useIsMobile } from '@/hooks/useMediaQuery';
 import { SkeletonTableRow } from '@/components/ui/Skeleton';
 import EmptyState from '@/components/ui/EmptyState';
 import { formatPaise, formatDate, capitalize, findActiveRateCardIds, cn } from '@/lib/utils';
@@ -24,6 +26,48 @@ const TD = ({ children, className }) => (
 
 export default function RateCardTable({ rateCards, loading }) {
   const activeIds = findActiveRateCardIds(rateCards);
+  const isMobile = useIsMobile();
+
+  if (isMobile) {
+    return (
+      <MobileCardList
+        loading={loading}
+        skeletons={6}
+        isEmpty={rateCards.length === 0}
+        empty={(
+          <EmptyState
+            icon="💰"
+            title="No rate cards yet"
+            description="Add one to start pricing messages by country and category."
+          />
+        )}
+      >
+        {rateCards.map((rc) => {
+          const isActive = activeIds.has(rc._id);
+          return (
+            <MobileCard
+              key={rc._id}
+              className={isActive ? 'bg-brand-500/5' : undefined}
+              header={(
+                <div className="flex items-start justify-between gap-3">
+                  <p className="font-semibold text-text-primary min-w-0">
+                    {rc.countryCode} · {capitalize(rc.category.replace(/_/g, ' '))}
+                  </p>
+                  {isActive ? <Badge variant="success" dot>Active</Badge> : null}
+                </div>
+              )}
+            >
+              <CardField label="Price">
+                {formatPaise(rc.pricePaise)}
+                <span className="block text-xs text-text-tertiary">{rc.pricePaise} paise</span>
+              </CardField>
+              <CardField label="Effective from">{formatDate(rc.effectiveFrom)}</CardField>
+            </MobileCard>
+          );
+        })}
+      </MobileCardList>
+    );
+  }
 
   return (
     <div className="card overflow-hidden">

@@ -65,7 +65,7 @@ export default function ApplyBusinessCategoryTemplateModal({ open, template, onC
               </p>
             </div>
           </div>
-          <div className="flex justify-end gap-3 pt-2 border-t border-border-subtle">
+          <div className="modal-actions">
             <Button variant="secondary" onClick={handleClose}>
               Close
             </Button>
@@ -98,7 +98,7 @@ export default function ApplyBusinessCategoryTemplateModal({ open, template, onC
             </div>
           )}
 
-          <div className="flex justify-end gap-3 pt-4 border-t border-border-subtle">
+          <div className="modal-actions">
             <Button variant="secondary" onClick={handleClose}>
               Cancel
             </Button>

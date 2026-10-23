@@ -62,7 +62,7 @@ export default function DefaultFlowModal({
             <p>Businesses that already exist are not changed.</p>
           </div>
         </div>
-        <div className="flex items-center gap-3 justify-end">
+        <div className="modal-actions">
           <Button variant="ghost" onClick={onClose} disabled={loading}>Cancel</Button>
           <Button loading={loading} onClick={handleConfirm}>
             {isSet ? 'Yes, set default' : 'Yes, remove default'}

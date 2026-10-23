@@ -2,9 +2,14 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { ExternalLink, ToggleLeft, ToggleRight, Trash2 } from 'lucide-react';
 import Badge from '@/components/ui/Badge';
+import CopyId from '@/components/ui/CopyId';
+import RowMenu from '@/components/ui/RowMenu';
+import { MobileCardList, MobileCard, CardField } from '@/components/ui/MobileCards';
+import { useIsMobile } from '@/hooks/useMediaQuery';
 import { SkeletonTableRow } from '@/components/ui/Skeleton';
 import EmptyState from '@/components/ui/EmptyState';
 import {
@@ -18,7 +23,7 @@ import {
 
 const TH = ({ children, className }) => (
   <th className={cn(
-    'px-4 py-3 text-left text-xs font-semibold text-text-tertiary uppercase tracking-wider',
+    'px-3 xl:px-4 py-3 text-left text-xs font-semibold text-text-tertiary uppercase tracking-wider',
     className
   )}>
     {children}
@@ -26,12 +31,90 @@ const TH = ({ children, className }) => (
 );
 
 const TD = ({ children, className }) => (
-  <td className={cn('px-4 py-4 text-sm', className)}>
+  <td className={cn('px-3 xl:px-4 py-4 text-sm', className)}>
     {children}
   </td>
 );
 
+/** Phone layout: one card per business; Activate / View / Delete live in the ⋯ sheet. */
+function BusinessCards({ businesses, loading, onToggle, onDelete }) {
+  const router = useRouter();
+  return (
+    <MobileCardList
+      loading={loading}
+      isEmpty={businesses.length === 0}
+      empty={(
+        <EmptyState
+          icon="🏪"
+          title="No businesses found"
+          description="Try adjusting your search or filter criteria."
+        />
+      )}
+    >
+      {businesses.map((business) => (
+        <MobileCard
+          key={business._id}
+          header={(
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-bg-subtle text-lg flex-shrink-0">
+                {getBusinessEmoji(business.businessCategory)}
+              </div>
+              <div className="min-w-0 flex-1">
+                <Link
+                  href={`/businesses/${business._id}`}
+                  className="block font-semibold text-text-primary break-words line-clamp-2 py-2 -my-1.5"
+                >
+                  {business.name}
+                </Link>
+                <div className="flex items-center gap-2 flex-wrap mt-0.5">
+                  <Badge variant={business.isActive ? 'success' : 'neutral'} dot>
+                    {business.isActive ? 'Active' : 'Inactive'}
+                  </Badge>
+                  {business.city && (
+                    <span className="text-xs text-text-tertiary">📍 {business.city}</span>
+                  )}
+                </div>
+              </div>
+              <RowMenu
+                title={business.name}
+                actions={[
+                  { label: 'View details', icon: ExternalLink, onClick: () => router.push(`/businesses/${business._id}`) },
+                  {
+                    label: business.isActive ? 'Deactivate business' : 'Activate business',
+                    icon: business.isActive ? ToggleRight : ToggleLeft,
+                    onClick: () => onToggle(business),
+                  },
+                  { label: 'Delete business', icon: Trash2, danger: true, onClick: () => onDelete(business) },
+                ]}
+              />
+            </div>
+          )}
+        >
+          <CardField label="Type">
+            {capitalize(business.businessCategory)}
+          </CardField>
+          <CardField label="Owner">
+            {business.ownerUserId ? (
+              <>
+                {business.ownerUserId.name}
+                <span className="block text-xs text-text-tertiary break-all">{business.ownerUserId.email}</span>
+              </>
+            ) : '—'}
+          </CardField>
+          <CardField label="Joined">{formatDate(business.createdAt)}</CardField>
+          <CardField label="ID"><CopyId value={business._id} label="business ID" className="justify-end" /></CardField>
+        </MobileCard>
+      ))}
+    </MobileCardList>
+  );
+}
+
 export default function BusinessTable({ businesses, loading, onToggle, onDelete }) {
+  const isMobile = useIsMobile();
+  if (isMobile) {
+    return <BusinessCards businesses={businesses} loading={loading} onToggle={onToggle} onDelete={onDelete} />;
+  }
+
   return (
     <div className="card overflow-hidden">
       <div className="overflow-x-auto">
@@ -42,8 +125,8 @@ export default function BusinessTable({ businesses, loading, onToggle, onDelete 
             <tr>
               <TH>Business</TH>
               <TH>Owner</TH>
-              <TH className="hidden md:table-cell">Type</TH>
-              <TH className="hidden lg:table-cell">Joined</TH>
+              <TH className="hidden xl:table-cell">Type</TH>
+              <TH className="hidden xl:table-cell">Joined</TH>
               <TH>Status</TH>
               <TH className="text-right">Actions</TH>
             </tr>
@@ -125,7 +208,7 @@ export default function BusinessTable({ businesses, loading, onToggle, onDelete 
                 </TD>
 
                 {/* Business type */}
-                <TD className="hidden md:table-cell">
+                <TD className="hidden xl:table-cell">
                   <span className="text-text-secondary text-xs">
                     {getBusinessEmoji(business.businessCategory)}{' '}
                     {capitalize(business.businessCategory)}
@@ -133,7 +216,7 @@ export default function BusinessTable({ businesses, loading, onToggle, onDelete 
                 </TD>
 
                 {/* Date joined */}
-                <TD className="hidden lg:table-cell">
+                <TD className="hidden xl:table-cell">
                   <span className="text-text-tertiary text-xs">
                     {formatDate(business.createdAt)}
                   </span>
@@ -155,10 +238,10 @@ export default function BusinessTable({ businesses, loading, onToggle, onDelete 
 
                     {/* Toggle active/inactive */}
                     <button
-                      onClick={() => onToggle(business._id)}
+                      onClick={() => onToggle(business)}
                       title={business.isActive ? 'Deactivate business' : 'Activate business'}
                       className="
-                        w-8 h-8 flex items-center justify-center rounded-lg
+                        icon-btn
                         text-text-tertiary hover:text-text-primary hover:bg-bg-subtle
                         transition-colors duration-150
                       "
@@ -174,7 +257,7 @@ export default function BusinessTable({ businesses, loading, onToggle, onDelete 
                       <button
                         title="View business details"
                         className="
-                          w-8 h-8 flex items-center justify-center rounded-lg
+                          icon-btn
                           text-text-tertiary hover:text-text-primary hover:bg-bg-subtle
                           transition-colors duration-150
                         "
@@ -188,7 +271,7 @@ export default function BusinessTable({ businesses, loading, onToggle, onDelete 
                       onClick={() => onDelete(business)}
                       title="Delete business"
                       className="
-                        w-8 h-8 flex items-center justify-center rounded-lg
+                        icon-btn
                         text-text-tertiary hover:text-danger-text hover:bg-danger-bg
                         transition-colors duration-150
                       "

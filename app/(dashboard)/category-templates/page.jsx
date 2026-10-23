@@ -57,14 +57,14 @@ export default function CategoryTemplatesPage() {
       className="space-y-6"
     >
       {/* Page header */}
-      <div className="flex items-center justify-between">
+      <div className="page-header">
         <div>
           <h1 className="page-title">Category Templates</h1>
           <p className="text-sm text-text-secondary mt-1">
             Reusable chatbot rule sets for business categories, cloned from an existing business
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="page-actions">
           <Button variant="secondary" icon={Star} onClick={() => setShowCreateDefault(true)}>
             Create default from business
           </Button>

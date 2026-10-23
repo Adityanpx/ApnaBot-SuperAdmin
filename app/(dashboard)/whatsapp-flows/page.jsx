@@ -32,7 +32,7 @@ export default function WhatsappFlowsPage() {
       className="space-y-6"
     >
       {/* Page header */}
-      <div className="flex items-center justify-between">
+      <div className="page-header">
         <div>
           <h1 className="page-title">WhatsApp Flows</h1>
           <p className="text-sm text-text-secondary mt-1">

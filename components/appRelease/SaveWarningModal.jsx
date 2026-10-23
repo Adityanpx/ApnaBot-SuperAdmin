@@ -41,7 +41,7 @@ export default function SaveWarningModal({
           </div>
         </div>
 
-        <div className="flex items-center gap-3 justify-end pt-2">
+        <div className="modal-actions">
           <Button variant="ghost" onClick={onClose} disabled={loading}>Cancel</Button>
           <Button variant="danger" loading={loading} onClick={onConfirm}>Yes, save</Button>
         </div>

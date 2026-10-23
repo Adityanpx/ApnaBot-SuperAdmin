@@ -23,7 +23,7 @@ export default function PlanForm({ form, onChange, isEdit = false }) {
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Input
           label="Internal ID"
           placeholder="e.g. starter"
@@ -55,7 +55,7 @@ export default function PlanForm({ form, onChange, isEdit = false }) {
 
       <DurationPricing form={form} onChange={onChange} />
 
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <Input label="Messages/mo" type="number" placeholder="0" min="0"
           value={form.msgLimit} onChange={set('msgLimit')} />
         <Input label="Chatbot Rules" type="number" placeholder="0" min="0"
@@ -64,7 +64,7 @@ export default function PlanForm({ form, onChange, isEdit = false }) {
           value={form.customerLimit} onChange={set('customerLimit')} />
       </div>
 
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <Input label="Photos per reply" type="number" placeholder="1" min="1" max="10" step="1"
           value={form.imagesPerReply} onChange={set('imagesPerReply')} helper="1–10" />
         <Input label="Carousel cards per reply" type="number" placeholder="3" min="2" max="10" step="1"
@@ -86,7 +86,7 @@ export default function PlanForm({ form, onChange, isEdit = false }) {
         onChange={(features) => onChange({ ...form, features })}
       />
 
-      <div className="flex flex-wrap gap-4 pt-2">
+      <div className="grid grid-cols-1 sm:flex sm:flex-wrap gap-x-4 gap-y-1 pt-2">
         <Toggle label="Active (visible to customers)" checked={form.isActive}
           onChange={flip('isActive')} />
         <Toggle label="Popular badge" checked={form.isPopular} onChange={flip('isPopular')} />
@@ -121,7 +121,7 @@ function DurationPricing({ form, onChange }) {
       </p>
       <div className="space-y-2">
         {options.map((opt, i) => (
-          <div key={opt.months} className="flex items-center gap-3">
+          <div key={opt.months} className="flex flex-wrap items-center gap-x-3 gap-y-1">
             <span className="text-sm text-text-secondary w-28 flex-shrink-0">{opt.label}</span>
             <span
               className="text-sm font-semibold text-text-primary w-24"
@@ -187,7 +187,7 @@ function IconButton({ label, icon: Icon, onClick, disabled }) {
       aria-label={label}
       disabled={disabled}
       onClick={onClick}
-      className="p-2 rounded-lg text-text-tertiary hover:text-text-primary hover:bg-bg-subtle disabled:opacity-30 disabled:cursor-not-allowed"
+      className="icon-btn text-text-tertiary hover:text-text-primary hover:bg-bg-subtle disabled:opacity-30 disabled:cursor-not-allowed"
     >
       <Icon className="w-4 h-4" />
     </button>

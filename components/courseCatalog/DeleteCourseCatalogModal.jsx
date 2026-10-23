@@ -63,7 +63,7 @@ export default function DeleteCourseCatalogModal({ open, entry, onClose, deleteE
                 autoFocus
               />
             </div>
-            <div className="flex justify-end gap-3 pt-2">
+            <div className="modal-actions">
               <Button type="button" variant="secondary" onClick={handleClose}>Cancel</Button>
               <Button type="button" variant="danger" loading={loading} disabled={!isConfirmed} onClick={handleDelete}>
                 Delete Course

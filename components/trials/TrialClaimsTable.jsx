@@ -1,8 +1,11 @@
 // components/trials/TrialClaimsTable.jsx
 'use client';
 
-import { Search } from 'lucide-react';
+import { Search, RotateCcw } from 'lucide-react';
 import Badge from '@/components/ui/Badge';
+import RowMenu from '@/components/ui/RowMenu';
+import { MobileCardList, MobileCard, CardField } from '@/components/ui/MobileCards';
+import { useIsMobile } from '@/hooks/useMediaQuery';
 import Button from '@/components/ui/Button';
 import EmptyState from '@/components/ui/EmptyState';
 import Pagination from '@/components/ui/Pagination';
@@ -45,9 +48,10 @@ export default function TrialClaimsTable({
   claims, total, loading, search, onSearch, page, onPage, onReset,
 }) {
   const rows = claims.map(claimRow);
+  const isMobile = useIsMobile();
   return (
     <div className="space-y-3">
-      <div className="relative max-w-sm">
+      <div className="relative sm:max-w-sm">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-tertiary" />
         <input
           type="text"
@@ -57,6 +61,36 @@ export default function TrialClaimsTable({
           className="input-field pl-10"
         />
       </div>
+      {isMobile ? (
+        <MobileCardList
+          loading={loading}
+          isEmpty={rows.length === 0}
+          empty={<EmptyState icon="🎁" title={search ? 'No claims match your search' : 'No trial claims yet'} />}
+        >
+          {rows.map((row) => (
+            <MobileCard
+              key={row.id}
+              header={(
+                <div className="flex items-start gap-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold text-text-primary break-all">{row.phone}</p>
+                    <p className="text-sm text-text-secondary break-words">{row.businessName || '—'}</p>
+                  </div>
+                  <Badge variant={row.hasSubscription ? 'success' : 'neutral'}>
+                    {row.hasSubscription ? 'Linked' : 'None'}
+                  </Badge>
+                  <RowMenu
+                    title={row.businessName ? `${row.phone} · ${row.businessName}` : row.phone}
+                    actions={[{ label: 'Reset claim', icon: RotateCcw, danger: true, onClick: () => onReset(row) }]}
+                  />
+                </div>
+              )}
+            >
+              <CardField label="Claimed">{formatDate(row.claimedAt)}</CardField>
+            </MobileCard>
+          ))}
+        </MobileCardList>
+      ) : (
       <div className="card overflow-hidden overflow-x-auto">
         <table className="w-full">
           <thead className="border-b border-border bg-bg-subtle/50">
@@ -86,6 +120,7 @@ export default function TrialClaimsTable({
           </tbody>
         </table>
       </div>
+      )}
       <Pagination
         page={page}
         totalPages={Math.ceil(total / CLAIMS_PAGE_SIZE)}

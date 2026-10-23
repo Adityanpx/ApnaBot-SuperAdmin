@@ -22,7 +22,7 @@ export default function RateCardsPage() {
       className="space-y-6 max-w-screen-xl"
     >
       {/* Page header */}
-      <div className="flex items-center justify-between">
+      <div className="page-header">
         <div>
           <h1 className="page-title">Rate Cards</h1>
           <p className="text-sm text-text-secondary mt-1">

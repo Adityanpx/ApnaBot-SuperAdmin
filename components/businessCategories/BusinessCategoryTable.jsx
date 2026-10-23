@@ -1,9 +1,14 @@
 // components/businessCategories/BusinessCategoryTable.jsx
 'use client';
 
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Tag, icons as lucideIcons } from 'lucide-react';
 import Badge from '@/components/ui/Badge';
+import Switch from '@/components/ui/Switch';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
+import { MobileCardList, MobileCard } from '@/components/ui/MobileCards';
+import { useIsMobile } from '@/hooks/useMediaQuery';
 import { SkeletonTableRow } from '@/components/ui/Skeleton';
 import EmptyState from '@/components/ui/EmptyState';
 import { cn } from '@/lib/utils';
@@ -33,6 +38,78 @@ const TD = ({ children, className }) => (
 );
 
 export default function BusinessCategoryTable({ categories, loading, onToggle }) {
+  const isMobile = useIsMobile();
+  const [disabling, setDisabling] = useState(null);
+
+  // Turning a category OFF hides it from the signup screen, so it is confirmed by name;
+  // turning it on is harmless and immediate.
+  const requestToggle = (category) => {
+    if (category.isEnabled) setDisabling(category);
+    else onToggle(category.value, true);
+  };
+
+  const confirmDialog = (
+    <ConfirmDialog
+      open={!!disabling}
+      onClose={() => setDisabling(null)}
+      title="Stop offering this category?"
+      subject={disabling?.label}
+      confirmLabel="Yes, disable"
+      onConfirm={() => onToggle(disabling.value, false)}
+    >
+      <p>
+        <strong>{disabling?.label}</strong> will no longer be offered when new businesses sign up.
+        Existing businesses are not changed.
+      </p>
+    </ConfirmDialog>
+  );
+
+  if (isMobile) {
+    return (
+      <>
+        <MobileCardList
+          loading={loading}
+          skeletons={6}
+          isEmpty={categories.length === 0}
+          empty={(
+            <EmptyState
+              icon="🏷️"
+              title="No business categories"
+              description="Business categories offered at signup will appear here."
+            />
+          )}
+        >
+          {categories.map((category) => {
+            const CategoryIcon = getCategoryIcon(category.icon) || Tag;
+            return (
+              <MobileCard
+                key={category.value}
+                header={(
+                  <div className="flex items-center gap-3">
+                    <CategoryIcon className="w-4 h-4 text-text-tertiary flex-shrink-0" />
+                    <div className="min-w-0 flex-1">
+                      <p className="font-semibold text-text-primary truncate">{category.label}</p>
+                      <p className="font-mono text-xs text-text-tertiary truncate">{category.value}</p>
+                    </div>
+                    <Badge variant={category.isEnabled ? 'success' : 'neutral'}>
+                      {category.isEnabled ? 'Enabled' : 'Disabled'}
+                    </Badge>
+                    <Switch
+                      checked={category.isEnabled}
+                      label={`Offer ${category.label} at signup`}
+                      onChange={() => requestToggle(category)}
+                    />
+                  </div>
+                )}
+              />
+            );
+          })}
+        </MobileCardList>
+        {confirmDialog}
+      </>
+    );
+  }
+
   return (
     <div className="card overflow-hidden">
       <div className="overflow-x-auto">
@@ -103,24 +180,11 @@ export default function BusinessCategoryTable({ categories, loading, onToggle })
 
                   {/* Toggle */}
                   <TD className="text-right">
-                    <button
-                      role="switch"
-                      aria-checked={category.isEnabled}
-                      onClick={() => onToggle(category.value, !category.isEnabled)}
-                      className={cn(
-                        'relative inline-flex h-6 w-11 items-center rounded-full border transition-colors duration-200',
-                        category.isEnabled
-                          ? 'bg-brand-500 border-brand-500'
-                          : 'bg-bg-overlay border-border'
-                      )}
-                    >
-                      <span
-                        className={cn(
-                          'inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200',
-                          category.isEnabled ? 'translate-x-6' : 'translate-x-1'
-                        )}
-                      />
-                    </button>
+                    <Switch
+                      checked={category.isEnabled}
+                      label={`Offer ${category.label} at signup`}
+                      onChange={() => requestToggle(category)}
+                    />
                   </TD>
                 </motion.tr>
               );
@@ -128,6 +192,7 @@ export default function BusinessCategoryTable({ categories, loading, onToggle })
           </tbody>
         </table>
       </div>
+      {confirmDialog}
     </div>
   );
 }

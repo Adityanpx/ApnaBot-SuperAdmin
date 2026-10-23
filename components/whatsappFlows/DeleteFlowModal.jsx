@@ -77,7 +77,7 @@ export default function DeleteFlowModal({ open, flow, onClose, deleteFlow }) {
         </div>
 
         {/* Actions */}
-        <div className="flex justify-end gap-3 pt-2 border-t border-border-subtle">
+        <div className="modal-actions">
           <Button variant="secondary" onClick={handleClose}>
             Cancel
           </Button>

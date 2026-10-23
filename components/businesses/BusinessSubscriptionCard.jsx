@@ -38,7 +38,7 @@ function FeatureRow({ icon, label, value, enabled }) {
 export default function BusinessSubscriptionCard({ subscription, plan }) {
   if (!subscription || !plan) {
     return (
-      <div className="card p-6">
+      <div className="card p-4 sm:p-6">
         <h3 className="text-sm font-semibold text-text-secondary mb-4">Subscription</h3>
         <div className="flex flex-col items-center py-6 text-center">
           <CreditCard className="w-8 h-8 text-text-disabled mb-3" />
@@ -61,7 +61,7 @@ export default function BusinessSubscriptionCard({ subscription, plan }) {
     <div className="space-y-4">
 
       {/* Plan name + status */}
-      <div className="card p-6">
+      <div className="card p-4 sm:p-6">
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="text-xs text-text-tertiary font-medium mb-1">Current Plan</p>
@@ -98,7 +98,7 @@ export default function BusinessSubscriptionCard({ subscription, plan }) {
       </div>
 
       {/* Plan features / limits */}
-      <div className="card p-6">
+      <div className="card p-4 sm:p-6">
         <h3 className="text-sm font-semibold text-text-secondary mb-2">Plan Limits</h3>
         <div className="mt-2">
           <FeatureRow

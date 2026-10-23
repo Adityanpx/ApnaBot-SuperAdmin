@@ -37,7 +37,7 @@ export default function CategoryTemplateDetailPage() {
     >
       <Link
         href="/category-templates"
-        className="inline-flex items-center gap-1 text-sm text-text-secondary hover:text-text-primary"
+        className="inline-flex items-center gap-1 min-h-[44px] md:min-h-0 text-sm text-text-secondary hover:text-text-primary"
       >
         <ArrowLeft className="w-4 h-4" /> Category Templates
       </Link>

@@ -5,9 +5,10 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { toast } from 'sonner';
 import api from '@/lib/api';
 import { API } from '@/lib/constants';
-import { cn } from '@/lib/utils';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
+import Switch from '@/components/ui/Switch';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
 
 const POLL_MS = 2500;
 const BACKFILL_DAYS = 7;
@@ -24,8 +25,9 @@ const BACKFILL_DAYS = 7;
  *   saving      bool
  *   onChange    async fn(override: true|false|null) → boolean (saved?)
  */
-export default function OwnerMediaSwitch({ businessId, feature, saving, onChange }) {
+export default function OwnerMediaSwitch({ businessId, businessName, feature, saving, onChange }) {
   const on = feature.isEnabled;
+  const [confirmOff, setConfirmOff] = useState(false);
 
   const [offer, setOffer] = useState(null);       // { count } — the "also fetch?" prompt
   const [checking, setChecking] = useState(false);
@@ -98,26 +100,27 @@ export default function OwnerMediaSwitch({ businessId, feature, saving, onChange
             Customer media is always saved.
           </p>
         </div>
-        <button
-          type="button"
-          role="switch"
-          aria-checked={on}
-          aria-label={feature.label}
+        <Switch
+          checked={on}
+          label={feature.label}
           disabled={saving}
-          onClick={toggle}
-          className={cn(
-            'relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full transition-colors duration-200',
-            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500',
-            on ? 'bg-brand-500' : 'bg-bg-overlay border border-border',
-            saving && 'opacity-50 cursor-not-allowed'
-          )}
-        >
-          <span className={cn(
-            'inline-block h-4 w-4 rounded-full bg-white shadow transition-transform duration-200',
-            on ? 'translate-x-6' : 'translate-x-1'
-          )} />
-        </button>
+          onChange={() => (on ? setConfirmOff(true) : toggle())}
+        />
       </div>
+
+      <ConfirmDialog
+        open={confirmOff}
+        onClose={() => setConfirmOff(false)}
+        title="Stop saving owner media?"
+        subject={`${feature.label} · ${businessName ?? 'this business'}`}
+        confirmLabel="Yes, turn off"
+        onConfirm={toggle}
+      >
+        <p>
+          New photos, videos and PDFs the owner of <strong>{businessName ?? 'this business'}</strong> sends from the
+          WhatsApp Business app will no longer be saved. Media already saved is kept.
+        </p>
+      </ConfirmDialog>
 
       {feature.override !== null && (
         <p className="text-xs text-text-tertiary mt-2">
@@ -126,7 +129,7 @@ export default function OwnerMediaSwitch({ businessId, feature, saving, onChange
             type="button"
             disabled={saving}
             onClick={() => onChange(null)}
-            className="text-info-text hover:underline"
+            className="text-info-text hover:underline py-3 -my-3 md:py-0 md:my-0"
           >
             Follow the category instead
           </button>

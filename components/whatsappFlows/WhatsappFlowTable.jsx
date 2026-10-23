@@ -4,6 +4,9 @@
 import { motion } from 'framer-motion';
 import { Pencil, Send, Trash2 } from 'lucide-react';
 import Badge from '@/components/ui/Badge';
+import RowMenu from '@/components/ui/RowMenu';
+import { MobileCardList, MobileCard, CardField } from '@/components/ui/MobileCards';
+import { useIsMobile } from '@/hooks/useMediaQuery';
 import { SkeletonTableRow } from '@/components/ui/Skeleton';
 import EmptyState from '@/components/ui/EmptyState';
 import { CATEGORY_TEMPLATE_CATEGORIES } from '@/lib/constants';
@@ -25,6 +28,55 @@ const TD = ({ children, className }) => (
 );
 
 export default function WhatsappFlowTable({ flows, loading, onEdit, onPublish, onDelete }) {
+  const isMobile = useIsMobile();
+
+  if (isMobile) {
+    return (
+      <MobileCardList
+        loading={loading}
+        isEmpty={flows.length === 0}
+        empty={(
+          <EmptyState
+            icon="🗂️"
+            title="No WhatsApp flows yet"
+            description="Create one by pasting a Flow JSON from Meta's Flow Builder."
+          />
+        )}
+      >
+        {flows.map((flow) => {
+          const category = CATEGORY_TEMPLATE_CATEGORIES.find((c) => c.value === flow.category);
+          return (
+            <MobileCard
+              key={flow._id}
+              header={(
+                <div className="flex items-start gap-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold text-text-primary break-words">{flow.name}</p>
+                    <div className="mt-1">
+                      <Badge variant="brand">
+                        {category?.emoji ? `${category.emoji} ` : ''}{category?.label || flow.category}
+                      </Badge>
+                    </div>
+                  </div>
+                  <RowMenu
+                    title={flow.name}
+                    actions={[
+                      { label: 'Edit flow', icon: Pencil, onClick: () => onEdit(flow) },
+                      { label: 'Publish to business', icon: Send, onClick: () => onPublish(flow) },
+                      { label: 'Delete flow', icon: Trash2, danger: true, onClick: () => onDelete(flow) },
+                    ]}
+                  />
+                </div>
+              )}
+            >
+              <CardField label="Updated">{formatDate(flow.updatedAt)}</CardField>
+            </MobileCard>
+          );
+        })}
+      </MobileCardList>
+    );
+  }
+
   return (
     <div className="card overflow-hidden">
       <div className="overflow-x-auto">
@@ -95,7 +147,7 @@ export default function WhatsappFlowTable({ flows, loading, onEdit, onPublish, o
                         onClick={() => onEdit(flow)}
                         title="Edit WhatsApp flow"
                         className="
-                          w-8 h-8 flex items-center justify-center rounded-lg
+                          icon-btn
                           text-text-tertiary hover:text-text-primary hover:bg-bg-subtle
                           transition-colors duration-150
                         "
@@ -106,7 +158,7 @@ export default function WhatsappFlowTable({ flows, loading, onEdit, onPublish, o
                         onClick={() => onPublish(flow)}
                         title="Publish to business"
                         className="
-                          w-8 h-8 flex items-center justify-center rounded-lg
+                          icon-btn
                           text-text-tertiary hover:text-text-primary hover:bg-bg-subtle
                           transition-colors duration-150
                         "
@@ -117,7 +169,7 @@ export default function WhatsappFlowTable({ flows, loading, onEdit, onPublish, o
                         onClick={() => onDelete(flow)}
                         title="Delete WhatsApp flow"
                         className="
-                          w-8 h-8 flex items-center justify-center rounded-lg
+                          icon-btn
                           text-text-tertiary hover:text-danger-text hover:bg-danger-bg
                           transition-colors duration-150
                         "

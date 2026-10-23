@@ -3,8 +3,12 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { Trash2, Download, Star, StarOff, Languages } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Trash2, Download, Star, StarOff, Languages, ExternalLink } from 'lucide-react';
 import Badge from '@/components/ui/Badge';
+import RowMenu from '@/components/ui/RowMenu';
+import { MobileCardList, MobileCard, CardField } from '@/components/ui/MobileCards';
+import { useIsMobile } from '@/hooks/useMediaQuery';
 import { SkeletonTableRow } from '@/components/ui/Skeleton';
 import EmptyState from '@/components/ui/EmptyState';
 import { CATEGORY_TEMPLATE_CATEGORIES } from '@/lib/constants';
@@ -25,9 +29,89 @@ const TD = ({ children, className }) => (
   </td>
 );
 
+/** Phone layout: one card per template; actions live in the ⋯ sheet. */
+function TemplateCards({
+  templates, loading, onDelete, onExport, onSetDefault, onUnsetDefault, onTranslate,
+}) {
+  const router = useRouter();
+  return (
+    <MobileCardList
+      loading={loading}
+      isEmpty={templates.length === 0}
+      empty={(
+        <EmptyState
+          icon="🗂️"
+          title="No category templates yet"
+          description="Clone one from an existing business to get started."
+        />
+      )}
+    >
+      {templates.map((template) => {
+        const category = CATEGORY_TEMPLATE_CATEGORIES.find((c) => c.value === template.category);
+        return (
+          <MobileCard
+            key={template._id}
+            header={(
+              <div className="flex items-start gap-3">
+                <div className="min-w-0 flex-1">
+                  <Link
+                    href={`/category-templates/${template._id}`}
+                    className="block font-semibold text-text-primary break-words py-2 -my-1.5"
+                  >
+                    {template.name}
+                  </Link>
+                  <div className="flex items-center gap-2 flex-wrap mt-1">
+                    <Badge variant="brand">
+                      {category?.emoji ? `${category.emoji} ` : ''}{category?.label || template.category}
+                    </Badge>
+                    {template.isDefault && <Badge variant="success">Default</Badge>}
+                  </div>
+                </div>
+                <RowMenu
+                  title={template.name}
+                  actions={[
+                    { label: 'Open', icon: ExternalLink, onClick: () => router.push(`/category-templates/${template._id}`) },
+                    template.isDefault
+                      ? { label: 'Remove default', icon: StarOff, onClick: () => onUnsetDefault(template) }
+                      : { label: 'Set as default', icon: Star, onClick: () => onSetDefault(template) },
+                    { label: 'Translate…', icon: Languages, onClick: () => onTranslate(template) },
+                    { label: 'Export', icon: Download, onClick: () => onExport(template._id) },
+                    { label: 'Delete template', icon: Trash2, danger: true, onClick: () => onDelete(template) },
+                  ]}
+                />
+              </div>
+            )}
+          >
+            {template.description && (
+              <p className="text-xs text-text-tertiary">{template.description}</p>
+            )}
+            <CardField label="Created">{formatDate(template.createdAt)}</CardField>
+            <CardField label="Updated">{formatDate(template.updatedAt)}</CardField>
+          </MobileCard>
+        );
+      })}
+    </MobileCardList>
+  );
+}
+
 export default function CategoryTemplateTable({
   templates, loading, onDelete, onExport, onSetDefault, onUnsetDefault, onTranslate,
 }) {
+  const isMobile = useIsMobile();
+  if (isMobile) {
+    return (
+      <TemplateCards
+        templates={templates}
+        loading={loading}
+        onDelete={onDelete}
+        onExport={onExport}
+        onSetDefault={onSetDefault}
+        onUnsetDefault={onUnsetDefault}
+        onTranslate={onTranslate}
+      />
+    );
+  }
+
   return (
     <div className="card overflow-hidden">
       <div className="overflow-x-auto">
@@ -116,7 +200,7 @@ export default function CategoryTemplateTable({
                           onClick={() => onUnsetDefault(template)}
                           title="Remove default"
                           className="
-                            w-8 h-8 flex items-center justify-center rounded-lg
+                            icon-btn
                             text-text-tertiary hover:text-text-primary hover:bg-bg-subtle
                             transition-colors duration-150
                           "
@@ -128,7 +212,7 @@ export default function CategoryTemplateTable({
                           onClick={() => onSetDefault(template)}
                           title="Set as default"
                           className="
-                            w-8 h-8 flex items-center justify-center rounded-lg
+                            icon-btn
                             text-text-tertiary hover:text-text-primary hover:bg-bg-subtle
                             transition-colors duration-150
                           "
@@ -140,7 +224,7 @@ export default function CategoryTemplateTable({
                         onClick={() => onTranslate(template)}
                         title="Translate…"
                         className="
-                          w-8 h-8 flex items-center justify-center rounded-lg
+                          icon-btn
                           text-text-tertiary hover:text-text-primary hover:bg-bg-subtle
                           transition-colors duration-150
                         "
@@ -151,7 +235,7 @@ export default function CategoryTemplateTable({
                         onClick={() => onExport(template._id)}
                         title="Export category template"
                         className="
-                          w-8 h-8 flex items-center justify-center rounded-lg
+                          icon-btn
                           text-text-tertiary hover:text-text-primary hover:bg-bg-subtle
                           transition-colors duration-150
                         "
@@ -162,7 +246,7 @@ export default function CategoryTemplateTable({
                         onClick={() => onDelete(template)}
                         title="Delete category template"
                         className="
-                          w-8 h-8 flex items-center justify-center rounded-lg
+                          icon-btn
                           text-text-tertiary hover:text-danger-text hover:bg-danger-bg
                           transition-colors duration-150
                         "

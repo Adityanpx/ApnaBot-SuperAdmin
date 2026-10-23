@@ -3,6 +3,14 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+const navBtn = cn(
+  'w-8 h-8 max-md:w-11 max-md:h-11 flex items-center justify-center rounded-lg',
+  'text-text-secondary border border-border',
+  'hover:bg-bg-subtle hover:text-text-primary',
+  'transition-colors duration-150',
+  'disabled:opacity-40 disabled:cursor-not-allowed'
+);
+
 export default function Pagination({ page, totalPages, onPageChange, total, limit }) {
   if (totalPages <= 1) return null;
 
@@ -23,7 +31,7 @@ export default function Pagination({ page, totalPages, onPageChange, total, limi
 
   return (
     <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-1">
-      <p className="text-sm text-text-tertiary order-2 sm:order-1">
+      <p className="text-sm text-text-tertiary order-2 sm:order-1 text-center">
         Showing{' '}
         <span className="font-medium text-text-secondary">{startItem}–{endItem}</span>
         {' '}of{' '}
@@ -31,30 +39,30 @@ export default function Pagination({ page, totalPages, onPageChange, total, limi
         {' '}results
       </p>
 
-      <div className="flex items-center gap-1 order-1 sm:order-2">
+      <div className="flex items-center justify-between sm:justify-start gap-1 order-1 sm:order-2 w-full sm:w-auto">
         <button
           onClick={() => onPageChange(page - 1)}
           disabled={page === 1}
-          className={cn(
-            'w-8 h-8 flex items-center justify-center rounded-lg',
-            'text-text-secondary border border-border',
-            'hover:bg-bg-subtle hover:text-text-primary',
-            'transition-colors duration-150',
-            'disabled:opacity-40 disabled:cursor-not-allowed'
-          )}
+          aria-label="Previous page"
+          className={navBtn}
         >
           <ChevronLeft className="w-4 h-4" />
         </button>
 
+        {/* Phones: a compact "Page x of y" instead of a row of page numbers */}
+        <span className="sm:hidden text-sm font-medium text-text-secondary">
+          Page {page} of {totalPages}
+        </span>
+
         {pages.map((p, i) =>
           p === '…' ? (
-            <span key={`ellipsis-${i}`} className="w-8 h-8 flex items-center justify-center text-text-tertiary text-sm">…</span>
+            <span key={`ellipsis-${i}`} className="hidden sm:flex w-8 h-8 items-center justify-center text-text-tertiary text-sm">…</span>
           ) : (
             <button
               key={p}
               onClick={() => onPageChange(p)}
               className={cn(
-                'w-8 h-8 flex items-center justify-center rounded-lg',
+                'hidden sm:flex w-8 h-8 items-center justify-center rounded-lg',
                 'text-sm font-medium transition-colors duration-150',
                 p === page
                   ? 'bg-brand-500 text-white shadow-glow-brand'
@@ -69,13 +77,8 @@ export default function Pagination({ page, totalPages, onPageChange, total, limi
         <button
           onClick={() => onPageChange(page + 1)}
           disabled={page === totalPages}
-          className={cn(
-            'w-8 h-8 flex items-center justify-center rounded-lg',
-            'text-text-secondary border border-border',
-            'hover:bg-bg-subtle hover:text-text-primary',
-            'transition-colors duration-150',
-            'disabled:opacity-40 disabled:cursor-not-allowed'
-          )}
+          aria-label="Next page"
+          className={navBtn}
         >
           <ChevronRight className="w-4 h-4" />
         </button>

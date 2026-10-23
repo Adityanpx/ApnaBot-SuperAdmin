@@ -101,7 +101,7 @@ export default function VehicleCatalogCard({ entry, onEdit, onDelete, onToggle, 
           icon={Trash2}
           size="sm"
           onClick={onDelete}
-          className="w-9 px-0 flex-shrink-0"
+          className="w-9 max-md:w-11 px-0 flex-shrink-0"
         />
       </div>
     </motion.div>

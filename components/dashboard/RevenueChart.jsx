@@ -69,10 +69,10 @@ export default function RevenueChart({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: 0.4, ease: [0.4, 0, 0.2, 1] }}
-      className="card p-6"
+      className="card p-4 sm:p-6"
     >
       {/* Header row */}
-      <div className="flex items-center justify-between gap-4 mb-8">
+      <div className="flex items-center justify-between gap-4 mb-6 sm:mb-8">
         <div>
           <h2 className="text-base font-semibold text-text-primary">
             Revenue Overview
@@ -89,7 +89,7 @@ export default function RevenueChart({
               key={opt.value}
               onClick={() => onPeriodChange?.(opt.value)}
               className={cn(
-                'px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200',
+                'px-3 py-1.5 max-md:px-4 max-md:min-h-[44px] rounded-lg text-xs font-semibold transition-all duration-200',
                 currentPeriod === opt.value
                   ? 'bg-brand-500 text-white shadow-glow-brand'
                   : 'text-text-secondary hover:text-text-primary'

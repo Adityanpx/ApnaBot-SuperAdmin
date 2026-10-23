@@ -169,7 +169,7 @@ function CopySetupBody({ business, onClose, onSuccess }) {
                 type="button"
                 onClick={() => pickSourceType(type)}
                 className={cn(
-                  'h-8 rounded-lg text-sm font-medium transition-colors duration-150',
+                  'h-11 sm:h-8 rounded-lg text-sm font-medium transition-colors duration-150',
                   sourceType === type
                     ? 'bg-bg-overlay text-text-primary shadow-card'
                     : 'text-text-secondary hover:text-text-primary'
@@ -299,7 +299,7 @@ function CopySetupBody({ business, onClose, onSuccess }) {
               value={confirmText}
               onChange={(e) => setConfirmText(e.target.value)}
               placeholder={`Type "${business.name}"`}
-              className="input input-bordered w-full"
+              className="input-field"
               autoFocus
             />
           </div>
@@ -307,7 +307,7 @@ function CopySetupBody({ business, onClose, onSuccess }) {
       )}
 
       {/* ── Actions ─────────────────────────────────────────────────────── */}
-      <div className="flex items-center gap-3 justify-end pt-2 border-t border-border-subtle">
+      <div className="modal-actions">
         {step === 1 && (
           <>
             <Button variant="ghost" onClick={onClose}>Cancel</Button>

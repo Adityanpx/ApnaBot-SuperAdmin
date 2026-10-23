@@ -45,16 +45,17 @@ export default function DashboardLayout({ children }) {
       <Sidebar />
 
       {/* Main content area — offset by sidebar width on desktop */}
-      <div className="md:pl-sidebar min-h-screen flex flex-col">
+      <div className="lg:pl-sidebar min-h-screen flex flex-col min-w-0">
 
         {/* Sticky topbar */}
         <Topbar />
 
         {/* Page content */}
-        <main className="flex-1 p-6 md:p-8">
+        <main className="flex-1 min-w-0 px-4 py-5 sm:p-6 lg:p-8">
           <AnimatePresence mode="wait">
             <motion.div
               key="dashboard-content"
+              className="min-w-0"
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}

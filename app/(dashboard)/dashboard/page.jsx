@@ -53,7 +53,7 @@ export default function DashboardPage() {
       className="space-y-8"
     >
       {/* Page header */}
-      <div className="flex items-center justify-between">
+      <div className="page-header">
         <div>
           <h1 className="text-2xl font-bold text-text-primary">
             Dashboard

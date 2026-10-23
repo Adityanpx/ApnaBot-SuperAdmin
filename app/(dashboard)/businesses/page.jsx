@@ -7,6 +7,7 @@ import BusinessFilters from '@/components/businesses/BusinessFilters';
 import BusinessTable from '@/components/businesses/BusinessTable';
 import DeleteBusinessModal from '@/components/businesses/DeleteBusinessModal';
 import Pagination from '@/components/ui/Pagination';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
 
 export default function BusinessesPage() {
   const {
@@ -27,6 +28,7 @@ export default function BusinessesPage() {
   } = useBusinesses();
 
   const [deletingBusiness, setDeletingBusiness] = useState(null);
+  const [togglingBusiness, setTogglingBusiness] = useState(null);
 
   return (
     <div className="space-y-6 max-w-screen-xl">
@@ -54,7 +56,7 @@ export default function BusinessesPage() {
       <BusinessTable
         businesses={businesses}
         loading={loading}
-        onToggle={toggleBusiness}
+        onToggle={setTogglingBusiness}
         onDelete={setDeletingBusiness}
       />
 
@@ -68,6 +70,23 @@ export default function BusinessesPage() {
           limit={limit}
         />
       )}
+
+      {/* Activate / deactivate confirmation — names the business so a tap on the wrong row is caught */}
+      <ConfirmDialog
+        open={!!togglingBusiness}
+        onClose={() => setTogglingBusiness(null)}
+        title={togglingBusiness?.isActive ? 'Deactivate business?' : 'Activate business?'}
+        subject={togglingBusiness?.name}
+        danger={!!togglingBusiness?.isActive}
+        confirmLabel={togglingBusiness?.isActive ? 'Yes, deactivate' : 'Yes, activate'}
+        onConfirm={() => toggleBusiness(togglingBusiness._id)}
+      >
+        <p>
+          {togglingBusiness?.isActive
+            ? <>Deactivating <strong>{togglingBusiness?.name}</strong> will immediately stop their WhatsApp chatbot from responding to customers.</>
+            : <>Activating <strong>{togglingBusiness?.name}</strong> will let their chatbot respond to customers again.</>}
+        </p>
+      </ConfirmDialog>
 
       {/* Delete confirmation */}
       <DeleteBusinessModal
