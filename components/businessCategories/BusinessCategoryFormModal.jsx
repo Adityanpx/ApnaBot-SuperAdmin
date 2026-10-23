@@ -75,12 +75,12 @@ export default function BusinessCategoryFormModal({ open, onClose, category, onS
           className="font-mono"
         />
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Input label="Hindi label" value={form.labelHi} onChange={set('labelHi')} />
-          <Input label="Marathi label" value={form.labelMr} onChange={set('labelMr')} />
+          <Input label="Hindi label" value={form.labelHi} onChange={set('labelHi')} error={errors.labelHi} />
+          <Input label="Marathi label" value={form.labelMr} onChange={set('labelMr')} error={errors.labelMr} />
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <Input label="Emoji" value={form.emoji} onChange={set('emoji')} placeholder="🧵" />
-          <Input label="Lucide icon" value={form.icon} onChange={set('icon')} placeholder="graduation-cap" />
+          <Input label="Emoji" value={form.emoji} onChange={set('emoji')} placeholder="🧵" error={errors.emoji} />
+          <Input label="Lucide icon" value={form.icon} onChange={set('icon')} placeholder="graduation-cap" error={errors.icon} />
           <Input
             label="Display order"
             type="number"
