@@ -6,7 +6,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ListChecks } from 'lucide-react';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
-import { FLOW_PACK_CATEGORIES } from '@/lib/constants';
+import { withAny } from '@/lib/categoryOptions';
+import { useCategoryOptions } from '@/hooks/useCategoryOptions';
 import { cn, formatDate } from '@/lib/utils';
 
 /**
@@ -20,9 +21,10 @@ import { cn, formatDate } from '@/lib/utils';
  *   onApply   fn()   — open the apply-to-business modal for this template
  */
 export default function BusinessCategoryTemplateCard({ template, onApply }) {
+  const { categories } = useCategoryOptions();
   const [expanded, setExpanded] = useState(false);
 
-  const category = FLOW_PACK_CATEGORIES.find((c) => c.value === template.businessCategory);
+  const category = withAny(categories).find((c) => c.value === template.businessCategory);
   const fieldCount = template.flowFields?.length || 0;
 
   return (

@@ -11,7 +11,7 @@ import { MobileCardList, MobileCard, CardField } from '@/components/ui/MobileCar
 import { useIsMobile } from '@/hooks/useMediaQuery';
 import { SkeletonTableRow } from '@/components/ui/Skeleton';
 import EmptyState from '@/components/ui/EmptyState';
-import { CATEGORY_TEMPLATE_CATEGORIES } from '@/lib/constants';
+import { useCategoryOptions } from '@/hooks/useCategoryOptions';
 import { formatDate, cn } from '@/lib/utils';
 
 const TH = ({ children, className }) => (
@@ -47,7 +47,7 @@ function TemplateCards({
       )}
     >
       {templates.map((template) => {
-        const category = CATEGORY_TEMPLATE_CATEGORIES.find((c) => c.value === template.category);
+        const category = categories.find((c) => c.value === template.category);
         return (
           <MobileCard
             key={template._id}
@@ -97,6 +97,7 @@ function TemplateCards({
 export default function CategoryTemplateTable({
   templates, loading, onDelete, onExport, onSetDefault, onUnsetDefault, onTranslate,
 }) {
+  const { categories } = useCategoryOptions();
   const isMobile = useIsMobile();
   if (isMobile) {
     return (
@@ -150,7 +151,7 @@ export default function CategoryTemplateTable({
 
             {/* Data rows */}
             {!loading && templates.map((template, i) => {
-              const category = CATEGORY_TEMPLATE_CATEGORIES.find((c) => c.value === template.category);
+              const category = categories.find((c) => c.value === template.category);
               return (
                 <motion.tr
                   key={template._id}

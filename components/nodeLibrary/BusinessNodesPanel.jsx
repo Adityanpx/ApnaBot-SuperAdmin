@@ -8,18 +8,20 @@ import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
 import Skeleton from '@/components/ui/Skeleton';
 import EmptyState from '@/components/ui/EmptyState';
-import { CATEGORY_TEMPLATE_CATEGORIES } from '@/lib/constants';
+import { withAny } from '@/lib/categoryOptions';
+import { useCategoryOptions } from '@/hooks/useCategoryOptions';
 
 // One node row — reply nodes are keyed by `keyword`, question nodes by
 // `fieldKey`. A node already in the library shows a disabled badge instead
 // of the category picker (server-side dedup, annotated on fetch).
 function NodeRow({ node, onAdd }) {
+  const { categories } = useCategoryOptions();
   const [category, setCategory] = useState('');
   const [loading, setLoading]   = useState(false);
   const identifier = node.nodeType === 'question' ? node.fieldKey : node.keyword;
 
   if (node.alreadyInLibrary) {
-    const cat = CATEGORY_TEMPLATE_CATEGORIES.find((c) => c.value === node.libraryCategory);
+    const cat = withAny(categories).find((c) => c.value === node.libraryCategory);
     return (
       <div className="flex items-center justify-between gap-3 px-4 py-3 rounded-xl bg-bg-subtle">
         <div className="min-w-0">
@@ -50,7 +52,7 @@ function NodeRow({ node, onAdd }) {
       </div>
       <div className="flex items-center gap-2 flex-shrink-0">
         <Select
-          options={CATEGORY_TEMPLATE_CATEGORIES}
+          options={categories}
           value={category}
           onChange={(e) => setCategory(e.target.value)}
           placeholder="Category…"

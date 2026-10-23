@@ -9,7 +9,8 @@ import Select from '@/components/ui/Select';
 import Button from '@/components/ui/Button';
 import BusinessPicker from './BusinessPicker';
 import api from '@/lib/api';
-import { API, CATEGORY_TEMPLATE_CATEGORIES } from '@/lib/constants';
+import { API } from '@/lib/constants';
+import { useCategoryOptions } from '@/hooks/useCategoryOptions';
 import { formatDate } from '@/lib/utils';
 
 const EMPTY_FORM = { business: null, category: '', name: '', description: '', sourceSnapshotId: '' };
@@ -26,6 +27,7 @@ const CURRENT_LIVE_FLOW = { value: '', label: 'Current live flow' };
  *   cloneFromBusiness fn      — useCategoryTemplates().cloneFromBusiness (toasts + refetches internally)
  */
 export default function CloneCategoryTemplateModal({ open, onClose, cloneFromBusiness }) {
+  const { categories } = useCategoryOptions();
   const [form, setForm]       = useState(EMPTY_FORM);
   const [loading, setLoading] = useState(false);
   const [snapshots, setSnapshots]               = useState([]);
@@ -132,7 +134,7 @@ export default function CloneCategoryTemplateModal({ open, onClose, cloneFromBus
 
         <Select
           label="Category"
-          options={CATEGORY_TEMPLATE_CATEGORIES}
+          options={categories}
           value={form.category}
           onChange={(e) => setForm((prev) => ({ ...prev, category: e.target.value }))}
           required

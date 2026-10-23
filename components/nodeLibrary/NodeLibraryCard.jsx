@@ -4,7 +4,8 @@
 import { motion } from 'framer-motion';
 import { Trash2, MapPin, List as ListIcon, ExternalLink } from 'lucide-react';
 import Badge from '@/components/ui/Badge';
-import { CATEGORY_TEMPLATE_CATEGORIES } from '@/lib/constants';
+import { withAny } from '@/lib/categoryOptions';
+import { useCategoryOptions } from '@/hooks/useCategoryOptions';
 import { formatDate } from '@/lib/utils';
 
 // options can arrive as plain strings or as {id/value, title/label/text} objects
@@ -26,8 +27,9 @@ function optionLabel(option, i) {
  *   onDelete fn(entry)
  */
 export default function NodeLibraryCard({ entry, index = 0, onDelete }) {
+  const { categories } = useCategoryOptions();
   const data = entry.nodeData || {};
-  const category = CATEGORY_TEMPLATE_CATEGORIES.find((c) => c.value === entry.category);
+  const category = withAny(categories).find((c) => c.value === entry.category);
   const identifier = entry.nodeType === 'question' ? data.fieldKey : data.keyword;
   const options = Array.isArray(data.options) ? data.options : [];
 

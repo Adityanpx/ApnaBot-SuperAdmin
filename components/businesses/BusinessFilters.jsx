@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react';
 import { Search, X, SlidersHorizontal } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { BUSINESS_TYPES } from '@/lib/constants';
+import { useCategoryOptions } from '@/hooks/useCategoryOptions';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
 import Select from '@/components/ui/Select';
@@ -26,11 +26,6 @@ const STATUS_OPTIONS = [
   { value: 'false', label: 'Inactive' },
 ];
 
-const TYPE_OPTIONS = [
-  { value: '', label: 'All Types' },
-  ...BUSINESS_TYPES,
-];
-
 export default function BusinessFilters({
   search,
   isActive,
@@ -40,6 +35,8 @@ export default function BusinessFilters({
   onTypeChange,
   totalBusinesses,
 }) {
+  const { categories } = useCategoryOptions();
+  const TYPE_OPTIONS = [{ value: '', label: 'All Types' }, ...categories];
   const [localSearch, setLocalSearch] = useState(search);
   const isMobile = useIsMobile();
   const [sheetOpen, setSheetOpen] = useState(false);

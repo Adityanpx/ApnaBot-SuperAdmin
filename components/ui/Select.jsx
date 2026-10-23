@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
  * Select — styled native select with custom chevron
  *
  * Usage:
- *   <Select label="Business Type" options={BUSINESS_TYPES} {...register('businessType')} />
+ *   <Select label="Category" options={categories} {...register('businessType')} />
  */
 
 const Select = forwardRef(function Select(

@@ -4,6 +4,14 @@ import CreateDefaultFlowModal from '@/components/categoryTemplates/CreateDefault
 import { mount, click, buttonByText, flush } from '@/tests/helpers/dom';
 
 jest.mock('sonner', () => ({ toast: { success: jest.fn(), error: jest.fn() } }));
+jest.mock('@/hooks/useCategoryOptions', () => {
+  const categories = [{ value: 'salon', label: 'Salon / Parlour', emoji: '' }];
+  return {
+    useCategoryOptions: () => ({
+      categories, labelOf: (v) => categories.find((c) => c.value === v)?.label || v,
+    }),
+  };
+});
 jest.mock('@/components/categoryTemplates/BusinessPicker', () => ({
   __esModule: true,
   default: ({ onChange }) => (

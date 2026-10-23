@@ -14,15 +14,14 @@ import DefaultFlowModal from '@/components/categoryTemplates/DefaultFlowModal';
 import CreateDefaultFlowModal from '@/components/categoryTemplates/CreateDefaultFlowModal';
 import Button from '@/components/ui/Button';
 import Select from '@/components/ui/Select';
-import { CATEGORY_TEMPLATE_CATEGORIES } from '@/lib/constants';
+import { useCategoryOptions } from '@/hooks/useCategoryOptions';
 import {
   defaultFor, filterByCategory, noDefaultNotice, categoriesMissingDefault,
 } from '@/lib/categoryTemplates';
 
-const ALL_CATEGORIES = [{ value: 'all', label: 'All categories' }, ...CATEGORY_TEMPLATE_CATEGORIES];
-const labelOf = (v) => CATEGORY_TEMPLATE_CATEGORIES.find((c) => c.value === v)?.label || v;
-
 export default function CategoryTemplatesPage() {
+  const { categories, labelOf } = useCategoryOptions();
+  const ALL_CATEGORIES = [{ value: 'all', label: 'All categories' }, ...categories];
   const {
     templates, loading,
     cloneFromBusiness, deleteTemplate,

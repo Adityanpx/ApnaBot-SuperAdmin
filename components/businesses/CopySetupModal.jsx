@@ -8,13 +8,15 @@ import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
 import Spinner from '@/components/ui/Spinner';
 import api from '@/lib/api';
-import { API, FLOW_PACK_CATEGORIES } from '@/lib/constants';
+import { API } from '@/lib/constants';
+import { useCategoryOptions } from '@/hooks/useCategoryOptions';
+import { withAny } from '@/lib/categoryOptions';
 import { capitalize, getBusinessEmoji, cn } from '@/lib/utils';
 import { useCategoryTemplates } from '@/hooks/useCategoryTemplates';
 import { useCopySetup } from '@/hooks/useCopySetup';
 
-export function getCategoryLabel(category) {
-  return FLOW_PACK_CATEGORIES.find((c) => c.value === category)?.label || capitalize(category);
+export function getCategoryLabel(categories, category) {
+  return withAny(categories).find((c) => c.value === category)?.label || capitalize(category);
 }
 
 // Same debounce as components/categoryTemplates/BusinessPicker.jsx
@@ -68,7 +70,8 @@ function SourceOption({ selected, onClick, emoji, title, subtitle }) {
 // Mounted only while the modal is open (Modal renders children only when open),
 // so every open starts fresh at step 1 and the templates list is fetched lazily.
 function CopySetupBody({ business, onClose, onSuccess }) {
-  const categoryLabel = getCategoryLabel(business.businessCategory);
+  const { categories } = useCategoryOptions();
+  const categoryLabel = getCategoryLabel(categories, business.businessCategory);
   const emoji = getBusinessEmoji(business.businessCategory);
 
   const { templates, loading: templatesLoading } = useCategoryTemplates();

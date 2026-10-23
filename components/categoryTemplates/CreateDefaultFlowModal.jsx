@@ -10,15 +10,14 @@ import Input from '@/components/ui/Input';
 import Select from '@/components/ui/Select';
 import Button from '@/components/ui/Button';
 import BusinessPicker from './BusinessPicker';
-import { CATEGORY_TEMPLATE_CATEGORIES } from '@/lib/constants';
+import { useCategoryOptions } from '@/hooks/useCategoryOptions';
 import { parseCloneResult, BUSINESS_NAME_TOKEN } from '@/lib/categoryTemplates';
 
 const EMPTY = { business: null, category: '', name: '' };
-const labelOf = (v) => CATEGORY_TEMPLATE_CATEGORIES.find((c) => c.value === v)?.label || v;
 
 /** Category + name suggested for a picked business (blank when its category has no template list). */
-function suggestionFor(business) {
-  const known = CATEGORY_TEMPLATE_CATEGORIES.some((c) => c.value === business?.businessCategory);
+function suggestionFor(business, categories, labelOf) {
+  const known = categories.some((c) => c.value === business?.businessCategory);
   if (!business || !known) return { business, category: '', name: '' };
   const category = business.businessCategory;
   return { business, category, name: `${labelOf(category)} default` };
@@ -26,16 +25,17 @@ function suggestionFor(business) {
 
 /** Step 1 — pick the business, the category and the template name. */
 function PickStep({ form, setForm, loading, onNext, onCancel }) {
+  const { categories, labelOf } = useCategoryOptions();
   const ready = form.business && form.category && form.name.trim();
   return (
     <div className="space-y-4">
       <div className="space-y-1.5">
         <label className="block text-sm font-medium text-text-secondary">Business</label>
-        <BusinessPicker value={form.business} onChange={(b) => setForm(suggestionFor(b))} />
+        <BusinessPicker value={form.business} onChange={(b) => setForm(suggestionFor(b, categories, labelOf))} />
       </div>
       <Select
         label="Category"
-        options={CATEGORY_TEMPLATE_CATEGORIES}
+        options={categories}
         value={form.category}
         onChange={(e) => setForm({ ...form, category: e.target.value })}
       />
@@ -86,6 +86,7 @@ function ConfirmStep({ created, categoryLabel, loading, onSet, onSkip }) {
  * Props: open, onClose, cloneFromBusiness, setDefault (from useCategoryTemplates)
  */
 export default function CreateDefaultFlowModal({ open, onClose, cloneFromBusiness, setDefault }) {
+  const { labelOf } = useCategoryOptions();
   const [form, setForm] = useState(EMPTY);
   const [created, setCreated] = useState(null);
   const [loading, setLoading] = useState(false);

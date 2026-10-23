@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Tag, icons as lucideIcons } from 'lucide-react';
+import { Tag, Pencil, icons as lucideIcons } from 'lucide-react';
 import Badge from '@/components/ui/Badge';
 import Switch from '@/components/ui/Switch';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
@@ -22,6 +22,25 @@ function getCategoryIcon(iconName) {
   return lucideIcons[pascalName] || null;
 }
 
+// Emoji when the category has one, else its lucide icon (or a generic tag).
+function CategoryEmoji({ category, Icon }) {
+  if (category.emoji) return <span className="text-base leading-none flex-shrink-0" aria-hidden="true">{category.emoji}</span>;
+  return <Icon className="w-4 h-4 text-text-tertiary flex-shrink-0" />;
+}
+
+function EditButton({ category, onEdit }) {
+  return (
+    <button
+      type="button"
+      onClick={() => onEdit(category)}
+      aria-label={`Edit ${category.label}`}
+      className="w-9 h-9 md:w-8 md:h-8 flex items-center justify-center rounded-lg text-text-tertiary hover:text-text-primary hover:bg-bg-subtle transition-colors"
+    >
+      <Pencil className="w-4 h-4 md:w-3.5 md:h-3.5" />
+    </button>
+  );
+}
+
 const TH = ({ children, className }) => (
   <th className={cn(
     'px-4 py-3 text-left text-xs font-semibold text-text-tertiary uppercase tracking-wider',
@@ -37,7 +56,7 @@ const TD = ({ children, className }) => (
   </td>
 );
 
-export default function BusinessCategoryTable({ categories, loading, onToggle }) {
+export default function BusinessCategoryTable({ categories, loading, onToggle, onEdit }) {
   const isMobile = useIsMobile();
   const [disabling, setDisabling] = useState(null);
 
@@ -86,7 +105,7 @@ export default function BusinessCategoryTable({ categories, loading, onToggle })
                 key={category.value}
                 header={(
                   <div className="flex items-center gap-3">
-                    <CategoryIcon className="w-4 h-4 text-text-tertiary flex-shrink-0" />
+                    <CategoryEmoji category={category} Icon={CategoryIcon} />
                     <div className="min-w-0 flex-1">
                       <p className="font-semibold text-text-primary truncate">{category.label}</p>
                       <p className="font-mono text-xs text-text-tertiary truncate">{category.value}</p>
@@ -94,6 +113,7 @@ export default function BusinessCategoryTable({ categories, loading, onToggle })
                     <Badge variant={category.isEnabled ? 'success' : 'neutral'}>
                       {category.isEnabled ? 'Enabled' : 'Disabled'}
                     </Badge>
+                    <EditButton category={category} onEdit={onEdit} />
                     <Switch
                       checked={category.isEnabled}
                       label={`Offer ${category.label} at signup`}
@@ -159,7 +179,7 @@ export default function BusinessCategoryTable({ categories, loading, onToggle })
                   {/* Category */}
                   <TD>
                     <span className="flex items-center gap-2 font-semibold text-text-primary">
-                      <CategoryIcon className="w-3.5 h-3.5 text-text-tertiary" />
+                      <CategoryEmoji category={category} Icon={CategoryIcon} />
                       {category.label}
                     </span>
                   </TD>
@@ -180,11 +200,14 @@ export default function BusinessCategoryTable({ categories, loading, onToggle })
 
                   {/* Toggle */}
                   <TD className="text-right">
-                    <Switch
-                      checked={category.isEnabled}
-                      label={`Offer ${category.label} at signup`}
-                      onChange={() => requestToggle(category)}
-                    />
+                    <span className="inline-flex items-center gap-2">
+                      <EditButton category={category} onEdit={onEdit} />
+                      <Switch
+                        checked={category.isEnabled}
+                        label={`Offer ${category.label} at signup`}
+                        onChange={() => requestToggle(category)}
+                      />
+                    </span>
                   </TD>
                 </motion.tr>
               );

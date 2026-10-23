@@ -8,9 +8,10 @@ import BusinessPicker from '@/components/categoryTemplates/BusinessPicker';
 import BusinessNodesPanel from '@/components/nodeLibrary/BusinessNodesPanel';
 import NodeLibraryTable from '@/components/nodeLibrary/NodeLibraryTable';
 import Select from '@/components/ui/Select';
-import { CATEGORY_TEMPLATE_CATEGORIES } from '@/lib/constants';
+import { useCategoryOptions } from '@/hooks/useCategoryOptions';
 
 export default function NodeLibraryPage() {
+  const { categories } = useCategoryOptions();
   const {
     entries, entriesLoading, fetchEntries,
     businessNodes, businessNodesLoading, fetchBusinessNodes,
@@ -83,7 +84,7 @@ export default function NodeLibraryPage() {
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-semibold text-text-primary">Library</h2>
           <Select
-            options={CATEGORY_TEMPLATE_CATEGORIES}
+            options={categories}
             value={categoryFilter}
             onChange={handleFilterChange}
             placeholder="All categories"

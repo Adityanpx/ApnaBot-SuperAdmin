@@ -9,7 +9,7 @@ import { MobileCardList, MobileCard, CardField } from '@/components/ui/MobileCar
 import { useIsMobile } from '@/hooks/useMediaQuery';
 import { SkeletonTableRow } from '@/components/ui/Skeleton';
 import EmptyState from '@/components/ui/EmptyState';
-import { CATEGORY_TEMPLATE_CATEGORIES } from '@/lib/constants';
+import { useCategoryOptions } from '@/hooks/useCategoryOptions';
 import { formatDate, cn } from '@/lib/utils';
 
 const TH = ({ children, className }) => (
@@ -28,6 +28,7 @@ const TD = ({ children, className }) => (
 );
 
 export default function WhatsappFlowTable({ flows, loading, onEdit, onPublish, onDelete }) {
+  const { categories } = useCategoryOptions();
   const isMobile = useIsMobile();
 
   if (isMobile) {
@@ -44,7 +45,7 @@ export default function WhatsappFlowTable({ flows, loading, onEdit, onPublish, o
         )}
       >
         {flows.map((flow) => {
-          const category = CATEGORY_TEMPLATE_CATEGORIES.find((c) => c.value === flow.category);
+          const category = categories.find((c) => c.value === flow.category);
           return (
             <MobileCard
               key={flow._id}
@@ -114,7 +115,7 @@ export default function WhatsappFlowTable({ flows, loading, onEdit, onPublish, o
 
             {/* Data rows */}
             {!loading && flows.map((flow, i) => {
-              const category = CATEGORY_TEMPLATE_CATEGORIES.find((c) => c.value === flow.category);
+              const category = categories.find((c) => c.value === flow.category);
               return (
                 <motion.tr
                   key={flow._id}

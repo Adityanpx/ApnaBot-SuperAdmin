@@ -7,7 +7,7 @@ import Modal  from '@/components/ui/Modal';
 import Input  from '@/components/ui/Input';
 import Select from '@/components/ui/Select';
 import Button from '@/components/ui/Button';
-import { CATEGORY_TEMPLATE_CATEGORIES } from '@/lib/constants';
+import { useCategoryOptions } from '@/hooks/useCategoryOptions';
 
 /**
  * EditFlowModal — edits an existing WhatsApp flow definition
@@ -18,6 +18,7 @@ import { CATEGORY_TEMPLATE_CATEGORIES } from '@/lib/constants';
  *   updateFlow fn      — useWhatsappFlows().updateFlow (toasts + refetches internally)
  */
 export default function EditFlowModal({ open, flow, onClose, updateFlow }) {
+  const { categories } = useCategoryOptions();
   const [form, setForm]             = useState({ category: '', name: '', flowJsonText: '' });
   const [parsedJson, setParsedJson] = useState(null);
   const [parseError, setParseError] = useState('');
@@ -91,7 +92,7 @@ export default function EditFlowModal({ open, flow, onClose, updateFlow }) {
       <form onSubmit={handleSubmit} className="space-y-4">
         <Select
           label="Category"
-          options={CATEGORY_TEMPLATE_CATEGORIES}
+          options={categories}
           value={form.category}
           onChange={(e) => setForm((prev) => ({ ...prev, category: e.target.value }))}
           required

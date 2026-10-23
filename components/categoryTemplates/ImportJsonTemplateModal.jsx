@@ -7,7 +7,7 @@ import Modal  from '@/components/ui/Modal';
 import Input  from '@/components/ui/Input';
 import Select from '@/components/ui/Select';
 import Button from '@/components/ui/Button';
-import { CATEGORY_TEMPLATE_CATEGORIES } from '@/lib/constants';
+import { useCategoryOptions } from '@/hooks/useCategoryOptions';
 
 const EMPTY_FORM = { category: '', name: '', description: '' };
 
@@ -24,6 +24,7 @@ const EMPTY_FORM = { category: '', name: '', description: '' };
  *   importFromJson fn      — useCategoryTemplates().importFromJson (toasts + refetches internally)
  */
 export default function ImportJsonTemplateModal({ open, onClose, importFromJson }) {
+  const { categories } = useCategoryOptions();
   const [form, setForm]           = useState(EMPTY_FORM);
   const [fileName, setFileName]   = useState('');
   const [parsedJson, setParsedJson] = useState(null);
@@ -105,7 +106,7 @@ export default function ImportJsonTemplateModal({ open, onClose, importFromJson 
       <form onSubmit={handleSubmit} className="space-y-4">
         <Select
           label="Category"
-          options={CATEGORY_TEMPLATE_CATEGORIES}
+          options={categories}
           value={form.category}
           onChange={(e) => setForm((prev) => ({ ...prev, category: e.target.value }))}
           required
