@@ -1,5 +1,6 @@
 // components/appRelease/AppReleaseForm.test.jsx
 
+import { act } from 'react';
 import AppReleaseForm from '@/components/appRelease/AppReleaseForm';
 import { mount, click, type, flush, buttonByText } from '@/tests/helpers/dom';
 
@@ -13,6 +14,8 @@ const data = {
   playStoreUrl: 'https://play.google.com/store/apps/details?id=com.apnabot.app',
   translateMonthlyCharCap: 20000,
   translateGlobalMonthlyCap: 1800000,
+  supportWhatsappNumber: '',
+  supportMessage: 'Hi, I need help with ApnaBot. Business: {{businessName}}, email: {{email}}',
   updatedAt: null,
   updatedBy: null,
 };
@@ -84,6 +87,33 @@ describe('AppReleaseForm', () => {
     const { container, unmount } = setup();
     type(inputs(container)[4], '12.5');
     expect(container.textContent).toContain('Whole number');
+    expect(saveButton(container).disabled).toBe(true);
+    unmount();
+  });
+
+  it('saves the support number as digits with country code, and shows a test link', async () => {
+    const { container, onSave, unmount } = setup();
+    expect(container.textContent).toContain('Enter a valid number');
+    type(inputs(container)[5], '+91 98765 43210');
+    const link = [...container.querySelectorAll('a')].find((a) => a.textContent.includes('Test link'));
+    expect(link.getAttribute('href').startsWith('https://wa.me/919876543210?text=')).toBe(true);
+    expect(decodeURIComponent(link.getAttribute('href'))).toContain('Business: Test Business, email: test@example.com');
+    click(saveButton(container));
+    await flush();
+    expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ supportWhatsappNumber: '919876543210' }));
+    unmount();
+  });
+
+  it('rejects a bad support number and a blank support message', () => {
+    const { container, unmount } = setup();
+    type(inputs(container)[5], '12345');
+    expect(container.textContent).toContain('10 digits');
+    expect(saveButton(container).disabled).toBe(true);
+    type(inputs(container)[5], '');
+    const area = container.querySelector('textarea');
+    const setter = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value').set;
+    act(() => { setter.call(area, '   '); area.dispatchEvent(new Event('input', { bubbles: true })); });
+    expect(container.textContent).toContain('1 to 500 characters');
     expect(saveButton(container).disabled).toBe(true);
     unmount();
   });

@@ -9,21 +9,24 @@ import { toast } from 'sonner';
 import {
   LayoutDashboard, Store, CreditCard,
   FileText, LogOut, Bot, X, Car, Workflow, IndianRupee, FolderKanban, Library, Tag, MessageSquareCode, ClipboardList,
-  SlidersHorizontal, HardDrive, Smartphone, Gift,
+  SlidersHorizontal, HardDrive, Smartphone, Gift, Inbox,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { NAV_ITEMS } from '@/lib/constants';
 import { performLogout } from '@/lib/api';
 import useAuthStore  from '@/store/authStore';
 import useSidebar    from '@/hooks/useSidebar';
+import { useNewRequestCount } from '@/hooks/useNewRequestCount';
 
-const ICON_MAP = { LayoutDashboard, Store, CreditCard, FileText, Car, Workflow, IndianRupee, FolderKanban, Library, Tag, MessageSquareCode, ClipboardList, SlidersHorizontal, HardDrive, Smartphone, Gift };
+const ICON_MAP = { LayoutDashboard, Store, CreditCard, FileText, Car, Workflow, IndianRupee, FolderKanban, Library, Tag, MessageSquareCode, ClipboardList, SlidersHorizontal, HardDrive, Smartphone, Gift, Inbox };
 
 export default function Sidebar() {
   const pathname              = usePathname();
   const router                = useRouter();
   const { user, logout }      = useAuthStore();
   const { isOpen, close }     = useSidebar();
+  const newRequests           = useNewRequestCount();
+  const badges                = { newRequests };
 
   // Close drawer on route change (mobile)
   useEffect(() => { close(); }, [pathname]);
@@ -107,6 +110,14 @@ export default function Sidebar() {
                     )} />
                   )}
                   <span className="text-sm">{item.label}</span>
+                  {item.badge && badges[item.badge] > 0 && (
+                    <span
+                      className="ml-auto min-w-[20px] px-1.5 py-0.5 rounded-full bg-brand-500 text-white text-[11px] font-semibold text-center leading-none"
+                      aria-label={`${badges[item.badge]} new`}
+                    >
+                      {badges[item.badge] > 99 ? '99+' : badges[item.badge]}
+                    </span>
+                  )}
                   {isActive && (
                     <motion.div
                       layoutId={showClose ? 'active-nav-indicator-drawer' : 'active-nav-indicator'}
