@@ -36,7 +36,7 @@ export default function DeletePlanModal({ open, plan, onClose, onSuccess }) {
       onClose();
       setConfirmText('');
     } catch (err) {
-      toast.error(err.response?.data?.userMessage || 'Failed to delete plan');
+      toast.error(err.userMessage || err.response?.data?.message || 'Failed to delete plan');
     } finally {
       setLoading(false);
     }

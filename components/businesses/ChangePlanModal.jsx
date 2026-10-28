@@ -8,7 +8,8 @@ import { motion } from 'framer-motion';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
 import Spinner from '@/components/ui/Spinner';
-import { cn, formatCurrency, formatLimit } from '@/lib/utils';
+import { cn, formatCurrency } from '@/lib/utils';
+import { planLimitLines } from '@/lib/planForm';
 import api from '@/lib/api';
 import { API } from '@/lib/constants';
 
@@ -117,11 +118,7 @@ export default function ChangePlanModal({ open, onClose, businessId, businessNam
                       </p>
                       {/* Key limits inline */}
                       <p className="text-xs text-text-tertiary mt-2">
-                        {formatLimit(plan.msgLimit)} msgs ·{' '}
-                        {formatLimit(plan.ruleLimit)} rules ·{' '}
-                        {formatLimit(plan.customerLimit)} customers
-                        {plan.staffEnabled ? ` · ${plan.maxStaff} staff` : ''}
-                        {plan.paymentLinkEnabled ? ' · Payments' : ''}
+                        {planLimitLines(plan).map((l) => `${l.label}: ${l.value}`).join(' · ')}
                       </p>
                     </div>
 

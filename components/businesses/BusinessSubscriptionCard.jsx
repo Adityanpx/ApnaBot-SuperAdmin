@@ -1,22 +1,33 @@
 // components/businesses/BusinessSubscriptionCard.jsx
 import React from 'react';
 import Badge from '@/components/ui/Badge';
+import { planLimitLines } from '@/lib/planForm';
 import {
   formatDate,
   formatCurrency,
-  formatLimit,
   getSubStatusVariant,
   capitalize,
 } from '@/lib/utils';
 import {
   MessageSquare,
-  BookOpen,
+  Image,
+  Send,
   Users,
+  HardDrive,
   CalendarClock,
   CreditCard,
   CheckCircle,
   XCircle,
 } from 'lucide-react';
+
+const LIMIT_ICONS = {
+  messages: MessageSquare,
+  media: Image,
+  collections: Image,
+  broadcast: Send,
+  staff: Users,
+  storage: HardDrive,
+};
 
 function FeatureRow({ icon, label, value, enabled }) {
   return (
@@ -101,33 +112,9 @@ export default function BusinessSubscriptionCard({ subscription, plan }) {
       <div className="card p-4 sm:p-6">
         <h3 className="text-sm font-semibold text-text-secondary mb-2">Plan Limits</h3>
         <div className="mt-2">
-          <FeatureRow
-            icon={<MessageSquare className="w-4 h-4" />}
-            label="Messages / month"
-            value={formatLimit(plan.msgLimit)}
-          />
-          <FeatureRow
-            icon={<BookOpen className="w-4 h-4" />}
-            label="Chatbot rules"
-            value={formatLimit(plan.ruleLimit)}
-          />
-          <FeatureRow
-            icon={<Users className="w-4 h-4" />}
-            label="Customers"
-            value={formatLimit(plan.customerLimit)}
-          />
-          <FeatureRow
-            icon={<Users className="w-4 h-4" />}
-            label="Staff members"
-            value={plan.staffEnabled ? `Up to ${plan.maxStaff}` : undefined}
-            enabled={plan.staffEnabled}
-          />
-          <FeatureRow
-            icon={<CreditCard className="w-4 h-4" />}
-            label="Payment links"
-            value={plan.paymentLinkEnabled ? 'Enabled' : undefined}
-            enabled={plan.paymentLinkEnabled}
-          />
+          {planLimitLines(plan).map((l) => (
+            <FeatureRow key={l.key} icon={LIMIT_ICONS[l.key]} label={l.label} value={l.value} />
+          ))}
           <FeatureRow
             icon={<CalendarClock className="w-4 h-4" />}
             label="Booking flow"
