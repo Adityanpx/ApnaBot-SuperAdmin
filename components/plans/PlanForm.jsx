@@ -16,8 +16,9 @@ import { buildDurationOptions, moveItem } from '@/lib/planForm';
  *   form      object  — form state from emptyPlanForm() / planToForm()
  *   onChange  fn      — called with the updated form
  *   isEdit    boolean — Internal ID is read-only when true
+ *   broadcastError string — server message shown under the broadcast limit
  */
-export default function PlanForm({ form, onChange, isEdit = false }) {
+export default function PlanForm({ form, onChange, isEdit = false, broadcastError }) {
   const set = (field) => (e) => onChange({ ...form, [field]: e.target.value });
   const flip = (field) => (next) => onChange({ ...form, [field]: next });
 
@@ -55,29 +56,29 @@ export default function PlanForm({ form, onChange, isEdit = false }) {
 
       <DurationPricing form={form} onChange={onChange} />
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <Input label="Messages/mo" type="number" placeholder="0" min="0"
-          value={form.msgLimit} onChange={set('msgLimit')} />
-        <Input label="Chatbot Rules" type="number" placeholder="0" min="0"
-          value={form.ruleLimit} onChange={set('ruleLimit')} />
-        <Input label="Customers" type="number" placeholder="0" min="0"
-          value={form.customerLimit} onChange={set('customerLimit')} />
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <Input label="Messages/month" type="number" placeholder="0" step="1"
+          value={form.msgLimit} onChange={set('msgLimit')} helper="-1 = unlimited" />
+        <Input label="Broadcast recipients per broadcast" type="number" placeholder="100" step="1"
+          value={form.broadcastRecipientLimit} onChange={set('broadcastRecipientLimit')}
+          error={broadcastError}
+          helper="Whole number from 1, or -1 = unlimited" />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <Input label="Photos per reply" type="number" placeholder="1" min="1" max="10" step="1"
           value={form.imagesPerReply} onChange={set('imagesPerReply')} helper="1–10" />
-        <Input label="Carousel cards per reply" type="number" placeholder="3" min="2" max="10" step="1"
+        <Input label="Catalogue collections (cards per reply)" type="number" placeholder="3" min="2" max="10" step="1"
           value={form.carouselMaxCards} onChange={set('carouselMaxCards')}
           helper="Max swipe cards in one bot carousel reply" />
-        <Input label="Storage limit (MB)" type="number" placeholder="Default" min="0" step="1"
+        <Input label="Media storage (MB)" type="number" placeholder="Default" min="0" step="1"
           value={form.storageLimitMb} onChange={set('storageLimitMb')} />
         <Input label="Display order" type="number" placeholder="0" step="1"
           value={form.sortOrder} onChange={set('sortOrder')} helper="Lower shows first" />
       </div>
 
       {form.staffEnabled && (
-        <Input label="Max Staff Count" type="number" placeholder="e.g. 5" min="1"
+        <Input label="Staff accounts" type="number" placeholder="e.g. 5" min="1"
           value={form.maxStaff} onChange={set('maxStaff')} />
       )}
 
@@ -92,11 +93,9 @@ export default function PlanForm({ form, onChange, isEdit = false }) {
         <Toggle label="Popular badge" checked={form.isPopular} onChange={flip('isPopular')} />
         <Toggle label="Booking feature" checked={form.bookingEnabled}
           onChange={flip('bookingEnabled')} />
-        <Toggle label="Payment link feature" checked={form.paymentLinkEnabled}
-          onChange={flip('paymentLinkEnabled')} />
         <Toggle label="Staff management" checked={form.staffEnabled}
           onChange={flip('staffEnabled')} />
-        <Toggle label="Video in replies (16 MB)" checked={form.videoPerReply}
+        <Toggle label="Video per reply (16 MB)" checked={form.videoPerReply}
           onChange={flip('videoPerReply')} />
       </div>
     </div>

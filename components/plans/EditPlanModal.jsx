@@ -25,6 +25,7 @@ import {
 export default function EditPlanModal({ open, plan, onClose, onSuccess }) {
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState(emptyPlanForm);
+  const [broadcastError, setBroadcastError] = useState('');
   const [pending, setPending] = useState(null);
 
   useEffect(() => {
@@ -41,7 +42,9 @@ export default function EditPlanModal({ open, plan, onClose, onSuccess }) {
       onSuccess();
       onClose();
     } catch (err) {
-      toast.error(err.response?.data?.userMessage || 'Failed to update plan');
+      const message = err.userMessage || err.response?.data?.message || 'Failed to update plan';
+      if (/broadcastRecipientLimit/.test(message)) setBroadcastError(message);
+      else toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -69,7 +72,7 @@ export default function EditPlanModal({ open, plan, onClose, onSuccess }) {
         size="lg"
       >
         <form onSubmit={handleSubmit} className="space-y-4">
-          <PlanForm form={form} onChange={setForm} isEdit />
+          <PlanForm form={form} onChange={(next) => { setBroadcastError(''); setForm(next); }} broadcastError={broadcastError} isEdit />
           <div className="modal-actions">
             <Button type="button" variant="secondary" onClick={onClose}>
               Cancel

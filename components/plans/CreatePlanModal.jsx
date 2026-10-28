@@ -20,6 +20,7 @@ import { emptyPlanForm, validatePlanForm, formToPayload } from '@/lib/planForm';
 export default function CreatePlanModal({ open, onClose, onSuccess }) {
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState(emptyPlanForm);
+  const [broadcastError, setBroadcastError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -37,7 +38,9 @@ export default function CreatePlanModal({ open, onClose, onSuccess }) {
       onClose();
       setForm(emptyPlanForm());
     } catch (err) {
-      toast.error(err.response?.data?.userMessage || 'Failed to create plan');
+      const message = err.userMessage || err.response?.data?.message || 'Failed to create plan';
+      if (/broadcastRecipientLimit/.test(message)) setBroadcastError(message);
+      else toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -52,7 +55,7 @@ export default function CreatePlanModal({ open, onClose, onSuccess }) {
       size="lg"
     >
       <form onSubmit={handleSubmit} className="space-y-4">
-        <PlanForm form={form} onChange={setForm} />
+        <PlanForm form={form} onChange={(next) => { setBroadcastError(''); setForm(next); }} broadcastError={broadcastError} />
         <div className="modal-actions">
           <Button type="button" variant="secondary" onClick={onClose}>
             Cancel

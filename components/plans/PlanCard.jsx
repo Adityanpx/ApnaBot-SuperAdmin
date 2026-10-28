@@ -5,8 +5,8 @@ import { motion } from 'framer-motion';
 import {
   Edit2, Trash2,
   CheckCircle2, XCircle,
-  Users, Zap, MessageSquare,
-  BookOpen, CreditCard, Image, HardDrive,
+  Users, Send, MessageSquare,
+  BookOpen, Image, HardDrive,
 } from 'lucide-react';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
@@ -81,19 +81,14 @@ export default function PlanCard({ plan, onEdit, onDelete, delay = 0 }) {
           value={formatLimit(plan.msgLimit)}
         />
         <LimitRow
-          icon={Zap}
-          label="Chatbot rules"
-          value={formatLimit(plan.ruleLimit)}
-        />
-        <LimitRow
-          icon={Users}
-          label="Customers"
-          value={formatLimit(plan.customerLimit)}
+          icon={Send}
+          label="Broadcast recipients"
+          value={formatLimit(plan.broadcastRecipientLimit)}
         />
         {plan.staffEnabled && (
           <LimitRow
             icon={Users}
-            label="Max staff"
+            label="Staff accounts"
             value={`Up to ${plan.maxStaff}`}
           />
         )}
@@ -104,11 +99,11 @@ export default function PlanCard({ plan, onEdit, onDelete, delay = 0 }) {
         />
         <LimitRow
           icon={Image}
-          label="Carousel cards per reply"
+          label="Catalogue collections"
           value={`${plan.carouselMaxCards ?? 3} cards`}
         />
         {plan.storageLimitMb !== null && plan.storageLimitMb !== undefined && (
-          <LimitRow icon={HardDrive} label="Storage" value={`${plan.storageLimitMb} MB`} />
+          <LimitRow icon={HardDrive} label="Media storage" value={`${plan.storageLimitMb} MB`} />
         )}
       </div>
 
@@ -140,7 +135,6 @@ export default function PlanCard({ plan, onEdit, onDelete, delay = 0 }) {
       {/* Feature flags */}
       <div className="flex flex-wrap gap-2 pb-5 mb-5 border-b border-border-subtle">
         <FeaturePill icon={BookOpen}   label="Bookings" enabled={plan.bookingEnabled} />
-        <FeaturePill icon={CreditCard} label="Payments" enabled={plan.paymentLinkEnabled} />
         <FeaturePill icon={Users}      label="Staff"    enabled={plan.staffEnabled} />
       </div>
 

@@ -40,7 +40,7 @@ describe('PlanForm', () => {
   it('exposes popular, active, display order and storage limit', () => {
     const { container, unmount } = mount(<Harness />);
     const text = container.textContent;
-    ['Popular badge', 'Active (visible to customers)', 'Display order', 'Storage limit (MB)']
+    ['Popular badge', 'Active (visible to customers)', 'Display order', 'Media storage (MB)']
       .forEach((label) => expect(text).toContain(label));
     click(byLabel(container, 'Popular badge'));
     expect(latest.isPopular).toBe(true);
@@ -66,11 +66,20 @@ describe('PlanForm', () => {
     unmount();
   });
 
+  it('shows the broadcast limit and server error, and drops the legacy inputs', () => {
+    const { container, unmount } = mount(<PlanForm form={emptyPlanForm()} onChange={() => {}} broadcastError="nope" />);
+    const text = container.textContent;
+    ['Broadcast recipients per broadcast', 'nope', 'Messages/month', 'Media storage (MB)']
+      .forEach((label) => expect(text).toContain(label));
+    ['Chatbot Rules', 'Customers', 'Payment link'].forEach((label) => expect(text).not.toContain(label));
+    unmount();
+  });
+
   it('shows Max Staff only when staff management is on', () => {
     const { container, unmount } = mount(<Harness />);
-    expect(container.textContent).not.toContain('Max Staff Count');
+    expect(container.textContent).not.toContain('Staff accounts');
     click(byLabel(container, 'Staff management'));
-    expect(container.textContent).toContain('Max Staff Count');
+    expect(container.textContent).toContain('Staff accounts');
     unmount();
   });
 });

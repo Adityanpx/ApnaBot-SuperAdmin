@@ -26,7 +26,7 @@ describe('CreatePlanModal', () => {
     type(field(container, 'Display Name'), 'Gold');
     type(field(container, 'Monthly Price'), '200');
     type(field(container, 'Display order'), '3');
-    type(field(container, 'Storage limit'), '500');
+    type(field(container, 'Media storage'), '500');
     click(container.querySelector('[aria-label="Active (visible to customers)"]'));
     click(container.querySelector('[aria-label="Popular badge"]'));
     click(buttonByText(container, 'Create Plan'));
@@ -38,6 +38,20 @@ describe('CreatePlanModal', () => {
     });
     expect(payload.durationOptions.map((o) => o.price)).toEqual([200, 540, 960, 1680]);
     expect(onSuccess).toHaveBeenCalled();
+    unmount();
+  });
+
+  it('shows the server broadcast-limit message inline, not as a toast', async () => {
+    const message = 'broadcastRecipientLimit must be a whole number from 1, or -1 for unlimited';
+    api.post.mockRejectedValue({ userMessage: message });
+    const { container, unmount } = setup();
+    type(field(container, 'Internal ID'), 'gold');
+    type(field(container, 'Display Name'), 'Gold');
+    type(field(container, 'Monthly Price'), '200');
+    type(field(container, 'Broadcast recipients'), '50');
+    click(buttonByText(container, 'Create Plan'));
+    await flush();
+    expect(container.textContent).toContain(message);
     unmount();
   });
 
