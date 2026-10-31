@@ -16,7 +16,10 @@ import {
   User,
   Wifi,
   WifiOff,
+  MessageCircle,
 } from 'lucide-react';
+import CopyButton from '@/components/ui/CopyButton';
+import { ownerNameOf, ownerEmailOf, ownerPhoneOf, telLink, waLink } from '@/lib/ownerContact';
 
 function InfoRow({ icon, label, value }) {
   if (!value) return null;
@@ -35,6 +38,9 @@ function InfoRow({ icon, label, value }) {
 }
 
 export default function BusinessDetailCard({ business, staffCount }) {
+  const ownerName = ownerNameOf(business);
+  const ownerEmail = ownerEmailOf(business);
+  const ownerPhone = ownerPhoneOf(business);
   return (
     <div className="space-y-5">
 
@@ -105,15 +111,36 @@ export default function BusinessDetailCard({ business, staffCount }) {
               w-10 h-10 rounded-full flex items-center justify-center
               bg-gradient-brand text-white text-sm font-bold flex-shrink-0
             ">
-              {getInitials(business.ownerUserId.name)}
+              {getInitials(ownerName)}
             </div>
-            <div className="min-w-0">
-              <p className="text-sm font-semibold text-text-primary break-words">
-                {business.ownerUserId.name}
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold text-text-primary break-words flex items-center gap-1.5">
+                {ownerName || '-'}
+                <CopyButton value={ownerName} label="owner name" />
               </p>
               <p className="text-xs text-text-tertiary mt-0.5 flex items-center gap-1.5 break-all">
                 <Mail className="w-3 h-3 flex-shrink-0" />
-                {business.ownerUserId.email}
+                {ownerEmail || '-'}
+                <CopyButton value={ownerEmail} label="owner email" />
+              </p>
+              <p className="text-xs text-text-tertiary mt-0.5 flex items-center gap-1.5 break-all">
+                <Phone className="w-3 h-3 flex-shrink-0" />
+                {ownerPhone ? (
+                  <>
+                    <a href={telLink(ownerPhone)} className="hover:text-text-primary">{ownerPhone}</a>
+                    <a
+                      href={waLink(ownerPhone)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label="Open WhatsApp chat with owner"
+                      title="WhatsApp"
+                      className="text-success flex-shrink-0"
+                    >
+                      <MessageCircle className="w-3.5 h-3.5" />
+                    </a>
+                    <CopyButton value={ownerPhone} label="owner phone" />
+                  </>
+                ) : '-'}
               </p>
               {business.ownerUserId.lastLoginAt && (
                 <p className="text-xs text-text-tertiary mt-0.5 flex items-center gap-1.5">

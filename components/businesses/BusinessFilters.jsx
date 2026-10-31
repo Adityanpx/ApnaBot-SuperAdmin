@@ -83,7 +83,7 @@ export default function BusinessFilters({
           type="text"
           value={localSearch}
           onChange={(e) => setLocalSearch(e.target.value)}
-          placeholder="Search businesses or city…"
+          placeholder="Search business, city or owner phone…"
           className="input-field pl-10 pr-10 h-10"
         />
         {localSearch && (

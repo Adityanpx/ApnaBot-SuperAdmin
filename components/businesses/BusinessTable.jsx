@@ -4,7 +4,8 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { ExternalLink, ToggleLeft, ToggleRight, Trash2 } from 'lucide-react';
+import { ExternalLink, MessageCircle, ToggleLeft, ToggleRight, Trash2 } from 'lucide-react';
+import { ownerPhoneOf, telLink, waLink } from '@/lib/ownerContact';
 import Badge from '@/components/ui/Badge';
 import CopyId from '@/components/ui/CopyId';
 import RowMenu from '@/components/ui/RowMenu';
@@ -35,6 +36,28 @@ const TD = ({ children, className }) => (
     {children}
   </td>
 );
+
+/** Owner phone as a tap-to-call link plus a WhatsApp link; "-" when the owner has none. */
+function OwnerPhone({ phone, className }) {
+  if (!phone) return <span className="text-text-tertiary text-xs">-</span>;
+  return (
+    <span className={cn('inline-flex items-center gap-1.5', className)}>
+      <a href={telLink(phone)} className="text-text-secondary text-xs hover:text-text-primary whitespace-nowrap">
+        {phone}
+      </a>
+      <a
+        href={waLink(phone)}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Open WhatsApp chat with owner"
+        title="WhatsApp"
+        className="icon-btn !w-7 !h-7 max-md:!w-11 max-md:!h-11 text-success hover:bg-bg-subtle"
+      >
+        <MessageCircle className="w-3.5 h-3.5" />
+      </a>
+    </span>
+  );
+}
 
 /** Phone layout: one card per business; Activate / View / Delete live in the ⋯ sheet. */
 function BusinessCards({ businesses, loading, onToggle, onDelete }) {
@@ -101,6 +124,9 @@ function BusinessCards({ businesses, loading, onToggle, onDelete }) {
               </>
             ) : '—'}
           </CardField>
+          <CardField label="Owner phone">
+            <OwnerPhone phone={ownerPhoneOf(business)} className="justify-end" />
+          </CardField>
           <CardField label="Joined">{formatDate(business.createdAt)}</CardField>
           <CardField label="ID"><CopyId value={business._id} label="business ID" className="justify-end" /></CardField>
         </MobileCard>
@@ -125,6 +151,7 @@ export default function BusinessTable({ businesses, loading, onToggle, onDelete 
             <tr>
               <TH>Business</TH>
               <TH>Owner</TH>
+              <TH className="hidden lg:table-cell">Owner phone</TH>
               <TH className="hidden xl:table-cell">Type</TH>
               <TH className="hidden xl:table-cell">Joined</TH>
               <TH>Status</TH>
@@ -136,13 +163,13 @@ export default function BusinessTable({ businesses, loading, onToggle, onDelete 
           <tbody>
             {/* Loading skeleton rows */}
             {loading && Array.from({ length: 8 }).map((_, i) => (
-              <SkeletonTableRow key={i} cols={6} />
+              <SkeletonTableRow key={i} cols={7} />
             ))}
 
             {/* Empty state */}
             {!loading && businesses.length === 0 && (
               <tr>
-                <td colSpan={6}>
+                <td colSpan={7}>
                   <EmptyState
                     icon="🏪"
                     title="No businesses found"
@@ -205,6 +232,11 @@ export default function BusinessTable({ businesses, loading, onToggle, onDelete 
                   ) : (
                     <span className="text-text-tertiary text-xs">—</span>
                   )}
+                </TD>
+
+                {/* Owner phone */}
+                <TD className="hidden lg:table-cell">
+                  <OwnerPhone phone={ownerPhoneOf(business)} />
                 </TD>
 
                 {/* Business type */}
