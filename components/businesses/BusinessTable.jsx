@@ -4,8 +4,9 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { ExternalLink, MessageCircle, ToggleLeft, ToggleRight, Trash2 } from 'lucide-react';
-import { ownerPhoneOf, telLink, waLink } from '@/lib/ownerContact';
+import { ExternalLink, ToggleLeft, ToggleRight, Trash2 } from 'lucide-react';
+import { ownerPhoneOf } from '@/lib/ownerContact';
+import OwnerPhone from '@/components/businesses/OwnerPhone';
 import Badge from '@/components/ui/Badge';
 import CopyId from '@/components/ui/CopyId';
 import RowMenu from '@/components/ui/RowMenu';
@@ -36,28 +37,6 @@ const TD = ({ children, className }) => (
     {children}
   </td>
 );
-
-/** Owner phone as a tap-to-call link plus a WhatsApp link; "-" when the owner has none. */
-function OwnerPhone({ phone, className }) {
-  if (!phone) return <span className="text-text-tertiary text-xs">-</span>;
-  return (
-    <span className={cn('inline-flex items-center gap-1.5', className)}>
-      <a href={telLink(phone)} className="text-text-secondary text-xs hover:text-text-primary whitespace-nowrap">
-        {phone}
-      </a>
-      <a
-        href={waLink(phone)}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label="Open WhatsApp chat with owner"
-        title="WhatsApp"
-        className="icon-btn !w-7 !h-7 max-md:!w-11 max-md:!h-11 text-success hover:bg-bg-subtle"
-      >
-        <MessageCircle className="w-3.5 h-3.5" />
-      </a>
-    </span>
-  );
-}
 
 /** Phone layout: one card per business; Activate / View / Delete live in the ⋯ sheet. */
 function BusinessCards({ businesses, loading, onToggle, onDelete }) {

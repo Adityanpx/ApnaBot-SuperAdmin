@@ -9,7 +9,7 @@ import { toast } from 'sonner';
 import {
   LayoutDashboard, Store, CreditCard,
   FileText, LogOut, Bot, X, Car, Workflow, IndianRupee, FolderKanban, Library, Tag, MessageSquareCode, ClipboardList,
-  SlidersHorizontal, HardDrive, Smartphone, Gift, Inbox, Stethoscope,
+  SlidersHorizontal, HardDrive, Smartphone, Gift, Inbox, Stethoscope, UserX,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { NAV_ITEMS } from '@/lib/constants';
@@ -18,7 +18,7 @@ import useAuthStore  from '@/store/authStore';
 import useSidebar    from '@/hooks/useSidebar';
 import { useNewRequestCount } from '@/hooks/useNewRequestCount';
 
-const ICON_MAP = { LayoutDashboard, Store, CreditCard, FileText, Car, Workflow, IndianRupee, FolderKanban, Library, Tag, MessageSquareCode, ClipboardList, SlidersHorizontal, HardDrive, Smartphone, Gift, Inbox, Stethoscope };
+const ICON_MAP = { LayoutDashboard, Store, CreditCard, FileText, Car, Workflow, IndianRupee, FolderKanban, Library, Tag, MessageSquareCode, ClipboardList, SlidersHorizontal, HardDrive, Smartphone, Gift, Inbox, Stethoscope, UserX };
 
 export default function Sidebar() {
   const pathname              = usePathname();
