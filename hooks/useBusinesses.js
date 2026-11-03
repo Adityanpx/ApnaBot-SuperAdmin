@@ -5,6 +5,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
 import api from '@/lib/api';
 import { API } from '@/lib/constants';
+import { listParams } from '@/lib/businessList';
 
 // ── Deleted-row summary for the post-delete toast ───────────────────────────
 // Matches the `deleted` breakdown returned by DELETE /api/admin/businesses/:id
@@ -38,15 +39,13 @@ export function useBusinesses() {
   const [search,       setSearch]       = useState('');
   const [isActive,     setIsActive]     = useState('');
   const [businessType, setBusinessType] = useState('');
+  const [connected,    setConnected]    = useState('');   // '' | 'true' | 'false' (WhatsApp)
 
   // ── Fetch businesses ────────────────────────────────────────────────────
   const fetchBusinesses = useCallback(async () => {
     try {
       setLoading(true);
-      const params = { page, limit };
-      if (search)       params.search       = search;
-      if (isActive)     params.isActive     = isActive;
-      if (businessType) params.businessCategory = businessType;
+      const params = listParams({ page, limit, search, isActive, businessType, connected });
 
       const res = await api.get(API.BUSINESSES, { params });
       setBusinesses(res.data.data.businesses);
@@ -56,12 +55,13 @@ export function useBusinesses() {
     } finally {
       setLoading(false);
     }
-  }, [page, limit, search, isActive, businessType]);
+  }, [page, limit, search, isActive, businessType, connected]);
 
   // ── Reset to page 1 when filters change ─────────────────────────────────
   const handleSearchChange  = (val) => { setSearch(val);       setPage(1); };
   const handleActiveChange  = (val) => { setIsActive(val);     setPage(1); };
   const handleTypeChange    = (val) => { setBusinessType(val); setPage(1); };
+  const handleConnectedChange = (val) => { setConnected(val); setPage(1); };
   const handlePageChange    = (val) => setPage(val);
 
   // ── Toggle a business (optimistic update) ───────────────────────────────
@@ -110,9 +110,11 @@ export function useBusinesses() {
     search,
     isActive,
     businessType,
+    connected,
     handleSearchChange,
     handleActiveChange,
     handleTypeChange,
+    handleConnectedChange,
     handlePageChange,
     refetch: fetchBusinesses,
     toggleBusiness,

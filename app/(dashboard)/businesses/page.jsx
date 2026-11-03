@@ -2,12 +2,20 @@
 'use client';
 
 import { useState } from 'react';
+import { Download } from 'lucide-react';
+import { toast } from 'sonner';
 import { useBusinesses } from '@/hooks/useBusinesses';
+import { useCategorySummary } from '@/hooks/useCategorySummary';
 import BusinessFilters from '@/components/businesses/BusinessFilters';
 import BusinessTable from '@/components/businesses/BusinessTable';
+import CategorySummaryStrip from '@/components/businesses/CategorySummaryStrip';
 import DeleteBusinessModal from '@/components/businesses/DeleteBusinessModal';
 import Pagination from '@/components/ui/Pagination';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
+import Button from '@/components/ui/Button';
+import { API } from '@/lib/constants';
+import { downloadCsv } from '@/lib/downloadCsv';
+import { filterParams } from '@/lib/businessList';
 
 export default function BusinessesPage() {
   const {
@@ -19,9 +27,11 @@ export default function BusinessesPage() {
     search,
     isActive,
     businessType,
+    connected,
     handleSearchChange,
     handleActiveChange,
     handleTypeChange,
+    handleConnectedChange,
     handlePageChange,
     toggleBusiness,
     deleteBusiness,
@@ -29,26 +39,54 @@ export default function BusinessesPage() {
 
   const [deletingBusiness, setDeletingBusiness] = useState(null);
   const [togglingBusiness, setTogglingBusiness] = useState(null);
+  const [exporting, setExporting] = useState(false);
+  const summary = useCategorySummary();
+
+  // The CSV carries whatever filters the list is showing now (all pages)
+  const exportCsv = async () => {
+    setExporting(true);
+    try {
+      const params = filterParams({ search, isActive, businessType, connected });
+      await downloadCsv(API.BUSINESSES_CSV, params, 'businesses.csv');
+    } catch {
+      toast.error('Could not export the CSV');
+    } finally {
+      setExporting(false);
+    }
+  };
 
   return (
     <div className="space-y-6 max-w-screen-xl">
 
       {/* Page header */}
-      <div>
-        <h1 className="page-title">Business</h1>
-        <p className="text-sm text-text-secondary mt-1">
-          View, search, and manage all registered businesses on the platform.
-        </p>
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h1 className="page-title">Business</h1>
+          <p className="text-sm text-text-secondary mt-1">
+            View, search, and manage all registered businesses on the platform.
+          </p>
+        </div>
+        <Button variant="outline" icon={Download} loading={exporting} onClick={exportCsv}>Export CSV</Button>
       </div>
+
+      {/* Businesses per category; a chip filters the list */}
+      <CategorySummaryStrip
+        total={summary.total}
+        categories={summary.categories}
+        selected={businessType}
+        onSelect={handleTypeChange}
+      />
 
       {/* Filters */}
       <BusinessFilters
         search={search}
         isActive={isActive}
         businessType={businessType}
+        connected={connected}
         onSearchChange={handleSearchChange}
         onActiveChange={handleActiveChange}
         onTypeChange={handleTypeChange}
+        onConnectedChange={handleConnectedChange}
         totalBusinesses={pagination.total}
       />
 

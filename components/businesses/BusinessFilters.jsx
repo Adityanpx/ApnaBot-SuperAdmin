@@ -26,13 +26,21 @@ const STATUS_OPTIONS = [
   { value: 'false', label: 'Inactive' },
 ];
 
+const CONNECTED_OPTIONS = [
+  { value: '',      label: 'All WhatsApp' },
+  { value: 'true',  label: 'WhatsApp connected' },
+  { value: 'false', label: 'Not connected' },
+];
+
 export default function BusinessFilters({
   search,
   isActive,
   businessType,
+  connected = '',
   onSearchChange,
   onActiveChange,
   onTypeChange,
+  onConnectedChange = () => {},
   totalBusinesses,
 }) {
   const { categories } = useCategoryOptions();
@@ -43,19 +51,22 @@ export default function BusinessFilters({
   // Draft values inside the Filters sheet — applied only on "Apply"
   const [draftActive, setDraftActive] = useState(isActive);
   const [draftType, setDraftType] = useState(businessType);
-  const activeFilterCount = (isActive !== '' ? 1 : 0) + (businessType !== '' ? 1 : 0);
+  const [draftConnected, setDraftConnected] = useState(connected);
+  const activeFilterCount = (isActive !== '' ? 1 : 0) + (businessType !== '' ? 1 : 0) + (connected !== '' ? 1 : 0);
 
   const openSheet = () => {
     setDraftActive(isActive);
     setDraftType(businessType);
+    setDraftConnected(connected);
     setSheetOpen(true);
   };
   const applySheet = () => {
     if (draftActive !== isActive) onActiveChange(draftActive);
     if (draftType !== businessType) onTypeChange(draftType);
+    if (draftConnected !== connected) onConnectedChange(draftConnected);
     setSheetOpen(false);
   };
-  const resetSheet = () => { setDraftActive(''); setDraftType(''); };
+  const resetSheet = () => { setDraftActive(''); setDraftType(''); setDraftConnected(''); };
   const debouncedSearch = useDebounce(localSearch, 400);
 
   // Sync debounced value up to parent
@@ -83,7 +94,7 @@ export default function BusinessFilters({
           type="text"
           value={localSearch}
           onChange={(e) => setLocalSearch(e.target.value)}
-          placeholder="Search business, city or owner phone…"
+          placeholder="Search business, city or owner…"
           className="input-field pl-10 pr-10 h-10"
         />
         {localSearch && (
@@ -139,6 +150,7 @@ export default function BusinessFilters({
                 value={draftType}
                 onChange={(e) => setDraftType(e.target.value)}
               />
+              <Select label="WhatsApp" placeholder={null} options={CONNECTED_OPTIONS} value={draftConnected} onChange={(e) => setDraftConnected(e.target.value)} />
             </div>
           </Modal>
         </>
@@ -171,6 +183,22 @@ export default function BusinessFilters({
             {TYPE_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value} className="bg-bg-overlay">
                 {opt.emoji ? `${opt.emoji} ` : ''}{opt.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* WhatsApp connected filter */}
+        <div className="relative">
+          <select
+            value={connected}
+            onChange={(e) => onConnectedChange(e.target.value)}
+            aria-label="WhatsApp connection"
+            className={selectClass}
+          >
+            {CONNECTED_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value} className="bg-bg-overlay">
+                {opt.label}
               </option>
             ))}
           </select>

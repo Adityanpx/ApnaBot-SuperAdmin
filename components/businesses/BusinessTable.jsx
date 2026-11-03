@@ -6,6 +6,8 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { ExternalLink, ToggleLeft, ToggleRight, Trash2 } from 'lucide-react';
 import { ownerPhoneOf } from '@/lib/ownerContact';
+import { categoryDetail, planText, subscriptionText } from '@/lib/businessList';
+import { useCategoryOptions } from '@/hooks/useCategoryOptions';
 import OwnerPhone from '@/components/businesses/OwnerPhone';
 import Badge from '@/components/ui/Badge';
 import CopyId from '@/components/ui/CopyId';
@@ -20,6 +22,7 @@ import {
   formatDate,
   getBusinessEmoji,
   formatRelative,
+  getSubStatusVariant,
   cn,
 } from '@/lib/utils';
 
@@ -38,9 +41,32 @@ const TD = ({ children, className }) => (
   </td>
 );
 
+const WhatsappBadge = ({ connected }) => (
+  <Badge variant={connected ? 'success' : 'neutral'}>{connected ? 'Connected' : 'Not connected'}</Badge>
+);
+
+/** Subscription status badge, or "-" when the business has no active / trial subscription. */
+const SubscriptionBadge = ({ business }) => (
+  business.subscriptionStatus
+    ? <Badge variant={getSubStatusVariant(business.subscriptionStatus)}>{subscriptionText(business)}</Badge>
+    : <span className="text-text-tertiary text-xs">-</span>
+);
+
+/** The category, with the typed-in category (general) or the sub-categories (multi_brand) under it. */
+function CategoryCell({ business, labelOf }) {
+  const detail = categoryDetail(business, labelOf);
+  return (
+    <>
+      {capitalize(business.businessCategory)}
+      {detail && <span className="block text-xs text-text-tertiary break-words">{detail}</span>}
+    </>
+  );
+}
+
 /** Phone layout: one card per business; Activate / View / Delete live in the ⋯ sheet. */
 function BusinessCards({ businesses, loading, onToggle, onDelete }) {
   const router = useRouter();
+  const { labelOf } = useCategoryOptions();
   return (
     <MobileCardList
       loading={loading}
@@ -93,7 +119,7 @@ function BusinessCards({ businesses, loading, onToggle, onDelete }) {
           )}
         >
           <CardField label="Type">
-            {capitalize(business.businessCategory)}
+            <CategoryCell business={business} labelOf={labelOf} />
           </CardField>
           <CardField label="Owner">
             {business.ownerUserId ? (
@@ -106,6 +132,9 @@ function BusinessCards({ businesses, loading, onToggle, onDelete }) {
           <CardField label="Owner phone">
             <OwnerPhone phone={ownerPhoneOf(business)} className="justify-end" />
           </CardField>
+          <CardField label="WhatsApp"><WhatsappBadge connected={!!business.isWhatsappConnected} /></CardField>
+          <CardField label="Plan">{planText(business)}</CardField>
+          <CardField label="Subscription"><SubscriptionBadge business={business} /></CardField>
           <CardField label="Joined">{formatDate(business.createdAt)}</CardField>
           <CardField label="ID"><CopyId value={business._id} label="business ID" className="justify-end" /></CardField>
         </MobileCard>
@@ -116,6 +145,7 @@ function BusinessCards({ businesses, loading, onToggle, onDelete }) {
 
 export default function BusinessTable({ businesses, loading, onToggle, onDelete }) {
   const isMobile = useIsMobile();
+  const { labelOf } = useCategoryOptions();
   if (isMobile) {
     return <BusinessCards businesses={businesses} loading={loading} onToggle={onToggle} onDelete={onDelete} />;
   }
@@ -132,6 +162,9 @@ export default function BusinessTable({ businesses, loading, onToggle, onDelete 
               <TH>Owner</TH>
               <TH className="hidden lg:table-cell">Owner phone</TH>
               <TH className="hidden xl:table-cell">Type</TH>
+              <TH className="hidden lg:table-cell">WhatsApp</TH>
+              <TH className="hidden xl:table-cell">Plan</TH>
+              <TH className="hidden xl:table-cell">Subscription</TH>
               <TH className="hidden xl:table-cell">Joined</TH>
               <TH>Status</TH>
               <TH className="text-right">Actions</TH>
@@ -142,13 +175,13 @@ export default function BusinessTable({ businesses, loading, onToggle, onDelete 
           <tbody>
             {/* Loading skeleton rows */}
             {loading && Array.from({ length: 8 }).map((_, i) => (
-              <SkeletonTableRow key={i} cols={7} />
+              <SkeletonTableRow key={i} cols={10} />
             ))}
 
             {/* Empty state */}
             {!loading && businesses.length === 0 && (
               <tr>
-                <td colSpan={7}>
+                <td colSpan={10}>
                   <EmptyState
                     icon="🏪"
                     title="No businesses found"
@@ -222,8 +255,23 @@ export default function BusinessTable({ businesses, loading, onToggle, onDelete 
                 <TD className="hidden xl:table-cell">
                   <span className="text-text-secondary text-xs">
                     {getBusinessEmoji(business.businessCategory)}{' '}
-                    {capitalize(business.businessCategory)}
+                    <CategoryCell business={business} labelOf={labelOf} />
                   </span>
+                </TD>
+
+                {/* WhatsApp connection */}
+                <TD className="hidden lg:table-cell">
+                  <WhatsappBadge connected={!!business.isWhatsappConnected} />
+                </TD>
+
+                {/* Plan */}
+                <TD className="hidden xl:table-cell">
+                  <span className="text-text-secondary text-xs">{planText(business)}</span>
+                </TD>
+
+                {/* Subscription status */}
+                <TD className="hidden xl:table-cell">
+                  <SubscriptionBadge business={business} />
                 </TD>
 
                 {/* Date joined */}
