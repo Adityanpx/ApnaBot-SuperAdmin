@@ -34,10 +34,12 @@ const setup = () => mount(<BusinessTable businesses={businesses} loading={false}
 describe('BusinessTable', () => {
   beforeEach(() => { mockMobile = false; });
 
-  it('has WhatsApp, Plan and Subscription columns', () => {
+  it('has WhatsApp and Plan columns, and no separate Subscription column', () => {
     const { container, unmount } = setup();
     const heads = [...container.querySelectorAll('thead th')].map((th) => th.textContent);
-    expect(heads).toEqual(expect.arrayContaining(['WhatsApp', 'Plan', 'Subscription']));
+    expect(heads).toEqual(expect.arrayContaining(['WhatsApp', 'Plan', 'Created', 'Actions']));
+    expect(heads).not.toContain('Subscription');
+    expect(heads).toHaveLength(9);
     unmount();
   });
 
@@ -51,11 +53,11 @@ describe('BusinessTable', () => {
     unmount();
   });
 
-  it('shows "-" for plan and subscription when there is no live subscription', () => {
+  it('shows "-" for the plan when there is no live subscription', () => {
     const { container, unmount } = setup();
     const cells = [...container.querySelectorAll('tbody tr')[1].querySelectorAll('td')].map((td) => td.textContent);
     expect(cells).toContain('Not connected');
-    expect(cells.filter((t) => t === '-')).toHaveLength(2);
+    expect(cells.filter((t) => t === '-')).toHaveLength(1);
     unmount();
   });
 

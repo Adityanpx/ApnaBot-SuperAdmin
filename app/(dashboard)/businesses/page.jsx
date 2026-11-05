@@ -56,7 +56,7 @@ export default function BusinessesPage() {
   };
 
   return (
-    <div className="space-y-6 max-w-screen-xl">
+    <div className="space-y-6 min-w-0 lg:-mx-2">
 
       {/* Page header */}
       <div className="flex items-start justify-between gap-3">

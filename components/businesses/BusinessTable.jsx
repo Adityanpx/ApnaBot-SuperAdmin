@@ -28,7 +28,7 @@ import {
 
 const TH = ({ children, className }) => (
   <th className={cn(
-    'px-3 xl:px-4 py-3 text-left text-xs font-semibold text-text-tertiary uppercase tracking-wider',
+    'px-2.5 py-3 text-left text-xs font-semibold text-text-tertiary uppercase tracking-wider whitespace-nowrap',
     className
   )}>
     {children}
@@ -36,10 +36,13 @@ const TH = ({ children, className }) => (
 );
 
 const TD = ({ children, className }) => (
-  <td className={cn('px-3 xl:px-4 py-4 text-sm', className)}>
+  <td className={cn('px-2.5 py-3 text-sm', className)}>
     {children}
   </td>
 );
+
+// Sticky last column: opaque (also on row hover) so scrolled cells never show through
+const STICKY_EDGE = 'sticky right-0 z-10 border-l border-border shadow-[-8px_0_8px_-8px_rgba(0,0,0,0.25)]';
 
 const WhatsappBadge = ({ connected }) => (
   <Badge variant={connected ? 'success' : 'neutral'}>{connected ? 'Connected' : 'Not connected'}</Badge>
@@ -153,21 +156,31 @@ export default function BusinessTable({ businesses, loading, onToggle, onDelete 
   return (
     <div className="card overflow-hidden">
       <div className="overflow-x-auto">
-        <table className="w-full">
+        <table className="w-full min-w-[1040px] table-fixed">
+          <colgroup>
+            <col />
+            <col />
+            <col className="w-[140px]" />
+            <col className="w-[100px]" />
+            <col className="w-[110px]" />
+            <col className="w-[110px]" />
+            <col className="w-[90px]" />
+            <col className="w-[90px]" />
+            <col className="w-[116px]" />
+          </colgroup>
 
           {/* Head */}
-          <thead className="border-b border-border bg-bg-subtle/50">
+          <thead className="border-b border-border bg-bg-overlay">
             <tr>
               <TH>Business</TH>
               <TH>Owner</TH>
-              <TH className="hidden lg:table-cell">Owner phone</TH>
-              <TH className="hidden xl:table-cell">Type</TH>
-              <TH className="hidden lg:table-cell">WhatsApp</TH>
-              <TH className="hidden xl:table-cell">Plan</TH>
-              <TH className="hidden xl:table-cell">Subscription</TH>
-              <TH className="hidden xl:table-cell">Joined</TH>
+              <TH>Owner phone</TH>
+              <TH>Category</TH>
+              <TH>WhatsApp</TH>
+              <TH>Plan</TH>
+              <TH>Created</TH>
               <TH>Status</TH>
-              <TH className="text-right">Actions</TH>
+              <TH className={cn('text-right bg-bg-overlay', STICKY_EDGE)}>Actions</TH>
             </tr>
           </thead>
 
@@ -175,13 +188,13 @@ export default function BusinessTable({ businesses, loading, onToggle, onDelete 
           <tbody>
             {/* Loading skeleton rows */}
             {loading && Array.from({ length: 8 }).map((_, i) => (
-              <SkeletonTableRow key={i} cols={10} />
+              <SkeletonTableRow key={i} cols={9} />
             ))}
 
             {/* Empty state */}
             {!loading && businesses.length === 0 && (
               <tr>
-                <td colSpan={10}>
+                <td colSpan={9}>
                   <EmptyState
                     icon="🏪"
                     title="No businesses found"
@@ -198,23 +211,23 @@ export default function BusinessTable({ businesses, loading, onToggle, onDelete 
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: i * 0.03, duration: 0.25 }}
-                className="table-row"
+                className="table-row group"
               >
                 {/* Business name + city */}
                 <TD>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2.5 min-w-0">
                     <div className="
-                      w-9 h-9 rounded-xl flex items-center justify-center
+                      w-8 h-8 rounded-xl flex items-center justify-center
                       bg-bg-subtle text-base flex-shrink-0
                     ">
                       {getBusinessEmoji(business.businessCategory)}
                     </div>
-                    <div className="min-w-0">
-                      <p className="font-semibold text-text-primary truncate max-w-[180px]">
+                    <div className="min-w-0 flex-1">
+                      <p className="font-semibold text-text-primary truncate" title={business.name}>
                         {business.name}
                       </p>
                       {business.city && (
-                        <p className="text-xs text-text-tertiary mt-0.5">
+                        <p className="text-xs text-text-tertiary mt-0.5 truncate" title={business.city}>
                           📍 {business.city}
                         </p>
                       )}
@@ -225,18 +238,18 @@ export default function BusinessTable({ businesses, loading, onToggle, onDelete 
                 {/* Owner */}
                 <TD>
                   {business.ownerUserId ? (
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 min-w-0">
                       <div className="
                         w-7 h-7 rounded-full flex items-center justify-center
                         bg-gradient-brand text-white text-xs font-bold flex-shrink-0
                       ">
                         {getInitials(business.ownerUserId.name)}
                       </div>
-                      <div className="min-w-0">
-                        <p className="text-text-primary text-xs font-medium truncate max-w-[130px]">
+                      <div className="min-w-0 flex-1">
+                        <p className="text-text-primary text-xs font-medium truncate" title={business.ownerUserId.name}>
                           {business.ownerUserId.name}
                         </p>
-                        <p className="text-text-tertiary text-[11px] truncate max-w-[130px]">
+                        <p className="text-text-tertiary text-[11px] truncate" title={business.ownerUserId.email}>
                           {business.ownerUserId.email}
                         </p>
                       </div>
@@ -247,36 +260,35 @@ export default function BusinessTable({ businesses, loading, onToggle, onDelete 
                 </TD>
 
                 {/* Owner phone */}
-                <TD className="hidden lg:table-cell">
+                <TD className="whitespace-nowrap">
                   <OwnerPhone phone={ownerPhoneOf(business)} />
                 </TD>
 
                 {/* Business type */}
-                <TD className="hidden xl:table-cell">
-                  <span className="text-text-secondary text-xs">
-                    {getBusinessEmoji(business.businessCategory)}{' '}
+                <TD>
+                  <div className="text-text-secondary text-xs min-w-0">
                     <CategoryCell business={business} labelOf={labelOf} />
-                  </span>
+                  </div>
                 </TD>
 
                 {/* WhatsApp connection */}
-                <TD className="hidden lg:table-cell">
+                <TD>
                   <WhatsappBadge connected={!!business.isWhatsappConnected} />
                 </TD>
 
-                {/* Plan */}
-                <TD className="hidden xl:table-cell">
-                  <span className="text-text-secondary text-xs">{planText(business)}</span>
+                {/* Plan + its subscription status */}
+                <TD>
+                  <div className="flex flex-col items-start gap-1 min-w-0 max-w-full">
+                    <span className="text-text-secondary text-xs truncate max-w-full" title={planText(business)}>
+                      {planText(business)}
+                    </span>
+                    {business.subscriptionStatus && <SubscriptionBadge business={business} />}
+                  </div>
                 </TD>
 
-                {/* Subscription status */}
-                <TD className="hidden xl:table-cell">
-                  <SubscriptionBadge business={business} />
-                </TD>
-
-                {/* Date joined */}
-                <TD className="hidden xl:table-cell">
-                  <span className="text-text-tertiary text-xs">
+                {/* Date created */}
+                <TD>
+                  <span className="text-text-tertiary text-xs whitespace-nowrap">
                     {formatDate(business.createdAt)}
                   </span>
                 </TD>
@@ -291,19 +303,20 @@ export default function BusinessTable({ businesses, loading, onToggle, onDelete 
                   </Badge>
                 </TD>
 
-                {/* Actions */}
-                <TD className="text-right">
+                {/* Actions (sticky, always visible) */}
+                <TD className={cn(
+                  'text-right bg-bg-raised group-hover:bg-bg-subtle transition-colors duration-150',
+                  STICKY_EDGE
+                )}>
                   <div className="flex items-center justify-end gap-1">
 
                     {/* Toggle active/inactive */}
                     <button
+                      type="button"
                       onClick={() => onToggle(business)}
                       title={business.isActive ? 'Deactivate business' : 'Activate business'}
-                      className="
-                        icon-btn
-                        text-text-tertiary hover:text-text-primary hover:bg-bg-subtle
-                        transition-colors duration-150
-                      "
+                      aria-label={business.isActive ? `Deactivate ${business.name}` : `Activate ${business.name}`}
+                      className="icon-btn text-text-tertiary hover:text-text-primary hover:bg-bg-overlay transition-colors duration-150"
                     >
                       {business.isActive
                         ? <ToggleRight className="w-4 h-4 text-success" />
@@ -312,28 +325,22 @@ export default function BusinessTable({ businesses, loading, onToggle, onDelete 
                     </button>
 
                     {/* View detail */}
-                    <Link href={`/businesses/${business._id}`}>
-                      <button
-                        title="View business details"
-                        className="
-                          icon-btn
-                          text-text-tertiary hover:text-text-primary hover:bg-bg-subtle
-                          transition-colors duration-150
-                        "
-                      >
-                        <ExternalLink className="w-3.5 h-3.5" />
-                      </button>
+                    <Link
+                      href={`/businesses/${business._id}`}
+                      title="View business details"
+                      aria-label={`View details of ${business.name}`}
+                      className="icon-btn text-text-tertiary hover:text-text-primary hover:bg-bg-overlay transition-colors duration-150"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
                     </Link>
 
                     {/* Delete */}
                     <button
+                      type="button"
                       onClick={() => onDelete(business)}
                       title="Delete business"
-                      className="
-                        icon-btn
-                        text-text-tertiary hover:text-danger-text hover:bg-danger-bg
-                        transition-colors duration-150
-                      "
+                      aria-label={`Delete ${business.name}`}
+                      className="icon-btn text-text-tertiary hover:text-danger-text hover:bg-danger-bg transition-colors duration-150"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
