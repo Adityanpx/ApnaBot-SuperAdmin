@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 import api from '@/lib/api';
 import { API } from '@/lib/constants';
 import {
-  DEFAULT_KEYWORD, canEnable, enableBody, isProtected, isQuoteCategory, requiredAcknowledgement, sortedItems, switchError,
+  DEFAULT_KEYWORD, canEnable, enableBody, installStatus, isProtected, isQuoteCategory, requiredAcknowledgement, sortedItems, switchError,
 } from '@/lib/quoteFlow';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
@@ -68,7 +68,9 @@ export default function BusinessQuoteFlowCard({ businessId, businessName, catego
   };
 
   const protectedBusiness = isProtected(readiness);
-  const installed = readiness?.installed?.state === 'installed';
+  const status = installStatus(readiness);
+  const installed = status.state === 'installed';
+  const hasSteps = status.hasSteps; // installed or dormant: the quote steps exist, so Disable can remove them
   const acknowledgement = readiness ? requiredAcknowledgement(readiness) : null;
 
   return (
@@ -81,7 +83,12 @@ export default function BusinessQuoteFlowCard({ businessId, businessName, catego
             adds the quote steps to its WhatsApp bot (nothing existing is changed); Disable removes them.
           </p>
         </div>
-        {readiness && <Badge variant={readiness.enabled ? 'success' : 'neutral'}>{readiness.enabled ? 'On' : 'Off'}</Badge>}
+        {readiness && (
+          <div className="flex flex-shrink-0 flex-wrap justify-end gap-1.5">
+            <Badge variant={readiness.enabled ? 'success' : 'neutral'}>{readiness.enabled ? 'On' : 'Off'}</Badge>
+            <Badge variant={status.variant}>{status.label}</Badge>
+          </div>
+        )}
       </div>
 
       {loadError && (
@@ -147,7 +154,7 @@ export default function BusinessQuoteFlowCard({ businessId, businessName, catego
                   Enable quote flow
                 </Button>
               )}
-              {(readiness.enabled || installed) && (
+              {(readiness.enabled || hasSteps) && (
                 <Button variant="danger" size="sm" onClick={() => setConfirm('disable')}>Disable quote flow</Button>
               )}
             </div>
