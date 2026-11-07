@@ -68,7 +68,12 @@ export default function LoginPage() {
       // triggers it without a second, competing replace() here.
 
     } catch (err) {
-      toast.error(err.userMessage || 'Login failed. Check your credentials.');
+      // Generic on purpose: never reveal which part of the login was wrong.
+      toast.error(
+        err.response?.status === 429
+          ? 'Too many attempts. Please wait a few minutes and try again.'
+          : 'Login failed. Check your credentials.'
+      );
     } finally {
       setLoading(false);
     }
